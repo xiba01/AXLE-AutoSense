@@ -1,0 +1,324 @@
+{
+    "story_id": "story_prius_prime_2024_demo",
+    "car_id": "car_toyota_001",
+    "title": "The Dual Nature",
+    "meta": {
+        "schema_version": "1.0.0",
+        "template": "cinematic",
+        "theme_color": "#FF3B30",
+        "language": "en",
+        "generated_at": "2025-12-20T12:00:00Z"
+    },
+    "scenes": [
+        {
+            "id": "scene_00",
+            "type": "intro_view",
+            "order": 1,
+            "intro_content": {
+                "title": "The Dual Nature",
+                "background_image": "/assets/images/intro_image.jpg",
+                "subtitle": "2024 Toyota Prius Prime",
+                "brand_logo": "/assets/logos/toyota_white.png",
+                "start_button_label": "Start Experience"
+            }
+        },
+        {
+            "id": "scene_01",
+            "type": "slide_view",
+            "order": 2,
+            "image_url": "/assets/images/scene_01_garage.jpg",
+            "audio_url": "/assets/audio/scene_01_silent_start.mp3",
+            "layout": {
+                "composition": "split-image-right",
+                "content_alignment": "top-left",
+                "image_focus": "center-right",
+                "safe_area": "left",
+                "motion": {
+                    "image": "slow-zoom-in",
+                    "content": "fade-up"
+                }
+            },
+            "slide_content": {
+                "theme_tag": "EFFICIENCY",
+                "headline": "The Silent Start",
+                "badges": [
+                    {
+                        "label": "Green Choice",
+                        "icon": "leaf",
+                        "color": "green"
+                    },
+                    {
+                        "label": "Tax Credit",
+                        "icon": "dollar-sign",
+                        "color": "blue"
+                    }
+                ],
+                "paragraph": "With a fully charged battery, the Prius Prime operates as a pure EV. The 13.6 kWh battery pack sits low in the chassis, providing stability and silence for your morning commute.",
+                "key_stats": [
+                    {
+                        "label": "EV Range",
+                        "value": "44",
+                        "unit": "mi"
+                    },
+                    {
+                        "label": "Efficiency",
+                        "value": "127",
+                        "unit": "MPGe"
+                    },
+                    {
+                        "label": "Charge Time",
+                        "value": "4",
+                        "unit": "hrs"
+                    }
+                ]
+            },
+            "hotspots": [
+                {
+                    "id": "hs_1",
+                    "x": 48.5,
+                    "y": 49.2,
+                    "icon": "plug",
+                    "label": "Charging Port",
+                    "hover_content": {
+                        "title": "J1772 Connector",
+                        "body": "Standard charging port compatible with all public Level 2 stations and home outlets."
+                    }
+                },
+                {
+                    "id": "hs_2",
+                    "x": 59.0,
+                    "y": 80.1,
+                    "icon": "battery",
+                    "label": "Lithium-Ion Pack",
+                    "hover_content": {
+                        "title": "13.6 kWh Capacity",
+                        "body": "Located under the rear seat to maximize cargo space while lowering the center of gravity."
+                    }
+                }
+            ],
+            "subtitles": [
+                {
+                    "text": "Imagine a morning where the engine never wakes up",
+                    "start": 0.0,
+                    "end": 3.62
+                },
+                {
+                    "text": "With 44 miles of pure electric range",
+                    "start": 3.62,
+                    "end": 6.7
+                },
+                {
+                    "text": "Your daily commute is silent, zero emission, and practically free",
+                    "start": 6.7,
+                    "end": 11.5
+                }
+            ]
+        },
+        {
+            "id": "scene_02",
+            "type": "slide_view",
+            "order": 3,
+            "image_url": "/assets/images/scene_02_highway.jpg",
+            "audio_url": "/assets/audio/scene_02_power.mp3",
+            "layout": {
+                "composition": "full-bleed",
+                "content_alignment": "middle-left",
+                "image_focus": "center-right",
+                "safe_area": "left",
+                "motion": {
+                    "image": "subtle-pan-right",
+                    "content": "slide-in-left"
+                }
+            },
+            "slide_content": {
+                "theme_tag": "PERFORMANCE",
+                "headline": "Unleashed Power",
+                "badges": [
+                    {
+                        "label": "Most Powerful Prius Ever",
+                        "icon": "trophy",
+                        "color": "gold"
+                    },
+                    {
+                        "label": "Sport Tuned",
+                        "icon": "gauge",
+                        "color": "red"
+                    }
+                ],
+                "paragraph": "The new 2.0L Hybrid powertrain delivers a 100 horsepower increase over the previous generation, merging efficiency with genuine sport-sedan acceleration.",
+                "key_stats": [
+                    {
+                        "label": "Horsepower",
+                        "value": "220",
+                        "unit": "HP"
+                    },
+                    {
+                        "label": "0-60 MPH",
+                        "value": "6.6",
+                        "unit": "Sec"
+                    },
+                    {
+                        "label": "Engine",
+                        "value": "2.0",
+                        "unit": "L"
+                    }
+                ]
+            },
+            "hotspots": [
+                {
+                    "id": "hs_3",
+                    "x": 52.3,
+                    "y": 51.5,
+                    "icon": "zap",
+                    "label": "Hybrid Powertrain",
+                    "hover_content": {
+                        "title": "Hybrid Synergy Drive",
+                        "body": "Seamlessly switches between the electric motors and gas engine for max power."
+                    }
+                },
+                {
+                    "id": "hs_4",
+                    "x": 55.8,
+                    "y": 68.5,
+                    "icon": "wind",
+                    "label": "Aerodynamics",
+                    "hover_content": {
+                        "title": "Active Grille Shutters",
+                        "body": "Automatically close at high speeds to reduce wind resistance and improve MPG."
+                    }
+                }
+            ],
+            "subtitles": [
+                {
+                    "text": "But when the highway opens up, the hybrid system roars to life",
+                    "start": 0.0,
+                    "end": 5.07
+                },
+                {
+                    "text": "220 horsepower, 0 to 60 in just 6.6 seconds",
+                    "start": 5.07,
+                    "end": 10.64
+                },
+                {
+                    "text": "This isn't just efficient, it's genuinely fast",
+                    "start": 10.64,
+                    "end": 14.52
+                }
+            ]
+        },
+        {
+            "id": "scene_03",
+            "type": "slide_view",
+            "order": 4,
+            "image_url": "/assets/images/scene_03_interior.jpg",
+            "audio_url": "/assets/audio/scene_03_safety.mp3",
+            "layout": {
+                "composition": "overlay-bottom",
+                "content_alignment": "bottom-left",
+                "image_focus": "center",
+                "safe_area": "bottom-left",
+                "motion": {
+                    "image": "slow-zoom-out",
+                    "content": "fade-up"
+                }
+            },
+            "slide_content": {
+                "theme_tag": "SAFETY",
+                "headline": "Guardian Angel",
+                "badges": [
+                    {
+                        "label": "TSS 3.0 Standard",
+                        "icon": "shield-check",
+                        "color": "blue"
+                    },
+                    {
+                        "label": "IIHS Top Safety Pick",
+                        "icon": "star",
+                        "color": "gold"
+                    }
+                ],
+                "paragraph": "Toyota Safety Sense 3.0 comes standard, using a network of cameras and radar to detect danger before you do, keeping you and your family safe in every condition.",
+                "key_stats": [
+                    {
+                        "label": "Airbags",
+                        "value": "8",
+                        "unit": "Count"
+                    },
+                    {
+                        "label": "Sensors",
+                        "value": "12",
+                        "unit": "Active"
+                    },
+                    {
+                        "label": "Auto-Brake",
+                        "value": "Yes",
+                        "unit": "Std"
+                    }
+                ]
+            },
+            "hotspots": [
+                {
+                    "id": "hs_5",
+                    "x": 55.8,
+                    "y": 13.0,
+                    "icon": "eye",
+                    "label": "Pre-Collision",
+                    "hover_content": {
+                        "title": "Pedestrian Detection",
+                        "body": "Detects pedestrians, cyclists, and motorcyclists—even at night."
+                    }
+                },
+                {
+                    "id": "hs_6",
+                    "x": 20.9,
+                    "y": 39.4,
+                    "icon": "steering-wheel",
+                    "label": "Lane Tracing",
+                    "hover_content": {
+                        "title": "Lane Tracing Assist",
+                        "body": "Keeps the vehicle centered in its lane using gentle steering inputs."
+                    }
+                }
+            ],
+            "subtitles": [
+                {
+                    "text": "And through every curve, you are watched over",
+                    "start": 0.0,
+                    "end": 3.6
+                },
+                {
+                    "text": "Traffic Jam Assist handles the gridlock",
+                    "start": 3.6,
+                    "end": 6.28
+                },
+                {
+                    "text": "While Proactive Driving Assist gently brakes for pedestrians automatically",
+                    "start": 6.28,
+                    "end": 12.27
+                }
+            ]
+        },
+        {
+            "id": "scene_05",
+            "type": "outro_view",
+            "order": 5,
+            "image_url": "/assets/images/scene_04_hero.jpg",
+            "outro_content": {
+                "headline": "Experience the Prime",
+                "subheadline": "Ready to get behind the wheel?",
+                "cta_buttons": [
+                    {
+                        "label": "Book Test Drive",
+                        "action": "OPEN_LEAD_FORM",
+                        "style": "primary"
+                    },
+                    {
+                        "label": "Replay Story",
+                        "action": "REPLAY_STORY",
+                        "style": "secondary"
+                    }
+                ]
+            }
+        }
+    ]
+}

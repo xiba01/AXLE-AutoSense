@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-noir-900 text-chrome-300 font-sans antialiased tracking-wide;
+  }
+}
+
+/* Chrome Gradient Utility */
+.chrome-border {
+  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(160,160,160,1) 50%, rgba(80,80,80,1) 100%);
+}
+
+.chrome-text {
+    background: linear-gradient(to bottom, #ffffff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
