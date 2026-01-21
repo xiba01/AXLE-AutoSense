@@ -6,13 +6,18 @@ import { StoryData } from '../types';
 // Let's import directly to keep it simple as per requirements.
 import storyJson from '../data/dummy_story.json';
 
-const data = storyJson as StoryData;
+// const data = storyJson as StoryData; // Moved to state
 
 interface StoryState {
+    storyData: StoryData;
     currentSceneIndex: number;
     isPlaying: boolean;
     activeHotspotId: string | null;
+
     audioCurrentTime: number;
+    themeConfig: {
+        cardStyle: 'liquid' | 'glass';
+    };
 
     // Actions
     nextScene: () => void;
@@ -21,21 +26,27 @@ interface StoryState {
     setActiveHotspot: (id: string | null) => void;
     setIsPlaying: (playing: boolean) => void;
     setAudioCurrentTime: (time: number) => void;
+    updateStoryData: (data: StoryData) => void;
+    setCardStyle: (style: 'liquid' | 'glass') => void;
 
     // Getters
-    getCurrentScene: () => typeof data.scenes[0];
+    getCurrentScene: () => StoryData['scenes'][0];
     getSceneCount: () => number;
 }
 
 export const useStoryStore = create<StoryState>((set, get) => ({
+    storyData: storyJson as StoryData,
     currentSceneIndex: 0,
     isPlaying: false,
     activeHotspotId: null,
     audioCurrentTime: 0,
+    themeConfig: {
+        cardStyle: 'liquid',
+    },
 
     nextScene: () => {
-        const { currentSceneIndex } = get();
-        const count = data.scenes.length;
+        const { currentSceneIndex, storyData } = get();
+        const count = storyData.scenes.length;
         if (currentSceneIndex < count - 1) {
             set({ currentSceneIndex: currentSceneIndex + 1, activeHotspotId: null });
         }
@@ -49,7 +60,8 @@ export const useStoryStore = create<StoryState>((set, get) => ({
     },
 
     setScene: (index) => {
-        if (index >= 0 && index < data.scenes.length) {
+        const { storyData } = get();
+        if (index >= 0 && index < storyData.scenes.length) {
             set({ currentSceneIndex: index, activeHotspotId: null });
         }
     },
@@ -58,6 +70,12 @@ export const useStoryStore = create<StoryState>((set, get) => ({
     setIsPlaying: (playing) => set({ isPlaying: playing }),
     setAudioCurrentTime: (time) => set({ audioCurrentTime: time }),
 
-    getCurrentScene: () => data.scenes[get().currentSceneIndex],
-    getSceneCount: () => data.scenes.length,
+    updateStoryData: (newData) => set({ storyData: newData }),
+    setCardStyle: (style) => set((state) => ({ themeConfig: { ...state.themeConfig, cardStyle: style } })),
+
+    getCurrentScene: () => {
+        const { storyData, currentSceneIndex } = get();
+        return storyData.scenes[currentSceneIndex];
+    },
+    getSceneCount: () => get().storyData.scenes.length,
 }));

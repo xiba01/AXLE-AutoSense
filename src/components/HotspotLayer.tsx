@@ -21,9 +21,23 @@ export const HotspotLayer = () => {
 
                 const isActive = activeHotspotId === hotspot.id;
 
-                // Determine card position context (simple logic: left side hotspots show card on right, etc.)
-                // x is percentage 0-100.
-                const cardPosition = hotspot.x < 50 ? 'right' : 'left';
+                // Smart Positioning System
+                // Heuristics to avoid collision with Subtitles (bottom area) and screen edges
+                let cardPosition: 'left' | 'right' | 'top' | 'bottom' = 'right';
+
+                if (hotspot.y > 75) {
+                    // Too close to bottom (Subtitles area), force Top
+                    cardPosition = 'top';
+                } else if (hotspot.x < 30) {
+                    // Too close to left edge
+                    cardPosition = 'right';
+                } else if (hotspot.x > 70) {
+                    // Too close to right edge
+                    cardPosition = 'left';
+                } else {
+                    // Default behavior based on side of screen
+                    cardPosition = hotspot.x < 50 ? 'right' : 'left';
+                }
 
                 return (
                     <div

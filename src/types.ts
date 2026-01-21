@@ -29,6 +29,7 @@ export interface Scene {
         theme_tag: string;
         headline: string;
         paragraph: string;
+        alignment?: 'left' | 'right' | 'center';
         badges?: { label: string; icon: string; color: string }[];
         key_stats?: { label: string; value: string; unit: string }[];
     };
