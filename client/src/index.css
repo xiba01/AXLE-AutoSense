@@ -1,0 +1,24 @@
+/* 1. Import the Tailwind V4 Engine */
+@import "tailwindcss";
+
+/* 2. Tell Tailwind where Preline lives (Crucial for v4) */
+@source "../node_modules/preline";
+
+/* 3. Custom Theme Config (Optional overrides) */
+@theme {
+  /* We can define our specific colors here later */
+  --color-axle-blue: #0088ff;
+  --color-axle-dark: #0f172a;
+}
+
+/* 4. Global Resets */
+body {
+  background-color: #f9fafb; /* Light mode default */
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0f172a;
+  }
+}
