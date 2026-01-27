@@ -159,10 +159,12 @@ export const useStoryStore = create((set, get) => ({
   // Getters
   getCurrentScene: () => {
     const { storyData, playback } = get();
-    return storyData.scenes[playback.currentSceneIndex] || storyData.scenes[0];
+    if (!storyData || !storyData.scenes || !storyData.scenes.length) return null;
+    const index = playback?.currentSceneIndex ?? 0;
+    return storyData.scenes[index] || storyData.scenes[0];
   },
 
-  getSceneCount: () => get().storyData.scenes.length,
+  getSceneCount: () => get().storyData?.scenes?.length || 0,
 
   getSceneAtTime: (time) => {
     const { storyData } = get();

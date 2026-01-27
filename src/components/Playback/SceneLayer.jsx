@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { useStoryData } from '../hooks/useStoryData';
-import { useStoryStore } from '../store/useStoryStore';
+import { useStoryData } from '../../hooks/useStoryData';
+import { useStoryStore } from '../../store/useStoryStore';
 
 export const SceneLayer = () => {
     const { storyData, playback } = useStoryStore();

@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../lib/utils';
-import { useStoryStore } from '../store/useStoryStore';
+import { cn } from '../../lib/utils';
+import { useStoryStore } from '../../store/useStoryStore';
 
 /**
  * @typedef {Object} PearlyHoverCardProps

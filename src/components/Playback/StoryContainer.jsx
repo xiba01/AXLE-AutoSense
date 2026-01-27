@@ -1,4 +1,4 @@
-import { useStoryStore } from '../store/useStoryStore';
+import { useStoryStore } from '../../store/useStoryStore';
 import { SceneLayer } from './SceneLayer';
 import { SlideContentLayer } from './SlideContentLayer';
 import { HotspotLayer } from './HotspotLayer';
@@ -7,9 +7,13 @@ import { AudioPlayer } from './AudioPlayer';
 
 export const StoryContainer = () => {
     const { storyData, playback } = useStoryStore();
-    const { currentSceneIndex } = playback;
+    const currentSceneIndex = playback?.currentSceneIndex ?? 0;
 
-    if (!storyData || !storyData.scenes) return null;
+    if (!storyData || !storyData.scenes) return (
+        <div className="absolute inset-0 flex items-center justify-center bg-noir-800 text-red-500 z-[300]">
+            ERROR: NO STORY DATA FOUND
+        </div>
+    );
 
     return (
         <div className="relative w-full h-full overflow-hidden bg-noir-900 text-chrome-100 selection:bg-neon-purple selection:text-white">

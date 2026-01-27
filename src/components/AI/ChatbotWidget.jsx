@@ -4,7 +4,7 @@ import { MessageCircle, X, Minimize2, Maximize2, Car, Settings } from 'lucide-re
 import { useChatbotStore } from '../../store/useChatbotStore';
 import { useStoryStore } from '../../store/useStoryStore';
 import { useAppStore } from '../../store/useAppStore';
-import ChatbotBackend from '../ChatbotBackend';
+import ChatbotBackend from '../../services/ChatbotService';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { logger } from '../../lib/logger';
@@ -32,6 +32,7 @@ export const ChatbotWidget = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef(null);
   const chatbotBackend = useRef(new ChatbotBackend());
+  const scene = getCurrentScene();
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
@@ -45,19 +46,17 @@ export const ChatbotWidget = () => {
   // Initialize chat when first opened
   useEffect(() => {
     if (isOpen && !isInitialized) {
-      const currentScene = getCurrentScene();
-      initializeChat(currentScene, selectedCar);
+      initializeChat(scene, selectedCar);
       setIsInitialized(true);
     }
-  }, [isOpen, isInitialized, getCurrentScene, selectedCar, initializeChat]);
+  }, [isOpen, isInitialized, scene, selectedCar, initializeChat]);
 
   // Update suggestions when scene or car changes
   useEffect(() => {
     if (isOpen) {
-      const currentScene = getCurrentScene();
-      updateContextualSuggestions(currentScene, selectedCar);
+      updateContextualSuggestions(scene, selectedCar);
     }
-  }, [isOpen, getCurrentScene(), selectedCar, updateContextualSuggestions]);
+  }, [isOpen, scene, selectedCar, updateContextualSuggestions]);
 
   const handleSendMessage = async (userMessage) => {
     if (!userMessage.trim()) return;

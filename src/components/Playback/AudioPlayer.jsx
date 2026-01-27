@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useStoryStore } from '../store/useStoryStore';
-import { logger } from '../lib/logger';
+import { useStoryStore } from '../../store/useStoryStore';
+import { logger } from '../../lib/logger';
 
 export const AudioPlayer = () => {
     const { getCurrentScene, nextScene, setIsPlaying, setAudioCurrentTime, playback } = useStoryStore();

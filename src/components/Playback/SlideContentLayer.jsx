@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useStoryStore } from '../store/useStoryStore';
-import { useAIUXStore } from '../store/useAIUXStore';
+import { useStoryStore } from '../../store/useStoryStore';
+import { useAIUXStore } from '../../store/useAIUXStore';
 import * as Icons from 'lucide-react';
-import { cn, toPascalCase } from '../lib/utils';
+import { cn, toPascalCase } from '../../lib/utils';
 
 
 

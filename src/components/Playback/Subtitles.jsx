@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useStoryStore } from '../store/useStoryStore';
+import { useStoryStore } from '../../store/useStoryStore';
 import { useMemo } from 'react';
 
 export const Subtitles = () => {

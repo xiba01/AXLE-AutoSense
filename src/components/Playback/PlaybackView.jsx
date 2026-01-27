@@ -2,10 +2,10 @@ import { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../../store/useAppStore';
 import { useStoryStore } from '../../store/useStoryStore';
-import { StoryContainer } from '../StoryContainer';
+import { StoryContainer } from './StoryContainer';
 import { PlaybackControls } from './PlaybackControls';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
-import { ChatbotWidget } from '../Chatbot/ChatbotWidget';
+import { ChatbotWidget } from '../AI/ChatbotWidget';
 
 export const PlaybackView = () => {
   const {
@@ -15,17 +15,15 @@ export const PlaybackView = () => {
 
   const {
     playback, // Consumed from useStoryStore
-    isPlaying,
-    isPaused,
-    isFrozen,
-    currentTime,
-    storyData,
     setIsPlaying,
     setPaused,
     nextScene,
     prevScene,
     setScene,
+    storyData
   } = useStoryStore();
+
+  const { isPlaying, isPaused, isFrozen } = playback || {};
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e) => {
@@ -88,9 +86,9 @@ export const PlaybackView = () => {
           isPlaying={isPlaying}
           isPaused={isPaused}
           isFrozen={isFrozen}
-          currentScene={playback.currentSceneIndex}
-          totalScenes={storyData?.scenes.length || 0}
-          currentTime={playback.currentTime}
+          currentScene={playback?.currentSceneIndex || 0}
+          totalScenes={storyData?.scenes?.length || 0}
+          currentTime={playback?.currentTime || 0}
           audioEnabled={true} // Simplified
           autoAdvance={true} // Simplified
           onPlay={() => setIsPlaying(true)}

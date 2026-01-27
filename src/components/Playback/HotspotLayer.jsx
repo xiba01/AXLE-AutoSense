@@ -1,11 +1,11 @@
 import { useRef } from 'react';
-import { useStoryStore } from '../store/useStoryStore';
-import { useAppStore, appStates } from '../store/useAppStore';
-import { useAIUXStore } from '../store/useAIUXStore';
-import { BreathingHotspot } from './BreathingHotspot';
-import { PearlyHoverCard } from './PearlyHoverCard';
+import { useStoryStore } from '../../store/useStoryStore';
+import { useAppStore, appStates } from '../../store/useAppStore';
+import { useAIUXStore } from '../../store/useAIUXStore';
+import { BreathingHotspot } from '../Interactive/BreathingHotspot';
+import { PearlyHoverCard } from '../Interactive/PearlyHoverCard';
 import * as Icons from 'lucide-react';
-import { toPascalCase } from '../lib/utils';
+import { cn, toPascalCase } from '../../lib/utils';
 
 
 export const HotspotLayer = () => {

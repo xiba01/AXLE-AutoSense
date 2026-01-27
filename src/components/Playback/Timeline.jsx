@@ -105,10 +105,8 @@ export const Timeline = () => {
 
     if (isPlaying && !isFrozen && !isScrubbing) {
       interval = setInterval(() => {
-        setCurrentTime((prev) => {
-          if (prev >= 100) return 0;
-          return prev + 0.05; // speed
-        });
+        const nextTime = playback.currentTime >= 100 ? 0 : playback.currentTime + 0.05;
+        setCurrentTime(nextTime);
       }, 30);
     }
     return () => clearInterval(interval);

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../../store/useAppStore';
 import { useStoryStore } from '../../store/useStoryStore';
-import { StoryContainer } from '../StoryContainer';
+import { StoryContainer } from '../Playback/StoryContainer';
 import { Timeline } from '../Playback/Timeline';
 import {
   Eye,
