@@ -10,11 +10,10 @@ import { ChatbotWidget } from '../AI/ChatbotWidget';
 export const PlaybackView = () => {
   const {
     setAppState,
-    // Note: Playback actions now primarily live in useStoryStore
   } = useAppStore();
 
   const {
-    playback, // Consumed from useStoryStore
+    playback,
     setIsPlaying,
     setPaused,
     nextScene,
@@ -25,7 +24,6 @@ export const PlaybackView = () => {
 
   const { isPlaying, isPaused, isFrozen } = playback || {};
 
-  // Handle keyboard navigation
   const handleKeyDown = useCallback((e) => {
     switch (e.key) {
       case 'ArrowRight':
@@ -71,12 +69,12 @@ export const PlaybackView = () => {
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Story Container */}
+      { }
       <div className="absolute inset-0">
         <StoryContainer />
       </div>
 
-      {/* Playback Controls Overlay */}
+      { }
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,8 +87,8 @@ export const PlaybackView = () => {
           currentScene={playback?.currentSceneIndex || 0}
           totalScenes={storyData?.scenes?.length || 0}
           currentTime={playback?.currentTime || 0}
-          audioEnabled={true} // Simplified
-          autoAdvance={true} // Simplified
+          audioEnabled={true}
+          autoAdvance={true}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setPaused(true)}
           onNext={nextScene}
@@ -102,10 +100,10 @@ export const PlaybackView = () => {
         />
       </motion.div>
 
-      {/* Keyboard Shortcuts Help */}
+      { }
       <KeyboardShortcuts />
 
-      {/* Chatbot Widget - Only visible in Playback */}
+      { }
       <ChatbotWidget />
     </div>
   );

@@ -4,7 +4,7 @@ import storyJson from '../data/dummy_story.json';
 export const useStoryStore = create((set, get) => ({
   storyData: storyJson,
 
-  // SINGLE Source of Truth for Playback State
+  // The one and only, the source of truth for Playback State
   playback: {
     currentSceneIndex: 0,
     isPlaying: true,
@@ -29,7 +29,7 @@ export const useStoryStore = create((set, get) => ({
         playback: {
           ...playback,
           currentSceneIndex: playback.currentSceneIndex + 1,
-          currentTime: 0 // Reset time on scene change
+          currentTime: 0
         }
       });
     }
@@ -114,7 +114,6 @@ export const useStoryStore = create((set, get) => ({
     }));
   },
 
-  // POLYMORPHIC Scene Updater (Fixes Intro/Outro edits)
   updateCurrentScene: (updates) => {
     set((state) => {
       const scenes = [...state.storyData.scenes];
@@ -134,12 +133,9 @@ export const useStoryStore = create((set, get) => ({
         if (updates[contentKey]) {
           updatedScene[contentKey] = { ...current[contentKey], ...updates[contentKey] };
         } else {
-          // If updates are passed flat (e.g. { title: 'New' }), merge them into the relevant content key
-          // This handles the legacy flat update calls from components
           updatedScene[contentKey] = { ...current[contentKey], ...updates };
         }
 
-        // Also merge top-level properties (like 'enabled' or 'duration')
         Object.keys(updates).forEach(key => {
           if (key !== 'slide_content' && key !== 'intro_content' && key !== 'outro_content') {
             updatedScene[key] = updates[key];
@@ -156,7 +152,6 @@ export const useStoryStore = create((set, get) => ({
   setAudioCurrentTime: (time) => set({ audioCurrentTime: time }),
   setCardStyle: (style) => set({ themeConfig: { ...get().themeConfig, cardStyle: style } }),
 
-  // Getters
   getCurrentScene: () => {
     const { storyData, playback } = get();
     if (!storyData || !storyData.scenes || !storyData.scenes.length) return null;

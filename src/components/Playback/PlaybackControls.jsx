@@ -60,7 +60,6 @@ export const PlaybackControls = ({
 
   const handlePlayPause = () => {
     if (isFrozen) {
-      // Unfreeze when trying to play
       onPlay();
     } else if (isPaused || !isPlaying) {
       onPlay();
@@ -79,7 +78,7 @@ export const PlaybackControls = ({
           </div>
         )}
 
-        {/* Subtle Scene Progress Bar */}
+        {/* Scene Progress Bar */}
         <div className="mb-4">
           <div className="relative h-0.5 bg-white/5 rounded-full overflow-hidden">
             <motion.div
@@ -169,7 +168,7 @@ export const PlaybackControls = ({
             </div>
           </div>
 
-          {/* Center - Scene Selector */}
+          {/* Center Scene Selector */}
           <div className="flex-1 max-w-md mx-8">
             <button
               onClick={() => setShowScenes(!showScenes)}

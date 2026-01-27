@@ -14,7 +14,7 @@ export const Timeline = () => {
     setScrubbing,
     setScene,
     setIsPlaying,
-    isFrozen // Added for UI checks
+    isFrozen
   } = useStoryStore();
 
   const { currentSceneIndex, currentTime, isPlaying, isScrubbing } = playback;
@@ -23,16 +23,13 @@ export const Timeline = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   const totalScenes = storyData?.scenes.length || 0;
-  const duration = 100; // 100% timeline
-
-  // Calculate current scene based on time
+  const duration = 100;
   const getCurrentSceneFromTime = useCallback((time) => {
     if (!totalScenes) return 0;
     const sceneDuration = duration / totalScenes;
     return Math.min(Math.floor(time / sceneDuration), totalScenes - 1);
   }, [totalScenes]);
 
-  // Handle timeline click/scrub
   const handleTimelineClick = useCallback((e) => {
     if (!timelineRef.current) return;
 
@@ -44,17 +41,12 @@ export const Timeline = () => {
     setCurrentTime(clampedPercentage);
     setScrubbing(true);
 
-    // Update scene based on new time
     const newSceneIndex = getCurrentSceneFromTime(clampedPercentage);
     if (newSceneIndex !== currentSceneIndex) {
       setScene(newSceneIndex);
     }
-
-    // Stop scrubbing after a short delay
     setTimeout(() => setScrubbing(false), 100);
   }, [setCurrentTime, setScrubbing, getCurrentSceneFromTime, currentSceneIndex, setScene]);
-
-  // Handle drag scrubbing
   const handleMouseDown = useCallback((e) => {
     setIsDragging(true);
     setScrubbing(true);
@@ -71,7 +63,6 @@ export const Timeline = () => {
 
     setCurrentTime(clampedPercentage);
 
-    // Update scene based on new time
     const newSceneIndex = getCurrentSceneFromTime(clampedPercentage);
     if (newSceneIndex !== currentSceneIndex) {
       setScene(newSceneIndex);
@@ -83,7 +74,6 @@ export const Timeline = () => {
     setScrubbing(false);
   }, [setScrubbing]);
 
-  // Add global mouse event listeners
   useEffect(() => {
     const handleGlobalMouseMove = (e) => handleMouseMove(e);
     const handleGlobalMouseUp = () => handleMouseUp();
@@ -99,7 +89,6 @@ export const Timeline = () => {
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Sync timeline with Audio time if available
   useEffect(() => {
     let interval;
 

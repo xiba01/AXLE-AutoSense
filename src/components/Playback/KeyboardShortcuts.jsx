@@ -7,12 +7,10 @@ export const KeyboardShortcuts = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Show help when '?' is pressed
       if (e.key === '?' && !e.shiftKey) {
         e.preventDefault();
         setIsVisible(!isVisible);
       }
-      // Hide help when Escape is pressed
       if (e.key === 'Escape' && isVisible) {
         setIsVisible(false);
       }

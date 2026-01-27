@@ -22,8 +22,6 @@ export const HotspotLayer = () => {
     const handleDragEnd = (hotspotId, info) => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
-
-        // Calculate percentage coordinates relative to the host container
         const x = ((info.point.x - rect.left) / rect.width) * 100;
         const y = ((info.point.y - rect.top) / rect.height) * 100;
 
@@ -37,15 +35,9 @@ export const HotspotLayer = () => {
         >
             {currentScene.hotspots
                 .map((hotspot) => {
-                    // Resolve Icon component dynamically
-                    // The JSON has string names like "plug", "battery", etc.
-                    // We need to map these to actual Lucide components.
                     const IconComponent = Icons[toPascalCase(hotspot.icon)] || Icons.Circle;
 
                     const isActive = activeHotspotId === hotspot.id;
-
-                    // Smart Positioning System
-                    // Heuristics to avoid collision with Subtitles (bottom area) and screen edges
                     let cardPosition = 'right';
 
                     if (hotspot.y > 75) cardPosition = 'top';
@@ -60,7 +52,6 @@ export const HotspotLayer = () => {
                             style={{
                                 left: `${hotspot.x}%`,
                                 top: `${hotspot.y}%`,
-                                // Center the hotspot on the coordinate
                                 transform: 'translate(-50%, -50%)'
                             }}
                         >
@@ -68,7 +59,6 @@ export const HotspotLayer = () => {
                                 isActive={isActive}
                                 onMouseEnter={() => setActiveHotspot(hotspot.id)}
                                 onMouseLeave={() => setActiveHotspot(null)}
-                                // Drag props for Editor
                                 drag={isEditorMode}
                                 dragMomentum={false}
                                 dragConstraints={containerRef}
@@ -77,7 +67,7 @@ export const HotspotLayer = () => {
 
                             <div className="relative">
                                 <PearlyHoverCard
-                                    isVisible={isActive && !isEditorMode} // Hide card while editing
+                                    isVisible={isActive && !isEditorMode}
                                     title={hotspot.hover_content.title}
                                     body={hotspot.hover_content.body}
                                     icon={IconComponent}

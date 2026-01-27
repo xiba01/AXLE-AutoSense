@@ -46,7 +46,6 @@ export const ChatInput = ({
   };
 
   const handleInputBlur = () => {
-    // Delay hiding suggestions to allow click events
     setTimeout(() => setShowSuggestions(false), 200);
   };
 
@@ -120,7 +119,7 @@ export const ChatInput = ({
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              disabled={true} // Disabled for now
+              disabled={true}
               className="p-2 text-chrome-400 hover:text-chrome-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
               title="Voice input (coming soon)"
             >
@@ -134,8 +133,8 @@ export const ChatInput = ({
               whileHover={{ scale: inputValue.trim() ? 1.1 : 1 }}
               whileTap={{ scale: inputValue.trim() ? 0.9 : 1 }}
               className={`p-2 rounded-full transition-all duration-200 ${inputValue.trim() && !disabled
-                  ? 'bg-neon-purple text-white hover:bg-neon-purple/80'
-                  : 'bg-noir-700 text-chrome-500 cursor-not-allowed'
+                ? 'bg-neon-purple text-white hover:bg-neon-purple/80'
+                : 'bg-noir-700 text-chrome-500 cursor-not-allowed'
                 }`}
             >
               <Send className="w-4 h-4" />
@@ -143,7 +142,7 @@ export const ChatInput = ({
           </div>
         </motion.div>
 
-        {/* Character Count (Optional) */}
+        {/* Character Count (Optional tbh) */}
         {inputValue.length > 100 && (
           <div className="absolute -top-6 right-0 text-xs text-chrome-500">
             {inputValue.length}/500

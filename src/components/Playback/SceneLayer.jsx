@@ -12,11 +12,6 @@ export const SceneLayer = () => {
             {scenes.map((scene, index) => {
                 const isActive = index === currentSceneIndex;
 
-                // Optimization: Only render if it's the current, previous, or next scene 
-                // to avoid heavy DOM, but for "Liquid" transitions we might want them stacked.
-                // Given 5 scenes, stacking is fine.
-
-                // Get image URL based on scene type
                 const imageUrl = scene.type === 'intro_view'
                     ? scene.intro_content?.background_image || scene.image_url
                     : scene.image_url;

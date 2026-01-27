@@ -106,7 +106,7 @@ export const EditorSlide = ({ slide, Icon, onUpdate }) => {
               <span className="text-sm">{slide.enabled ? 'On' : 'Off'}</span>
             </button>
 
-            {/* Expand/Collapse */}
+            {/* Expand & Collapse */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-1 text-chrome-400 hover:text-white transition-colors"

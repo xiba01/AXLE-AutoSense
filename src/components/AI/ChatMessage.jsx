@@ -7,13 +7,13 @@ export const ChatMessage = ({ message }) => {
   const isWelcome = message.isWelcome;
 
   const messageVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 20,
       scale: 0.95
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       scale: 1,
       transition: {
@@ -33,11 +33,10 @@ export const ChatMessage = ({ message }) => {
       <div className={`flex max-w-[80%] ${isBot ? 'flex-row' : 'flex-row-reverse'}`}>
         {/* Avatar */}
         <div className={`flex-shrink-0 ${isBot ? 'mr-3' : 'ml-3'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-            isBot 
-              ? 'bg-gradient-to-br from-neon-purple to-neon-blue border border-white/20' 
-              : 'bg-noir-700 border border-chrome-300'
-          }`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isBot
+            ? 'bg-gradient-to-br from-neon-purple to-neon-blue border border-white/20'
+            : 'bg-noir-700 border border-chrome-300'
+            }`}>
             {isBot ? (
               <Sparkles className="w-4 h-4 text-white" />
             ) : (
@@ -47,22 +46,21 @@ export const ChatMessage = ({ message }) => {
         </div>
 
         {/* Message Bubble */}
-        <div className={`relative px-4 py-3 rounded-2xl ${
-          isBot 
-            ? 'bg-noir-800/90 backdrop-blur-md border border-white/10 text-chrome-100' 
-            : 'bg-neon-purple/20 backdrop-blur-md border border-neon-purple/30 text-chrome-100'
-        }`}>
-          {/* Welcome indicator */}
+        <div className={`relative px-4 py-3 rounded-2xl ${isBot
+          ? 'bg-noir-800/90 backdrop-blur-md border border-white/10 text-chrome-100'
+          : 'bg-neon-purple/20 backdrop-blur-md border border-neon-purple/30 text-chrome-100'
+          }`}>
+          {/* Hi Hello Whatsup indicator */}
           {isWelcome && (
             <div className="absolute -top-2 -left-2">
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   opacity: [0.5, 1, 0.5]
                 }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity 
+                transition={{
+                  duration: 2,
+                  repeat: Infinity
                 }}
                 className="w-2 h-2 bg-neon-purple rounded-full"
               />
@@ -76,9 +74,9 @@ export const ChatMessage = ({ message }) => {
 
           {/* Timestamp */}
           <div className={`mt-2 text-xs opacity-60 ${isBot ? 'text-left' : 'text-right'}`}>
-            {new Date(message.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {new Date(message.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </div>
 

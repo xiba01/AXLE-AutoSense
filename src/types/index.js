@@ -1,4 +1,4 @@
-// Hotspot content structure
+// The structure of the content of the hotspot 
 export const hotspotContentSchema = {
   title: '',
   body: ''
@@ -49,7 +49,7 @@ export const sceneSchema = {
   subtitles: []
 };
 
-// Story data structure
+// The structure of the story data
 export const storyDataSchema = {
   story_id: '',
   car_id: '',

@@ -85,7 +85,6 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
   };
 
   const handleConfigChange = (key, value) => {
-    // StoryStore now handles polymorphic nesting
     updateCurrentScene({ [key]: value });
   };
 

@@ -7,6 +7,7 @@ import { useStoryStore } from '../../store/useStoryStore';
 import { Play, Settings, BarChart3, Zap, Star, Flag, Plus, Trash2, Eye } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { logger } from '../../lib/logger';
+import autosenseLogo from '../../assets/autosense-logo.png';
 
 const slideIcons = {
   intro: Settings,
@@ -31,7 +32,7 @@ export const EditorView = () => {
     updateCurrentScene
   } = useStoryStore();
 
-  // Keep editorSlides in sync with StoryStore
+  // For keeping editorSlides in sync with StoryStore
   useEffect(() => {
     syncEditorSlides();
   }, [storyData, syncEditorSlides]);
@@ -42,7 +43,6 @@ export const EditorView = () => {
   const selectedSlide = editorSlides.find(s => s.id === selectedSlideId) || null;
 
   const handleLaunch = () => {
-    // AUTHORITATIVE Launch: Update view AND trigger playback
     useAppStore.getState().setAppState('playback');
     setScene(0);
     setIsPlaying(true);
@@ -51,12 +51,9 @@ export const EditorView = () => {
   const { reorderSlides } = useAppStore.getState();
 
   const handleReorder = (newOrder) => {
-    // Reorder.Group provides the new array of items
     const oldOrder = [...editorSlides];
-    // Find the moved item by comparing indices
     const fromIndex = oldOrder.findIndex((s, i) => s.id !== newOrder[i]?.id);
     if (fromIndex !== -1) {
-      // Find where it went
       const movedItem = oldOrder[fromIndex];
       const toIndex = newOrder.findIndex(s => s.id === movedItem.id);
       if (toIndex !== -1) {
@@ -72,10 +69,13 @@ export const EditorView = () => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">
-                  Autosense Editor
-                </h1>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                  <img src={autosenseLogo} alt="AutoSense Logo" className="h-8 w-auto" />
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">
+                    Autosense Editor
+                  </h1>
+                </div>
                 <p className="text-chrome-400 mt-1">Refine your interactive car story</p>
               </div>
             </div>
@@ -124,7 +124,7 @@ export const EditorView = () => {
       </div>
 
       <div className="flex h-[calc(100vh-73px)]">
-        {/* Sidebar - Car Configuration (Restored) */}
+        {/* Sidebar - Car Configuration */}
         <div className="w-80 border-r border-white/10 bg-black/20 backdrop-blur-sm overflow-y-auto">
           <div className="p-6">
             <h2 className="text-lg font-semibold mb-4 bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">
@@ -161,7 +161,7 @@ export const EditorView = () => {
           </div>
         </div>
 
-        {/* Main Content Area - Card View Restored */}
+        {/* Main Content Area => Card View Restored */}
         <div className="flex-1 overflow-y-auto bg-gradient-to-b from-black/20 to-black/40">
           {showLiveEditor && selectedSlide ? (
             <div className="p-6">
@@ -220,7 +220,7 @@ export const EditorView = () => {
                         Icon={Icon}
                         onUpdate={(updates) => {
                           updateCurrentScene(updates);
-                          syncEditorSlides(); // Ensure the board updates
+                          syncEditorSlides();
                         }}
                       />
                     </Reorder.Item>
@@ -239,6 +239,6 @@ export const EditorView = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };

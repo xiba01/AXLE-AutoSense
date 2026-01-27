@@ -58,7 +58,7 @@ export const PearlyHoverCard = ({
                     style={style}
                     className={cn(
                         "absolute z-50 p-5 w-72",
-                        // Default positioning (can be overridden by style or parent)
+                        // Default positioning (will be overridden by style or parent)
                         position === 'right' ? "left-10 top-1/2 -translate-y-1/2" :
                             position === 'left' ? "right-10 top-1/2 -translate-y-1/2" :
                                 position === 'top' ? "bottom-full mb-4 left-1/2 -translate-x-1/2" :
@@ -66,7 +66,6 @@ export const PearlyHoverCard = ({
 
                         // Theme Styling
                         isLiquid ? [
-                            // Liquid Obsidian Aesthetic (Original)
                             "bg-gradient-to-br from-white/10 to-white/5",
                             "backdrop-blur-2xl saturate-150",
                             "border border-white/20",
@@ -75,23 +74,15 @@ export const PearlyHoverCard = ({
                             "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]",
                             "shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.1)]",
                         ] : [
-                            // Ultimate Apple-style Liquid Glass (New Premium)
-                            // 1. Base Material: Ultra-smooth, barely there but present gradient
-                            "bg-gradient-to-br from-[rgba(255,255,255,0.35)] to-[rgba(255,255,255,0.15)]", // Higher opacity top-left
-
-                            // 2. The Blur: Heavy, premium frost
-                            "backdrop-blur-3xl saturate-200", // Boosting saturation makes colors behind pop like iOS
-
-                            // 3. The Border: Delicate, crisp inner light
+                            "bg-gradient-to-br from-[rgba(255,255,255,0.35)] to-[rgba(255,255,255,0.15)]",
+                            "backdrop-blur-3xl saturate-200",
                             "border border-white/40",
 
-                            // 4. Shape
-                            "rounded-[2.5rem]", // Super rounded, organic feel
+                            "rounded-[2.5rem]",
 
-                            // 5. Depth Stack
-                            "shadow-[0_20px_40px_-5px_rgba(0,0,0,0.4)]", // Deep, soft ambient shadow
-                            "shadow-[inset_0_1px_1px_rgba(255,255,255,0.7)]", // Sharp top ridge light
-                            "shadow-[inset_0_-4px_10px_rgba(255,255,255,0.2)]", // Internal glow/thickness simulation
+                            "shadow-[0_20px_40px_-5px_rgba(0,0,0,0.4)]",
+                            "shadow-[inset_0_1px_1px_rgba(255,255,255,0.7)]",
+                            "shadow-[inset_0_-4px_10px_rgba(255,255,255,0.2)]",
                         ],
                         className
                     )}
@@ -99,7 +90,7 @@ export const PearlyHoverCard = ({
                     {/* Specular Highlight / Sheen */}
                     <div className="absolute inset-0 pointer-events-none rounded-3xl bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-50" />
 
-                    {/* Noise texture overlay for realism (optional, keeping clean for now) */}
+                    {/* Noise texture overlay (again, really optional tbh) */}
 
                     <div className="relative z-10 flex items-start gap-4">
                         {Icon && (

@@ -40,7 +40,6 @@ class ChatbotBackend {
   async generateResponse(userMessage, currentCar, currentScene) {
     const message = userMessage.toLowerCase();
 
-    // 1. Dynamic Car Data Lookup (Highest Priority)
     if (currentCar) {
       if (message.includes('price') || message.includes('cost')) {
         return `The ${currentCar.year} ${currentCar.make} ${currentCar.model} ${currentCar.trim} starts at $${currentCar.price?.toLocaleString() || 'N/A'}.`;
@@ -67,18 +66,15 @@ class ChatbotBackend {
       }
     }
 
-    // 2. Direct Knowledge Lookup (Original Knowledge Base)
     for (const [key, answer] of Object.entries(this.knowledgeBase)) {
       if (message.includes(key)) {
         return answer;
       }
     }
 
-    // 2. Scene Context Lookup (Medium Priority)
     if (currentScene && currentScene.slide_content) {
       const { headline, paragraph, key_stats } = currentScene.slide_content;
 
-      // Check stats
       if (key_stats) {
         for (const stat of key_stats) {
           if (message.includes(stat.label.toLowerCase())) {
@@ -87,7 +83,6 @@ class ChatbotBackend {
         }
       }
 
-      // Check paragraph text content
       const significantWords = message.split(' ').filter(w => w.length > 4);
       const paraLower = paragraph.toLowerCase();
       for (const word of significantWords) {
@@ -97,12 +92,10 @@ class ChatbotBackend {
       }
     }
 
-    // 3. Fallback / Greeting
     if (this.isGreeting(message)) {
       return "Hi there! I can answer specific questions about Range, HP, Safety, or Charging. What would you like to know?";
     }
 
-    // 4. Conversational Fallback
     return "I'm not sure about that specific detail. Try asking about 'range', 'horsepower', 'safety', or 'price'.";
   }
 

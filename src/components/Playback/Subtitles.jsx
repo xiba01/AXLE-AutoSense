@@ -6,8 +6,6 @@ export const Subtitles = () => {
     const { getCurrentScene, audioCurrentTime } = useStoryStore();
     const scene = getCurrentScene();
 
-    // Memoize the current subtitle to avoid constant re-calculations
-    // although with simple arrays filter/find is fast enough.
     const activeSubtitle = useMemo(() => {
         if (!scene?.subtitles) return null;
         return scene.subtitles.find(

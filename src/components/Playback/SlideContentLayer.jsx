@@ -33,16 +33,12 @@ export const SlideContentLayer = () => {
                     transition={{ duration: 0.6, ease: "circOut", delay: 0.2 }}
                     className={cn(
                         "max-w-xl pointer-events-auto",
-                        // "Liquid Obsidian" Styling
-                        "p-10 rounded-[2rem]", // Softer corners
-                        // Complex Gradient: Dark base -> Lighter glassy top
+                        "p-10 rounded-[2rem]",
                         "bg-gradient-to-b from-black/80 via-black/40 to-black/20",
-                        "backdrop-blur-3xl saturate-100", // Heavy smooth blur
-                        // Borders: Double border illusion via shadow or nested divs? stick to simple
+                        "backdrop-blur-3xl saturate-100",
                         "border border-white/10",
-                        // Depth
-                        "shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)]", // Deep shadow
-                        "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]" // Top rim light
+                        "shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)]",
+                        "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
                     )}
                 >
                     {/* TYPE: INTRO */}
@@ -110,7 +106,7 @@ export const SlideContentLayer = () => {
                                                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
                                                         className={cn(
                                                             "absolute top-0 w-64 p-4 z-50",
-                                                            alignment === 'right' ? "right-full mr-4" : "left-full ml-4", // Flip side if aligned right
+                                                            alignment === 'right' ? "right-full mr-4" : "left-full ml-4",
                                                             "bg-gradient-to-br from-black/80 to-black/40",
                                                             "backdrop-blur-xl border border-white/10 rounded-2xl",
                                                             "shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
@@ -127,7 +123,7 @@ export const SlideContentLayer = () => {
                                                             <div>
                                                                 <h4 className="text-white text-sm font-bold mb-1">{badge.label}</h4>
                                                                 <p className="text-xs text-gray-300 leading-snug">
-                                                                    {/* Mock description generator since it's not in JSON yet */}
+                                                                    {/* Mock description generator since we don't have it in JSON yet */}
                                                                     {badge.color === 'green' ? "Certified eco-friendly materials and zero-emission capability." :
                                                                         badge.color === 'blue' ? "Advanced technology package included as standard." :
                                                                             "Premium feature highlighting luxury and performance."}
@@ -189,7 +185,6 @@ export const SlideContentLayer = () => {
                                         key={i}
                                         onClick={() => {
                                             if (btn.action === 'REPLAY_STORY') setScene(0);
-                                            // Handle other actions
                                         }}
                                         className={cn(
                                             "px-8 py-3 rounded-full tracking-wide transition-all backdrop-blur-md",

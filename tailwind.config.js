@@ -8,18 +8,18 @@ export default {
     extend: {
       colors: {
         noir: {
-          900: '#050505', // The Void (Background)
-          800: '#0A0A0F', // Deep Charcoal (Surface)
-          700: '#151520', // Lighter Surface
+          900: '#050505',
+          800: '#0A0A0F',
+          700: '#151520',
         },
         chrome: {
-          100: '#ffffff', // Highlight
-          300: '#E0E0E0', // Light Silver
-          500: '#A0A0A0', // Mid Metal
-          700: '#505050', // Dark Metal
+          100: '#ffffff',
+          300: '#E0E0E0',
+          500: '#A0A0A0',
+          700: '#505050',
         },
         neon: {
-          purple: '#b000ff', // Subtle accent
+          purple: '#b000ff',
         }
       },
       fontFamily: {

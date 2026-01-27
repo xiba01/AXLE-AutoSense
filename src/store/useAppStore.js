@@ -8,7 +8,6 @@ export const appStates = {
 };
 
 export const useAppStore = create((set, get) => ({
-  // App state - Routing Only
   appState: appStates.EDITOR,
   editorSlides: [],
   selectedCar: {
@@ -42,10 +41,8 @@ export const useAppStore = create((set, get) => ({
     ]
   },
 
-  // State transitions
   setAppState: (state) => set({ appState: state }),
 
-  // Sync Logic: Populates editorSlides from StoryStore
   syncEditorSlides: () => {
     const storyStore = useStoryStore.getState();
     const storyData = storyStore.storyData;
@@ -70,7 +67,6 @@ export const useAppStore = create((set, get) => ({
     set({ editorSlides });
   },
 
-  // Editor-specific UI Actions (that don't belong in StoryStore)
   toggleSlide: (slideId) => {
     const storyStore = useStoryStore.getState();
     const scenes = [...storyStore.storyData.scenes];
@@ -84,7 +80,6 @@ export const useAppStore = create((set, get) => ({
 
   updateSlideConfig: (slideId, config) => {
     const storyStore = useStoryStore.getState();
-    // We update the store directly. StoryStore now handles the polymorphic nesting.
     storyStore.updateCurrentScene(config);
     get().syncEditorSlides();
   },
@@ -106,14 +101,11 @@ export const useAppStore = create((set, get) => ({
     const storyStore = useStoryStore.getState();
     if (!storyStore.storyData?.scenes?.length) return;
 
-    // Switch to playback VIEW
     set({ appState: appStates.PLAYBACK });
 
-    // Trigger playback START in the authoritative store
     storyStore.setScene(0);
     storyStore.setIsPlaying(true);
   },
 
-  // Getters
   canLaunch: () => useStoryStore.getState().storyData !== null,
 }));

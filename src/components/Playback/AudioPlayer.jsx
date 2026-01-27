@@ -24,18 +24,15 @@ export const AudioPlayer = () => {
             audio.load();
         }
 
-        // 2. Handle Play/Pause based on global state
+        // 2. Handle Play & Pause based on global state
         if (isPlaying && !isPaused) {
-            // Should be playing
             if (audio.paused) {
-                // FORCE VOLUME RESET - Critical fix for "gone voice"
                 audio.volume = 1.0;
 
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
                     playPromise
                         .then(() => {
-                            // Already playing
                         })
                         .catch(error => {
                             logger.warn("Autoplay blocked:", error);
@@ -43,7 +40,6 @@ export const AudioPlayer = () => {
                 }
             }
         } else {
-            // Should be paused
             if (!audio.paused) {
                 audio.pause();
             }
@@ -52,7 +48,7 @@ export const AudioPlayer = () => {
     }, [currentScene?.id, currentScene?.audio_url, isPlaying, isPaused]);
 
     const handleEnded = () => {
-        if (autoAdvance !== false) { // Default to true
+        if (autoAdvance !== false) {
             nextScene();
         }
     };

@@ -1,6 +1,7 @@
 import { useStoryStore } from '../../store/useStoryStore';
 import { SceneLayer } from './SceneLayer';
 import { SlideContentLayer } from './SlideContentLayer';
+import autosenseLogo from '../../assets/autosense-logo.png';
 import { HotspotLayer } from './HotspotLayer';
 import { Subtitles } from './Subtitles';
 import { AudioPlayer } from './AudioPlayer';
@@ -31,7 +32,7 @@ export const StoryContainer = () => {
             {/* 4. Subtitle Layer (z-50) */}
             <Subtitles />
 
-            {/* 5. Audio Engine (Hidden) */}
+            {/* 5. Audio Engine */}
             <AudioPlayer />
         </div>
     );

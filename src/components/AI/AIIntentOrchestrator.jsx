@@ -22,8 +22,6 @@ export function AIIntentOrchestrator() {
 
     useEffect(() => {
         if (!intent) return;
-
-        // HARD RULES
         if (uxMode === "browse" && intent.type === "highlight") return;
 
         if (intent.type === "reassure" && intent.topic) {

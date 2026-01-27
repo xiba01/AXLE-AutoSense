@@ -8,6 +8,7 @@ import ChatbotBackend from '../../services/ChatbotService';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { logger } from '../../lib/logger';
+import autosenseLogo from '../../assets/autosense-logo.png';
 
 export const ChatbotWidget = () => {
   const {
@@ -34,7 +35,6 @@ export const ChatbotWidget = () => {
   const chatbotBackend = useRef(new ChatbotBackend());
   const scene = getCurrentScene();
 
-  // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -43,7 +43,7 @@ export const ChatbotWidget = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Initialize chat when first opened
+  // This is just to initialize chat when first opened
   useEffect(() => {
     if (isOpen && !isInitialized) {
       initializeChat(scene, selectedCar);
@@ -51,7 +51,6 @@ export const ChatbotWidget = () => {
     }
   }, [isOpen, isInitialized, scene, selectedCar, initializeChat]);
 
-  // Update suggestions when scene or car changes
   useEffect(() => {
     if (isOpen) {
       updateContextualSuggestions(scene, selectedCar);
@@ -61,24 +60,20 @@ export const ChatbotWidget = () => {
   const handleSendMessage = async (userMessage) => {
     if (!userMessage.trim()) return;
 
-    // Add user message
     addUserMessage(userMessage);
 
-    // Set typing state
     setTyping(true);
 
     try {
-      // Get current context
       const currentScene = getCurrentScene();
 
-      // Generate bot response
+      // Generate lame bot response
       const response = await chatbotBackend.current.generateResponse(
         userMessage,
         selectedCar,
         currentScene
       );
 
-      // Add bot response with a slight delay for natural feel
       setTimeout(() => {
         addBotMessage(response, currentScene?.id);
         setTyping(false);
@@ -86,7 +81,7 @@ export const ChatbotWidget = () => {
         // Update suggestions based on conversation context
         const newSuggestions = chatbotBackend.current.getContextualSuggestions(currentScene, selectedCar);
         setSuggestions(newSuggestions);
-      }, 1000 + Math.random() * 1000); // 1-2 second delay
+      }, 1000 + Math.random() * 1000);
 
     } catch (error) {
       logger.error('Error generating response:', error);
@@ -109,7 +104,6 @@ export const ChatbotWidget = () => {
     setIsMinimized(!isMinimized);
   };
 
-  // Floating button variants
   const floatingButtonVariants = {
     initial: { scale: 0 },
     animate: {
@@ -130,7 +124,6 @@ export const ChatbotWidget = () => {
     tap: { scale: 0.95 }
   };
 
-  // Chat window variants
   const chatWindowVariants = {
     hidden: {
       opacity: 0,
@@ -208,8 +201,8 @@ export const ChatbotWidget = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 bg-noir-800/90 border-b border-white/10">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-neon-purple to-neon-blue rounded-full flex items-center justify-center">
-                  <Car className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white/10">
+                  <img src={autosenseLogo} alt="Logo" className="w-6 h-auto" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-chrome-100">Automotive Assistant</h3>
@@ -252,8 +245,8 @@ export const ChatbotWidget = () => {
                   {isTyping && (
                     <div className="flex justify-start mb-4">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-neon-purple to-neon-blue rounded-full flex items-center justify-center">
-                          <Car className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white/10">
+                          <img src={autosenseLogo} alt="Logo" className="w-6 h-auto" />
                         </div>
                         <div className="px-4 py-3 bg-noir-800/90 backdrop-blur-md border border-white/10 rounded-2xl">
                           <div className="flex space-x-1">
