@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { MouseEventHandler } from 'react';
 
-interface BreathingHotspotProps {
-    onClick?: MouseEventHandler<HTMLDivElement>;
-    onMouseEnter?: MouseEventHandler<HTMLDivElement>;
-    onMouseLeave?: MouseEventHandler<HTMLDivElement>;
-    className?: string;
-    isActive?: boolean;
-}
+/**
+ * @typedef {Object} BreathingHotspotProps
+ * @property {import('react').MouseEventHandler} [onClick]
+ * @property {import('react').MouseEventHandler} [onMouseEnter]
+ * @property {import('react').MouseEventHandler} [onMouseLeave]
+ * @property {string} [className]
+ * @property {boolean} [isActive]
+ */
 
 export const BreathingHotspot = ({
     onClick,
@@ -16,7 +16,8 @@ export const BreathingHotspot = ({
     onMouseLeave,
     className,
     isActive = false,
-}: BreathingHotspotProps) => {
+    ...dragProps
+}) => {
     return (
         <motion.div
             className={cn(
@@ -29,6 +30,7 @@ export const BreathingHotspot = ({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             whileHover={{ scale: 1.2 }}
+            {...dragProps}
         >
             {/* Outer Pulse Ring */}
             <motion.div

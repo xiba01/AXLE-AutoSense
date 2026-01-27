@@ -1,14 +1,16 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoryStore } from '../store/useStoryStore';
+import { useAIUXStore } from '../store/useAIUXStore';
 import * as Icons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, toPascalCase } from '../lib/utils';
+
+
 
 export const SlideContentLayer = () => {
     const { getCurrentScene, nextScene, setScene, activeHotspotId } = useStoryStore();
     const scene = getCurrentScene();
-    const [activeBadgeIndex, setActiveBadgeIndex] = React.useState<number | null>(null);
+    const [activeBadgeIndex, setActiveBadgeIndex] = React.useState(null);
 
     if (!scene) return null;
 
@@ -49,27 +51,35 @@ export const SlideContentLayer = () => {
                             <h2 className="text-chrome-300 text-sm tracking-widest uppercase mb-2">
                                 {scene.intro_content.subtitle}
                             </h2>
-                            <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-gray-300 to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                            <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-gray-300 to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                                 {scene.intro_content.title}
                             </h1>
-                            <button
-                                onClick={nextScene}
-                                className="mt-8 px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-chrome-100 tracking-wide transition-all duration-300 backdrop-blur-md shadow-lg group"
-                            >
-                                <span className="group-hover:tracking-wider transition-all duration-300">
-                                    {scene.intro_content.start_button_label}
-                                </span>
-                            </button>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={nextScene}
+                                    className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-chrome-100 tracking-wide transition-all duration-300 backdrop-blur-md shadow-lg group"
+                                >
+                                    <span className="group-hover:tracking-wider transition-all duration-300">
+                                        {scene.intro_content.start_button_label}
+                                    </span>
+                                </button>
+
+                                <button
+                                    onClick={() => useAIUXStore.getState().setUXMode('guided')}
+                                    className="px-6 py-3 bg-neon-purple/20 hover:bg-neon-purple/40 border border-neon-purple/50 rounded-full text-white tracking-wide transition-all duration-300 backdrop-blur-md shadow-lg"
+                                >
+                                    Let us guide you
+                                </button>
+                            </div>
                         </div>
                     )}
 
                     {/* TYPE: SLIDE */}
                     {scene.type === 'slide_view' && scene.slide_content && (
                         <div className="space-y-6">
-                            <div className={cn("flex gap-2 mb-6", alignment === 'center' ? "justify-center" : alignment === 'right' ? "justify-end" : "justify-start")}>
+                            <div className={cn("flex gap-4 mb-6", alignment === 'center' ? "justify-center" : alignment === 'right' ? "justify-end" : "justify-start")}>
                                 {scene.slide_content.badges?.map((badge, i) => {
-                                    // @ts-ignore
-                                    const Icon = (Icons[toPascalCase(badge.icon)] || Icons.Circle) as LucideIcon;
+                                    const Icon = Icons[toPascalCase(badge.icon)] || Icons.Circle;
                                     const isHovered = activeBadgeIndex === i;
 
                                     return (
@@ -132,10 +142,21 @@ export const SlideContentLayer = () => {
                                 })}
                             </div>
 
-                            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight">
+                            <h1
+                                className="font-bold text-white mb-4 tracking-tight"
+                                style={{
+                                    fontSize: scene.slide_content.headlineSize ? `${scene.slide_content.headlineSize}rem` : undefined,
+                                    lineHeight: '1.1'
+                                }}
+                            >
                                 {scene.slide_content.headline}
                             </h1>
-                            <p className="text-lg text-chrome-100/80 leading-relaxed font-light">
+                            <p
+                                className="text-chrome-100/80 leading-relaxed font-light"
+                                style={{
+                                    fontSize: scene.slide_content.paragraphSize ? `${scene.slide_content.paragraphSize}rem` : undefined
+                                }}
+                            >
                                 {scene.slide_content.paragraph}
                             </p>
 
@@ -188,12 +209,3 @@ export const SlideContentLayer = () => {
         </div>
     );
 };
-
-// Helper for icon mapping "steering-wheel" -> "SteeringWheel"
-function toPascalCase(str: string) {
-    return str.replace(/(^\w|-\w)/g, clearAndUpper);
-}
-
-function clearAndUpper(text: string) {
-    return text.replace(/-/, "").toUpperCase();
-}

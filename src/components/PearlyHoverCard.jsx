@@ -1,17 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { LucideIcon } from 'lucide-react';
 import { useStoryStore } from '../store/useStoryStore';
 
-interface PearlyHoverCardProps {
-    isVisible: boolean;
-    title: string;
-    body: string;
-    icon?: LucideIcon;
-    position?: 'left' | 'right' | 'top' | 'bottom';
-    className?: string;
-    style?: React.CSSProperties;
-}
+/**
+ * @typedef {Object} PearlyHoverCardProps
+ * @property {boolean} isVisible
+ * @property {string} title
+ * @property {string} body
+ * @property {React.ComponentType} [icon]
+ * @property {'left'|'right'|'top'|'bottom'} [position]
+ * @property {string} [className]
+ * @property {import('react').CSSProperties} [style]
+ */
 
 export const PearlyHoverCard = ({
     isVisible,
@@ -21,7 +21,7 @@ export const PearlyHoverCard = ({
     position = 'right',
     className,
     style,
-}: PearlyHoverCardProps) => {
+}) => {
     const { themeConfig } = useStoryStore();
     const isLiquid = themeConfig.cardStyle === 'liquid';
 
@@ -112,7 +112,7 @@ export const PearlyHoverCard = ({
                             </div>
                         )}
                         <div className="flex-1 space-y-1">
-                            <h3 className={cn("font-bold text-sm tracking-wide drop-shadow-sm transition-colors", isLiquid ? "text-white" : "text-noir-900")}>
+                            <h3 className={cn("font-bold text-lg tracking-wide drop-shadow-sm transition-colors", isLiquid ? "text-white" : "text-noir-900")}>
                                 {title}
                             </h3>
                             <p className={cn("text-xs leading-relaxed font-medium transition-colors", isLiquid ? "text-blue-100/90" : "text-noir-800/80")}>
