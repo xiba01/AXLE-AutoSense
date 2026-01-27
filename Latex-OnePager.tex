@@ -1,0 +1,123 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.8cm, top=1.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} % accents
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage{tcolorbox}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\parindent}{0pt}
+\definecolor{mainblack}{HTML}{000000}
+\definecolor{darkgrey}{HTML}{2D2D2D}
+\definecolor{softgrey}{HTML}{666666}
+\definecolor{accentgold}{HTML}{8E8E8E}
+\titleformat{\section}
+  {\small\bfseries\color{mainblack}\selectfont}
+  {}{0pt}{\MakeUppercase}[\titlerule]
+\titlespacing*{\section}{0pt}{1.8em}{0.8em}
+\begin{document}
+
+% ---------------- Header ----------------
+\begin{minipage}[c]{0.40\textwidth}
+    \includegraphics[height=0.9cm]{AXLE-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+    \raggedleft
+    \includegraphics[height=2.2cm]{AutoSense-logo.png}
+\end{minipage}
+
+\vspace{1.5cm}
+
+% ---------------- Title ----------------
+{\Huge\bfseries AXLE \ \& \ AutoSense AI} \\[0.3em]
+{\color{softgrey}\large Stratégie d’Équipe \& Synthèse de Solution}
+
+\vspace{2cm}
+
+% ---------------- Team ----------------
+\section*{Expertise de l'Équipe}
+\begin{multicols}{2}
+\small
+
+\textbf{01. Backend \& AI Agents} \\
+\textcolor{darkgray}{Axle engine pipeline et 3D render | Mostafa Chiba} \\
+Conception du backend, orchestration des agents IA, gestion des assets 3D et administration des workflows pour un système robuste et scalable.
+
+\vspace{0.9em}
+
+\textbf{02. AI Experience \& Chatbot} \\
+\textcolor{darkgray}{AutoSense engine et guide interactif | Wissal Bechri} \\
+Mise en place du moteur AutoSense, expérience immersive AI, storytelling et intégration du chatbot contextuel pour la guidance de l’utilisateur.
+
+\columnbreak
+
+\textbf{03. Frontend \& Client} \\
+\textcolor{darkgray}{Interface utilisateur et showroom | Ilyass Firar} \\
+Développement du frontend interactif, parcours utilisateur, catalogue client et interface immersive pour l’expérience AutoSense.
+
+\vspace{0.9em}
+
+\textbf{04. Database Setup} \\
+\textcolor{darkgray}{Base de données et stockage | Haytam Raba} \\
+Création du schéma relationnel, configuration Supabase, stockage sécurisé et structuration des données pour une ingestion fluide dans les pipelines IA.
+
+\end{multicols}
+
+\vspace{1.5cm}
+
+% ---------------- Business Plus ----------------
+\begin{minipage}[t]{0.48\textwidth}
+    \section*{Le Cas Business}
+    \small\color{darkgrey}
+    Le marché de la vente automobile digitale reste dominé par des annonces standardisées et peu différenciées.  
+    Les concessionnaires peinent à valoriser leur stock et dépendent fortement des marketplaces, tandis que les acheteurs manquent de transparence et d’engagement.
+
+    L’enjeu est de transformer chaque véhicule en un actif digital explicatif et immersif, capable de renforcer la confiance et d’améliorer la décision d’achat.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \section*{La Solution}
+    \small\color{darkgrey}
+    AXLE \& AutoSense AI est une plateforme \textbf{B2B2C} qui automatise la transformation de données techniques (VIN, spécifications, documents) en expériences interactives et narratives.
+
+    \begin{itemize}[label=--, leftmargin=1em, nosep]
+        \item \textbf{AXLE} : gestion d’inventaire SaaS et déclenchement des expériences
+        \item \textbf{AutoSense} : moteur IA multi-agents, jumeau numérique interactif et storytelling immersif
+    \end{itemize}
+\end{minipage}
+
+\vspace{1.5cm}
+
+% ---------------- Highlight ----------------
+\begin{tcolorbox}[
+    colback=black,
+    colframe=black,
+    arc=0pt,
+    left=15pt,
+    right=15pt,
+    top=10pt,
+    bottom=10pt
+]
+\centering
+\color{white}\small\scshape
+Moins de 90 secondes pour transformer une fiche technique brute en une expérience automobile immersive et crédible.
+\end{tcolorbox}
+
+\vfill
+
+% ---------------- Footer ----------------
+\begin{center}
+    \footnotesize\color{softgrey}
+    Différenciation Concessionnaire \quad \textbullet \quad
+    Engagement Acheteur \quad \textbullet \quad
+    Standard de Transparence \quad \textbullet \quad
+    Scalabilité SaaS
+\end{center}
+
+\end{document}
