@@ -1,16 +1,18 @@
+import { heroui } from "@heroui/react";
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  // Preline needs to scan its own node_modules to generate styles
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "node_modules/preline/dist/*.js",
+    // This line allows Tailwind to scan HeroUI's internal components
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {},
   },
+  darkMode: "class", // HeroUI uses class-based dark mode
   plugins: [
-    // The Preline UI plugin
-    require("preline/plugin"),
+    heroui(), // Initialize the plugin
   ],
 };

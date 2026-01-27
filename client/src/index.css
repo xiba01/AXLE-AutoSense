@@ -1,8 +1,8 @@
 /* 1. Import the Tailwind V4 Engine */
 @import "tailwindcss";
-
-/* 2. Tell Tailwind where Preline lives (Crucial for v4) */
-@source "../node_modules/preline";
+@plugin '../hero.ts';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
 
 /* 3. Custom Theme Config (Optional overrides) */
 @theme {

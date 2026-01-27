@@ -1,61 +1,88 @@
 import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import { useDispatch } from "react-redux"; // <--- Redux Hook
+import { useDispatch } from "react-redux";
 import { supabase } from "./config/supabaseClient";
 import { setSession } from "./store/slices/authSlice";
+import { fetchDealerProfile } from "./store/slices/dealerSlice";
 
-import PrelineLayout from "./components/PrelineLayout";
+// Layouts & Wrappers
 import AuthLayout from "./layouts/AuthLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
-import ProtectedRoute from "./components/ProtectedRoute"; // <--- We will create this next
+import OnboardingLayout from "./layouts/OnboardingLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
+// Pages
 import Home from "./pages/Landing/Home";
 import Login from "./pages/Auth/Login";
 import Inventory from "./pages/Dashboard/Inventory";
-import Register from "./pages/Auth/Register";
+
+// Onboarding Pages
+import AccountStep from "./pages/Onboarding/AccountStep";
+import PaymentStep from "./pages/Onboarding/PaymentStep";
+import BrandingStep from "./pages/Onboarding/BrandingStep";
 
 function App() {
   const dispatch = useDispatch();
+
+  // ❌ DELETED: const AccountStep = ... (This was blocking your real component)
 
   useEffect(() => {
     // 1. Check active session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       dispatch(setSession(session));
+      if (session?.user) {
+        dispatch(fetchDealerProfile(session.user.id));
+      }
     });
 
-    // 2. Listen for changes (Sign in, Sign out)
+    // 2. Listen for changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       dispatch(setSession(session));
+      if (session?.user) {
+        dispatch(fetchDealerProfile(session.user.id));
+      }
     });
 
     return () => subscription.unsubscribe();
   }, [dispatch]);
 
   return (
-    <PrelineLayout>
-      <Routes>
-        <Route path="/" element={<Home />} />
+    <Routes>
+      {/* 1. PUBLIC LANDING */}
+      <Route path="/" element={<Home />} />
 
-        {/* Public Auth Routes */}
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} /> {/* <--- ADDED */}
-        </Route>
+      {/* 2. AUTHENTICATION */}
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<Login />} />
+      </Route>
 
-        {/* Protected Dashboard Routes */}
-        <Route element={<ProtectedRoute />}>
-          {" "}
-          {/* <--- The Guard */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<div>Dashboard Stats</div>} />
-            <Route path="inventory" element={<Inventory />} />
-            <Route path="settings" element={<div>Settings Page</div>} />
-          </Route>
+      {/* 3. ONBOARDING FUNNEL */}
+      <Route path="/onboarding" element={<OnboardingLayout />}>
+        {/* ✅ Now this renders the Real Form + Magic Listener */}
+        <Route path="account" element={<AccountStep />} />
+        <Route path="payment" element={<PaymentStep />} />
+        <Route path="branding" element={<BrandingStep />} />
+      </Route>
+
+      {/* 4. DEALER DASHBOARD */}
+      <Route path="/onboarding" element={<OnboardingLayout />}>
+        <Route path="account" element={<AccountStep />} />
+        <Route path="payment" element={<PaymentStep />} />
+        <Route path="branding" element={<BrandingStep />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        {/* The Layout wraps all inner pages */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          {/* Inner Pages */}
+          <Route index element={<div>Dashboard Home (Coming Soon)</div>} />
+          <Route path="inventory" element={<Inventory />} />
+          <Route path="settings" element={<div>Settings Page</div>} />
         </Route>
-      </Routes>
-    </PrelineLayout>
+      </Route>
+    </Routes>
   );
 }
 
