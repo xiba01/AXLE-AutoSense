@@ -1,13 +1,20 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { supabase } from "../../config/supabaseClient";
+import { Input, Button, Link, Divider } from "@heroui/react";
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
+
+  // State
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [isVisible, setIsVisible] = useState(false); // For password toggle
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,88 +29,103 @@ export default function Login() {
 
       if (error) throw error;
 
-      // Navigate to dashboard
-      // The App.jsx Auth Listener will handle the Redux state update
+      // The App.jsx Auth Listener will handle Redux updates automatically
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid email or password.");
+      setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Welcome Back
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold tracking-tight">Welcome Back</h2>
+        <p className="text-small text-default-500">
           Sign in to manage your inventory
         </p>
       </div>
 
-      <form onSubmit={handleLogin} className="space-y-4">
+      <form onSubmit={handleLogin} className="space-y-8">
+        {/* Error Alert */}
         {error && (
-          <div
-            className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <span className="block sm:inline">{error}</span>
+          <div className="bg-danger-50 border border-danger-200 p-3 rounded-xl flex items-center gap-2">
+            <AlertCircle className="size-4 text-danger shrink-0" />
+            <p className="text-tiny text-danger font-medium">{error}</p>
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium mb-2 dark:text-white">
-            Email
-          </label>
-          <input
+        <div className="space-y-4">
+          <Input
+            isRequired
             type="email"
-            required
-            className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+            label="Email"
+            placeholder="admin@dealership.com"
+            variant="bordered"
+            labelPlacement="outside"
+            startContent={
+              <Mail className="size-4 text-default-400 pointer-events-none" />
+            }
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="pb-4"
           />
-        </div>
 
-        <div>
-          <div className="flex justify-between items-center">
-            <label className="block text-sm font-medium mb-2 dark:text-white">
-              Password
-            </label>
-            <a
-              className="text-sm text-blue-600 decoration-2 hover:underline font-medium"
-              href="#"
-            >
-              Forgot password?
-            </a>
-          </div>
-          <input
-            type="password"
-            required
-            className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+          <Input
+            isRequired
+            label="Password"
+            placeholder="Enter your password"
+            variant="bordered"
+            labelPlacement="outside"
+            startContent={
+              <Lock className="size-4 text-default-400 pointer-events-none" />
+            }
+            endContent={
+              <button
+                className="focus:outline-none"
+                type="button"
+                onClick={toggleVisibility}
+              >
+                {isVisible ? (
+                  <EyeOff className="size-4 text-default-400" />
+                ) : (
+                  <Eye className="size-4 text-default-400" />
+                )}
+              </button>
+            }
+            type={isVisible ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+          color="primary"
+          variant="shadow"
+          fullWidth
+          isLoading={loading}
+          endContent={!loading && <ArrowRight className="size-4" />}
+          className="font-semibold"
         >
-          {loading ? "Signing in..." : "Sign In"}
-        </button>
+          Sign In
+        </Button>
       </form>
 
+      <Divider />
+
       <div className="text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account yet?{" "}
+        <p className="text-small text-default-500">
+          Don't have an account?{" "}
           <Link
-            to="/register"
-            className="text-blue-600 decoration-2 hover:underline font-medium"
+            as={RouterLink}
+            to="/onboarding/account?plan=pro"
+            color="primary"
+            className="font-medium cursor-pointer"
           >
-            Sign up here
+            Sign up
           </Link>
         </p>
       </div>

@@ -54,7 +54,7 @@ export default function OnboardingLayout() {
         </div>
 
         {/* Steps List */}
-        <div className="z-10 space-y-8">
+        <div className="z-10 flex flex-col">
           <StepItem
             icon={<User size={20} />}
             label="Create Account"
@@ -63,7 +63,7 @@ export default function OnboardingLayout() {
           />
 
           {/* Connector Line */}
-          <div className="w-px h-8 bg-default-800 ml-6 -my-4" />
+          <div className="w-px h-8 bg-default-800 ml-6 my-2" />
 
           <StepItem
             icon={<CreditCard size={20} />}
@@ -72,7 +72,8 @@ export default function OnboardingLayout() {
             status={getStepStatus("/onboarding/payment")}
           />
 
-          <div className="w-px h-8 bg-default-800 ml-6 -my-4" />
+          {/* Connector Line */}
+          <div className="w-px h-8 bg-default-800 ml-6 my-2" />
 
           <StepItem
             icon={<Palette size={20} />}
@@ -107,7 +108,7 @@ export default function OnboardingLayout() {
         {/* The Page Content */}
         <div className="flex-1 flex items-center justify-center p-6 md:p-12">
           {/* We wrap content in a transparent container to keep max-width consistent */}
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-6xl">
             <Outlet />
           </div>
         </div>

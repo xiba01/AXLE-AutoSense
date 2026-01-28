@@ -4,18 +4,27 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
   Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Drawer,
   DrawerContent,
   DrawerBody,
   useDisclosure,
   Divider,
   User,
+  Card,
+  CardBody,
+  Chip,
 } from "@heroui/react";
-import { LayoutDashboard, Car, Settings, LogOut, Menu } from "lucide-react";
+import {
+  Home,
+  Car,
+  Video,
+  Settings,
+  LogOut,
+  Menu,
+  Sparkles,
+  ChevronRight,
+  HelpCircle,
+} from "lucide-react";
 import { supabase } from "../config/supabaseClient";
 import { logout } from "../store/slices/authSlice";
 import { clearDealerData } from "../store/slices/dealerSlice";
@@ -29,10 +38,11 @@ export default function DashboardLayout() {
   // Get Real Dealer Data from Redux
   const { profile } = useSelector((state) => state.dealer);
 
-  // Fallbacks if profile isn't loaded yet
+  // Fallbacks
   const dealerName = profile?.dealership_name || "Dealer Account";
   const dealerLogo = profile?.logo_url;
-  const dealerInitial = dealerName.charAt(0).toUpperCase();
+  const subscription = profile?.subscription_tier || "free";
+  const isPro = subscription === "pro" || subscription === "enterprise";
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -41,32 +51,55 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
-  // Navigation Links Configuration
   const menuItems = [
-    { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { label: "Dashboard", path: "/dashboard", icon: Home },
     { label: "Inventory", path: "/dashboard/inventory", icon: Car },
+    { label: "Studio", path: "/dashboard/studio", icon: Video },
     { label: "Settings", path: "/dashboard/settings", icon: Settings },
   ];
 
-  // Reusable Sidebar Content
+  // ----------------------------------------------------------------------
+  // 🎨 SIDEBAR CONTENT (Reused for Desktop & Mobile)
+  // ----------------------------------------------------------------------
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-background">
-      {/* Brand Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-divider">
-        <Link
-          to="/dashboard"
-          className="flex items-center gap-2 font-bold text-2xl tracking-tighter"
-        >
+    <div className="flex flex-col h-full">
+      {/* 1. Header & Logo */}
+      <div className="h-20 flex items-center px-6">
+        <Link to="/dashboard" className="flex items-center gap-3">
           <img
-            className=" w-30"
-            src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/dealerships-logo/d9ed9926-ab4a-46a9-b0ee-c42dabefee6b/1769503521260.png"
-            alt=""
+            src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AXLE-logo.png"
+            alt="Axle Logo"
+            className="h-8 w-auto object-contain"
           />
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      {/* 2. User Profile (ACME Style) */}
+      <div className="px-4 mb-6">
+        <div className="p-3 rounded-xl bg-default-100/50 border border-default-100 flex items-center justify-between group cursor-pointer hover:bg-default-100 transition-colors">
+          <User
+            name={dealerName}
+            description={
+              <span className="capitalize text-default-400 text-xs">
+                {subscription} Plan
+              </span>
+            }
+            avatarProps={{
+              src: dealerLogo,
+              size: "sm",
+              isBordered: true,
+              color: isPro ? "secondary" : "default",
+            }}
+            classNames={{
+              name: "text-sm font-semibold text-foreground truncate max-w-[120px]",
+            }}
+          />
+          <ChevronRight className="size-4 text-default-400 group-hover:text-foreground" />
+        </div>
+      </div>
+
+      {/* 3. Navigation Links */}
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
@@ -79,121 +112,131 @@ export default function DashboardLayout() {
               fullWidth
               variant={isActive ? "flat" : "light"}
               color={isActive ? "primary" : "default"}
-              className={`justify-start gap-3 text-medium ${isActive ? "font-semibold" : "font-normal text-default-500"}`}
-              startContent={<Icon size={20} />}
+              className={`
+                justify-start h-11 px-4 gap-3 mb-1
+                ${
+                  isActive
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-default-500 hover:text-foreground"
+                }
+              `}
+              startContent={
+                <Icon
+                  size={20}
+                  className={isActive ? "text-primary" : "text-default-400"}
+                />
+              }
             >
               {item.label}
             </Button>
           );
         })}
+
+        <div className="pt-4">
+          <div className="text-tiny font-bold text-default-400 px-4 mb-2 uppercase tracking-wider">
+            Support
+          </div>
+          <Button
+            fullWidth
+            variant="light"
+            className="justify-start h-10 px-4 gap-3 text-default-500 hover:text-foreground"
+            startContent={<HelpCircle size={20} className="text-default-400" />}
+          >
+            Help & Info
+          </Button>
+        </div>
       </nav>
 
-      <Divider />
+      {/* 4. Upgrade Card (Only if Free) */}
+      {!isPro && (
+        <div className="px-4 mb-4">
+          <Card className="bg-gradient-to-br from-default-100 to-background border border-default-200 shadow-sm">
+            <CardBody className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 bg-primary/10 rounded-full text-primary">
+                  <Sparkles size={14} />
+                </div>
+                <span className="font-semibold text-small">Upgrade to Pro</span>
+              </div>
+              <p className="text-tiny text-default-500 mb-3 leading-relaxed">
+                Unlock 4K rendering, unlimited stories, and AI chat features.
+              </p>
+              <Button
+                size="sm"
+                color="primary"
+                variant="shadow"
+                fullWidth
+                className="font-medium"
+              >
+                Upgrade Plan
+              </Button>
+            </CardBody>
+          </Card>
+        </div>
+      )}
 
-      {/* Footer / Logout */}
-      <div className="p-4">
+      <Divider className="my-2" />
+
+      {/* 5. Logout */}
+      <div className="px-3 pb-3">
         <Button
           fullWidth
           variant="light"
           color="danger"
-          className="justify-start gap-3 font-medium"
+          className="justify-start h-11 px-4 gap-3 font-medium text-danger/80 hover:text-danger hover:bg-danger/10"
           startContent={<LogOut size={20} />}
           onPress={handleLogout}
         >
-          Sign Out
+          Log Out
         </Button>
       </div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-default-50">
-      {/* 1. DESKTOP SIDEBAR (Hidden on Mobile) */}
-      <aside className="hidden lg:block w-64 border-r border-divider fixed inset-y-0 z-50">
-        <SidebarContent />
+    <div className="flex h-screen w-full bg-default-50">
+      {/* 
+        A. DESKTOP FLOATING SIDEBAR 
+        We use padding (p-3) to create the gap, making the sidebar look like a floating card.
+      */}
+      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-0 left-0 z-50 p-3 pr-0">
+        <div className="flex-1 bg-background rounded-2xl border border-default-200 shadow-sm overflow-hidden">
+          <SidebarContent />
+        </div>
       </aside>
 
-      {/* 2. MOBILE SIDEBAR (Drawer) */}
+      {/* B. MOBILE SIDEBAR (Drawer) */}
       <Drawer isOpen={isOpen} onOpenChange={onOpenChange} placement="left">
         <DrawerContent className="max-w-[280px]">
           {(onClose) => (
             <DrawerBody className="p-0">
-              <SidebarContent />
+              {/* Reuse content, but no rounded corners for mobile drawer */}
+              <div className="h-full bg-background">
+                <SidebarContent />
+              </div>
             </DrawerBody>
           )}
         </DrawerContent>
       </Drawer>
 
-      {/* 3. MAIN CONTENT WRAPPER */}
-      <div className="flex-1 flex flex-col lg:pl-64 transition-all">
-        {/* TOP HEADER */}
-        <header className="h-16 sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-divider px-4 sm:px-6 flex items-center justify-between">
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-4 lg:hidden">
-            <Button isIconOnly variant="ghost" size="sm" onPress={onOpen}>
-              <Menu size={20} />
-            </Button>
-            <span className="font-bold text-large tracking-tight">AXLE</span>
-          </div>
-
-          {/* Spacer for Desktop Alignment */}
-          <div className="hidden lg:block"></div>
-
-          {/* User Profile Dropdown */}
+      {/* C. MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col lg:pl-72 h-screen overflow-hidden">
+        {/* Mobile Header (Only visible < lg) */}
+        <header className="h-16 lg:hidden shrink-0 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-default-200 px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex flex-col items-end mr-2">
-              <span className="text-small font-semibold text-foreground">
-                {dealerName}
-              </span>
-              <span className="text-tiny text-default-500">Pro Dealer</span>
-            </div>
-
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Avatar
-                  isBordered
-                  as="button"
-                  className="transition-transform"
-                  color="primary"
-                  name={dealerInitial}
-                  size="sm"
-                  src={dealerLogo}
-                />
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem
-                  key="profile"
-                  className="h-14 gap-2"
-                  textValue="Signed in as"
-                >
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold text-primary">{dealerName}</p>
-                </DropdownItem>
-                <DropdownItem
-                  key="settings"
-                  href="/dashboard/settings"
-                  startContent={<Settings size={16} />}
-                >
-                  Settings
-                </DropdownItem>
-                <DropdownItem key="separator" className="p-0 h-px bg-divider" />
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  className="text-danger"
-                  startContent={<LogOut size={16} />}
-                  onPress={handleLogout}
-                >
-                  Log Out
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            <Button isIconOnly variant="light" size="sm" onPress={onOpen}>
+              <Menu size={24} />
+            </Button>
           </div>
+          <Avatar src={dealerLogo} size="sm" />
         </header>
 
-        {/* PAGE CONTENT */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <Outlet />
+        {/* Page Content */}
+        {/* We add padding to create the visual separation from the floating sidebar */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

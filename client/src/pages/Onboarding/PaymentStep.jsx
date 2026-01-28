@@ -56,7 +56,7 @@ export default function PaymentStep() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 max-w-lg mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Select your plan</h2>
@@ -110,57 +110,61 @@ export default function PaymentStep() {
         </Card>
 
         {/* PRO CARD */}
-        <Card
-          isPressable
-          onPress={() => setSelectedPlan("pro")}
-          className={`border-2 relative overflow-visible transition-all ${
-            selectedPlan === "pro"
-              ? "border-primary bg-primary/5"
-              : "border-transparent hover:border-default-300"
-          }`}
-          shadow="sm"
-        >
+        <div className="relative">
+          {/* Badge sits outside the Card so it doesn't get clipped by overflow-hidden */}
           {selectedPlan === "pro" && (
             <Chip
               color="primary"
               size="sm"
-              className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 font-bold uppercase tracking-wider"
+              className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 font-bold uppercase tracking-wider shadow-md"
             >
               Recommended
             </Chip>
           )}
 
-          <CardBody className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-2">
-                <Zap
-                  className={`size-5 ${selectedPlan === "pro" ? "text-primary" : "text-default-400"}`}
-                />
-                <span className="font-semibold text-large">Pro Dealer</span>
+          <Card
+            isPressable
+            onPress={() => setSelectedPlan("pro")}
+            className={`border-2 transition-all w-full ${
+              selectedPlan === "pro"
+                ? "border-primary bg-primary/5"
+                : "border-transparent hover:border-default-300"
+            }`}
+            shadow="sm"
+          >
+            <CardBody className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-2">
+                  <Zap
+                    className={`size-5 ${selectedPlan === "pro" ? "text-primary" : "text-default-400"}`}
+                  />
+                  <span className="font-semibold text-large">Pro Dealer</span>
+                </div>
+                {selectedPlan === "pro" && (
+                  <Check className="size-5 text-primary" />
+                )}
               </div>
-              {selectedPlan === "pro" && (
-                <Check className="size-5 text-primary" />
-              )}
-            </div>
-            <div className="mb-4">
-              <span className="text-3xl font-bold">$49</span>
-              <span className="text-small text-default-500"> /mo</span>
-            </div>
-            <ul className="space-y-2">
-              <li className="text-small text-default-500 flex items-center gap-2">
-                <div className="size-1.5 rounded-full bg-primary" /> Unlimited
-                Stories
-              </li>
-              <li className="text-small text-default-500 flex items-center gap-2">
-                <div className="size-1.5 rounded-full bg-primary" /> 4K
-                Rendering
-              </li>
-              <li className="text-small text-default-500 flex items-center gap-2">
-                <div className="size-1.5 rounded-full bg-primary" /> White-label
-              </li>
-            </ul>
-          </CardBody>
-        </Card>
+              <div className="mb-4">
+                <span className="text-3xl font-bold">$49</span>
+                <span className="text-small text-default-500"> /mo</span>
+              </div>
+              <ul className="space-y-2">
+                <li className="text-small text-default-500 flex items-center gap-2">
+                  <div className="size-1.5 rounded-full bg-primary" /> Unlimited
+                  Stories
+                </li>
+                <li className="text-small text-default-500 flex items-center gap-2">
+                  <div className="size-1.5 rounded-full bg-primary" /> 4K
+                  Rendering
+                </li>
+                <li className="text-small text-default-500 flex items-center gap-2">
+                  <div className="size-1.5 rounded-full bg-primary" />{" "}
+                  White-label
+                </li>
+              </ul>
+            </CardBody>
+          </Card>
+        </div>
       </div>
 
       <Divider />
@@ -192,6 +196,7 @@ export default function PaymentStep() {
 
             <Input
               isDisabled={loading}
+              defaultValue="4242 4242 4242 4242" // FAKE DATA
               placeholder="0000 0000 0000 0000"
               startContent={
                 <CreditCard className="text-default-400 pointer-events-none" />
@@ -202,11 +207,13 @@ export default function PaymentStep() {
             <div className="grid grid-cols-2 gap-4">
               <Input
                 isDisabled={loading}
+                defaultValue="12 / 25" // FAKE DATA
                 placeholder="MM / YY"
                 variant="bordered"
               />
               <Input
                 isDisabled={loading}
+                defaultValue="123" // FAKE DATA
                 placeholder="CVC"
                 variant="bordered"
               />
