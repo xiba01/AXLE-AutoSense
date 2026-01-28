@@ -15,11 +15,15 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Landing/Home";
 import Login from "./pages/Auth/Login";
 import Inventory from "./pages/Dashboard/Inventory";
+import StudioPage from "./pages/Dashboard/Studio/StudioPage";
 
 // Onboarding Pages
 import AccountStep from "./pages/Onboarding/AccountStep";
 import PaymentStep from "./pages/Onboarding/PaymentStep";
 import BrandingStep from "./pages/Onboarding/BrandingStep";
+
+import StudioWizard from "./pages/Dashboard/Studio/Wizard/StudioWizard";
+import StudioPage from "./pages/Dashboard/Studio/StudioPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -79,6 +83,13 @@ function App() {
           {/* Inner Pages */}
           <Route index element={<div>Dashboard Home (Coming Soon)</div>} />
           <Route path="inventory" element={<Inventory />} />
+          {/* Index: All Stories */}
+          <Route path="studio" element={<StudioPage />} />
+          {/* Sub-routes: Filtered Views */}
+          <Route path="studio/published" element={<StudioPage />} />
+          <Route path="studio/trash" element={<StudioPage />} />
+
+          <Route path="studio/wizard" element={<StudioWizard />} />
           <Route path="settings" element={<div>Settings Page</div>} />
         </Route>
       </Route>

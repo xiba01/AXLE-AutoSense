@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Button,
   Avatar,
@@ -10,9 +11,11 @@ import {
   useDisclosure,
   Divider,
   User,
-  Card,
-  CardBody,
-  Chip,
+  Tooltip,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
 import {
   Home,
@@ -22,8 +25,15 @@ import {
   LogOut,
   Menu,
   Sparkles,
-  ChevronRight,
-  HelpCircle,
+  ChevronDown,
+  Library,
+  Film,
+  Trash2,
+  PlusCircle,
+  BarChart3,
+  CreditCard,
+  Users,
+  Archive,
 } from "lucide-react";
 import { supabase } from "../config/supabaseClient";
 import { logout } from "../store/slices/authSlice";
@@ -35,11 +45,9 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get Real Dealer Data from Redux
   const { profile } = useSelector((state) => state.dealer);
 
-  // Fallbacks
-  const dealerName = profile?.dealership_name || "Dealer Account";
+  const dealerName = profile?.dealership_name || "Dealer";
   const dealerLogo = profile?.logo_url;
   const subscription = profile?.subscription_tier || "free";
   const isPro = subscription === "pro" || subscription === "enterprise";
@@ -51,190 +59,330 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
-  const menuItems = [
-    { label: "Dashboard", path: "/dashboard", icon: Home },
-    { label: "Inventory", path: "/dashboard/inventory", icon: Car },
-    { label: "Studio", path: "/dashboard/studio", icon: Video },
-    { label: "Settings", path: "/dashboard/settings", icon: Settings },
+  // ----------------------------------------------------------------------
+  // 1. NAVIGATION CONFIGURATION
+  // ----------------------------------------------------------------------
+
+  const PRIMARY_NAV = [
+    { key: "dashboard", label: "Overview", path: "/dashboard", icon: Home },
+    {
+      key: "inventory",
+      label: "Inventory",
+      path: "/dashboard/inventory",
+      icon: Car,
+    },
+    // Clicking Studio defaults to /dashboard/studio which maps to "All Stories"
+    { key: "studio", label: "Studio", path: "/dashboard/studio", icon: Video },
+    {
+      key: "settings",
+      label: "Settings",
+      path: "/dashboard/settings",
+      icon: Settings,
+    },
   ];
 
+  const SECONDARY_MENUS = {
+    // 1. STUDIO CONTEXT
+    "/dashboard/studio": [
+      {
+        section: "Library",
+        items: [
+          // "Home" = All Stories
+          {
+            label: "All Stories",
+            path: "/dashboard/studio",
+            icon: Library,
+            exact: true,
+          },
+          // "Published" = Completed Stories
+          {
+            label: "Published",
+            path: "/dashboard/studio/published",
+            icon: Film,
+          },
+          // "Trash" = Archived/Deleted
+          { label: "Trash", path: "/dashboard/studio/trash", icon: Trash2 },
+        ],
+      },
+      {
+        section: "Create",
+        items: [
+          {
+            label: "New Story",
+            path: "/dashboard/studio/wizard",
+            icon: Sparkles,
+            highlight: true,
+          },
+        ],
+      },
+    ],
+    // 2. INVENTORY CONTEXT
+    "/dashboard/inventory": [
+      {
+        section: "Fleet",
+        items: [
+          { label: "All Vehicles", path: "/dashboard/inventory", icon: Car },
+          {
+            label: "Add Vehicle",
+            path: "/dashboard/inventory",
+            icon: PlusCircle,
+            action: "openModal",
+          },
+        ],
+      },
+    ],
+    // 3. SETTINGS CONTEXT
+    "/dashboard/settings": [
+      {
+        section: "Account",
+        items: [
+          { label: "General", path: "/dashboard/settings", icon: Settings },
+          { label: "Billing", path: "/dashboard/settings", icon: CreditCard },
+          { label: "Team", path: "/dashboard/settings", icon: Users },
+        ],
+      },
+    ],
+    // 4. DEFAULT
+    "/dashboard": [
+      {
+        section: "Analytics",
+        items: [{ label: "Overview", path: "/dashboard", icon: BarChart3 }],
+      },
+    ],
+  };
+
+  // Determine active menu based on path start
+  const activeSectionKey =
+    Object.keys(SECONDARY_MENUS).find(
+      (path) =>
+        location.pathname === path || location.pathname.startsWith(path + "/"),
+    ) || "/dashboard";
+
+  const currentSecondaryItems = SECONDARY_MENUS[activeSectionKey];
+
   // ----------------------------------------------------------------------
-  // 🎨 SIDEBAR CONTENT (Reused for Desktop & Mobile)
+  // 🎨 COMPONENT: PRIMARY RAIL
   // ----------------------------------------------------------------------
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* 1. Header & Logo */}
-      <div className="h-20 flex items-center px-6">
-        <Link to="/dashboard" className="flex items-center gap-3">
+  const PrimaryRail = () => (
+    <div className="flex flex-col h-full bg-[#f7f7f5] dark:bg-[#151516] border-r border-default-200 w-[72px] shrink-0 z-30 items-center py-4">
+      <Link to="/dashboard" className="mb-6">
+        <div className="size-10 flex items-center justify-center">
           <img
-            src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AXLE-logo.png"
-            alt="Axle Logo"
-            className="h-8 w-auto object-contain"
+            src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AXLE-logo-mini.png"
+            alt="Logo"
+            className="w-10 h-auto object-contain group-hover:scale-110 transition-transform"
           />
-        </Link>
-      </div>
-
-      {/* 2. User Profile (ACME Style) */}
-      <div className="px-4 mb-6">
-        <div className="p-3 rounded-xl bg-default-100/50 border border-default-100 flex items-center justify-between group cursor-pointer hover:bg-default-100 transition-colors">
-          <User
-            name={dealerName}
-            description={
-              <span className="capitalize text-default-400 text-xs">
-                {subscription} Plan
-              </span>
-            }
-            avatarProps={{
-              src: dealerLogo,
-              size: "sm",
-              isBordered: true,
-              color: isPro ? "secondary" : "default",
-            }}
-            classNames={{
-              name: "text-sm font-semibold text-foreground truncate max-w-[120px]",
-            }}
-          />
-          <ChevronRight className="size-4 text-default-400 group-hover:text-foreground" />
         </div>
-      </div>
+      </Link>
 
-      {/* 3. Navigation Links */}
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+      <nav className="flex-1 flex flex-col gap-3 w-full px-2">
+        {PRIMARY_NAV.map((item) => {
+          // Check if this primary item is active (including sub-routes)
+          const isActive =
+            location.pathname === item.path ||
+            (item.path !== "/dashboard" &&
+              location.pathname.startsWith(item.path));
           const Icon = item.icon;
 
           return (
-            <Button
-              key={item.path}
-              as={Link}
-              to={item.path}
-              fullWidth
-              variant={isActive ? "flat" : "light"}
-              color={isActive ? "primary" : "default"}
-              className={`
-                justify-start h-11 px-4 gap-3 mb-1
-                ${
-                  isActive
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-default-500 hover:text-foreground"
-                }
-              `}
-              startContent={
-                <Icon
-                  size={20}
-                  className={isActive ? "text-primary" : "text-default-400"}
-                />
-              }
+            <Tooltip
+              key={item.key}
+              content={item.label}
+              placement="right"
+              color="foreground"
+              closeDelay={0}
             >
-              {item.label}
-            </Button>
+              <Link to={item.path} className="w-full flex justify-center">
+                <div
+                  className={`
+                  size-10 rounded-xl flex items-center justify-center transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-white dark:bg-default-100 text-primary shadow-sm border border-default-200"
+                      : "text-default-400 hover:text-default-600 hover:bg-default-100/50"
+                  }
+                `}
+                >
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+              </Link>
+            </Tooltip>
           );
         })}
-
-        <div className="pt-4">
-          <div className="text-tiny font-bold text-default-400 px-4 mb-2 uppercase tracking-wider">
-            Support
-          </div>
-          <Button
-            fullWidth
-            variant="light"
-            className="justify-start h-10 px-4 gap-3 text-default-500 hover:text-foreground"
-            startContent={<HelpCircle size={20} className="text-default-400" />}
-          >
-            Help & Info
-          </Button>
-        </div>
       </nav>
 
-      {/* 4. Upgrade Card (Only if Free) */}
-      {!isPro && (
-        <div className="px-4 mb-4">
-          <Card className="bg-gradient-to-br from-default-100 to-background border border-default-200 shadow-sm">
-            <CardBody className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-primary/10 rounded-full text-primary">
-                  <Sparkles size={14} />
-                </div>
-                <span className="font-semibold text-small">Upgrade to Pro</span>
-              </div>
-              <p className="text-tiny text-default-500 mb-3 leading-relaxed">
-                Unlock 4K rendering, unlimited stories, and AI chat features.
-              </p>
-              <Button
-                size="sm"
-                color="primary"
-                variant="shadow"
-                fullWidth
-                className="font-medium"
-              >
-                Upgrade Plan
-              </Button>
-            </CardBody>
-          </Card>
-        </div>
-      )}
-
-      <Divider className="my-2" />
-
-      {/* 5. Logout */}
-      <div className="px-3 pb-3">
-        <Button
-          fullWidth
-          variant="light"
-          color="danger"
-          className="justify-start h-11 px-4 gap-3 font-medium text-danger/80 hover:text-danger hover:bg-danger/10"
-          startContent={<LogOut size={20} />}
-          onPress={handleLogout}
-        >
-          Log Out
-        </Button>
+      <div className="mt-auto flex flex-col gap-3">
+        <Tooltip content="Sign Out" placement="right" color="danger">
+          <button
+            onClick={handleLogout}
+            className="size-10 rounded-xl flex items-center justify-center text-default-400 hover:text-danger hover:bg-danger/10 transition-colors"
+          >
+            <LogOut size={20} />
+          </button>
+        </Tooltip>
       </div>
     </div>
   );
 
-  return (
-    <div className="flex h-screen w-full bg-default-50">
-      {/* 
-        A. DESKTOP FLOATING SIDEBAR 
-        We use padding (p-3) to create the gap, making the sidebar look like a floating card.
-      */}
-      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-0 left-0 z-50 p-3 pr-0">
-        <div className="flex-1 bg-background rounded-2xl border border-default-200 shadow-sm overflow-hidden">
-          <SidebarContent />
-        </div>
-      </aside>
-
-      {/* B. MOBILE SIDEBAR (Drawer) */}
-      <Drawer isOpen={isOpen} onOpenChange={onOpenChange} placement="left">
-        <DrawerContent className="max-w-[280px]">
-          {(onClose) => (
-            <DrawerBody className="p-0">
-              {/* Reuse content, but no rounded corners for mobile drawer */}
-              <div className="h-full bg-background">
-                <SidebarContent />
+  // ----------------------------------------------------------------------
+  // 🎨 COMPONENT: SECONDARY SIDEBAR
+  // ----------------------------------------------------------------------
+  const SecondarySidebar = () => (
+    <div className="flex flex-col h-full w-[240px] bg-background border-r border-default-200 shrink-0 z-20">
+      {/* User Profile */}
+      <div className="h-16 flex items-center px-4 border-b border-default-100">
+        <Dropdown placement="bottom-start" className="w-full">
+          <DropdownTrigger>
+            <div className="flex items-center gap-3 w-full p-1.5 rounded-lg hover:bg-default-100 cursor-pointer transition-colors group">
+              <div className="flex-1 text-left overflow-hidden">
+                <p className="text-sm font-semibold truncate leading-tight text-foreground">
+                  {dealerName}
+                </p>
+                <p className="text-[10px] text-default-400 uppercase tracking-wide font-medium">
+                  {subscription} Plan
+                </p>
               </div>
+              <ChevronDown
+                size={14}
+                className="text-default-400 group-hover:text-foreground"
+              />
+            </div>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="User Actions" variant="flat">
+            <DropdownItem key="settings" startContent={<Settings size={14} />}>
+              Workspace Settings
+            </DropdownItem>
+            <DropdownItem key="billing" startContent={<CreditCard size={14} />}>
+              Billing
+            </DropdownItem>
+            <DropdownItem
+              key="logout"
+              color="danger"
+              className="text-danger"
+              startContent={<LogOut size={14} />}
+              onPress={handleLogout}
+            >
+              Log Out
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
+
+      {/* Menu Items */}
+      <div className="flex-1 overflow-y-auto py-6 px-3 space-y-6">
+        {currentSecondaryItems.map((section, idx) => (
+          <div key={idx}>
+            <div className="px-3 mb-2 text-[11px] font-bold text-default-400 uppercase tracking-wider">
+              {section.section}
+            </div>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const Icon = item.icon;
+
+                // Active Logic:
+                // 1. Exact Match (e.g. "All Stories" should only highlight on /dashboard/studio, not sub-routes)
+                // 2. Prefix Match (e.g. /dashboard/studio/published)
+                const isActive = item.exact
+                  ? location.pathname === item.path
+                  : location.pathname.startsWith(item.path);
+
+                return (
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    className={`
+                      flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group
+                      ${
+                        isActive
+                          ? "bg-default-100 text-foreground font-medium"
+                          : item.highlight
+                            ? "bg-primary/10 text-primary hover:bg-primary/20 font-medium mt-2"
+                            : "text-default-500 hover:bg-default-50 hover:text-foreground"
+                      }
+                    `}
+                  >
+                    <Icon
+                      size={18}
+                      className={
+                        isActive
+                          ? "text-foreground"
+                          : item.highlight
+                            ? "text-primary"
+                            : "text-default-400 group-hover:text-default-600"
+                      }
+                    />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Upgrade Card */}
+      {!isPro && (
+        <div className="p-4 mt-auto">
+          <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 rounded-xl p-4 text-center">
+            <Sparkles className="size-6 text-primary mx-auto mb-2" />
+            <p className="text-xs font-semibold text-primary-600 mb-2">
+              Upgrade to Pro
+            </p>
+            <Button
+              size="sm"
+              color="primary"
+              variant="shadow"
+              fullWidth
+              className="h-8 text-xs font-bold"
+              onPress={() => navigate("/dashboard/settings")}
+            >
+              Unlock AI
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen w-full bg-background">
+      {/* DESKTOP */}
+      <div className="hidden lg:flex h-full">
+        <PrimaryRail />
+        <SecondarySidebar />
+      </div>
+
+      {/* MOBILE */}
+      <Drawer
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="left"
+        size="xs"
+      >
+        <DrawerContent className="max-w-[300px] flex flex-row p-0 gap-0">
+          {(onClose) => (
+            <DrawerBody className="p-0 flex flex-row gap-0">
+              <PrimaryRail />
+              <SecondarySidebar />
             </DrawerBody>
           )}
         </DrawerContent>
       </Drawer>
 
-      {/* C. MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col lg:pl-72 h-screen overflow-hidden">
-        {/* Mobile Header (Only visible < lg) */}
-        <header className="h-16 lg:hidden shrink-0 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-default-200 px-4 flex items-center justify-between">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col h-screen min-w-0 bg-default-50/50">
+        <header className="h-14 lg:hidden shrink-0 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-default-200 px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button isIconOnly variant="light" size="sm" onPress={onOpen}>
               <Menu size={24} />
             </Button>
+            <span className="font-bold text-large tracking-tight">AXLE</span>
           </div>
           <Avatar src={dealerLogo} size="sm" />
         </header>
 
-        {/* Page Content */}
-        {/* We add padding to create the visual separation from the floating sidebar */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10">
+          <div className="max-w-[1600px] mx-auto h-full flex flex-col">
             <Outlet />
           </div>
         </main>
