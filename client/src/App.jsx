@@ -23,7 +23,6 @@ import PaymentStep from "./pages/Onboarding/PaymentStep";
 import BrandingStep from "./pages/Onboarding/BrandingStep";
 
 import StudioWizard from "./pages/Dashboard/Studio/Wizard/StudioWizard";
-import StudioPage from "./pages/Dashboard/Studio/StudioPage";
 
 function App() {
   const dispatch = useDispatch();

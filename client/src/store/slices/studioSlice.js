@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../../config/supabaseClient";
 
-// ------------------------------------------------------------------
-// 1. ASYNC THUNK: FETCH STUDIO DATA (CARS + STORIES)
-// ------------------------------------------------------------------
 export const fetchStudioData = createAsyncThunk(
   "studio/fetchData",
   async (_, { getState, rejectWithValue }) => {
@@ -11,7 +8,6 @@ export const fetchStudioData = createAsyncThunk(
     if (!user) return rejectWithValue("User not authenticated");
 
     try {
-      // Fetch Cars AND their associated Stories in one request (Left Join)
       const { data, error } = await supabase
         .from("cars")
         .select(
@@ -30,20 +26,28 @@ export const fetchStudioData = createAsyncThunk(
 
       if (error) throw error;
 
-      // Transform data for easier UI consumption
+      // --- LOGIC FIX HERE ---
       const studioItems = data.map((car) => {
-        // Check if there is a story array and if it has items
-        const activeStory =
-          car.stories && car.stories.length > 0 ? car.stories[0] : null;
+        let activeStory = null;
+
+        // 1. Handle One-to-Many (Array)
+        if (Array.isArray(car.stories) && car.stories.length > 0) {
+          activeStory = car.stories[0];
+        }
+        // 2. Handle One-to-One (Single Object) - THIS IS LIKELY YOUR CASE
+        else if (car.stories && typeof car.stories === "object") {
+          activeStory = car.stories;
+        }
 
         return {
           ...car,
-          story: activeStory, // Attach the story object directly
-          hasStory: !!activeStory, // Boolean flag for easy filtering
+          story: activeStory,
+          hasStory: !!activeStory, // True if story exists
           storyStatus: activeStory ? activeStory.generation_status : "none",
         };
       });
 
+      console.log("🔥 Studio Data Fetched:", studioItems); // Debug Log
       return studioItems;
     } catch (error) {
       console.error("Studio Fetch Error:", error);
@@ -52,16 +56,10 @@ export const fetchStudioData = createAsyncThunk(
   },
 );
 
-// ------------------------------------------------------------------
-// 2. THE SLICE
-// ------------------------------------------------------------------
+// ... Rest of the file remains the same ...
 const initialState = {
-  items: [], // The full list of cars with story metadata
-  stats: {
-    total: 0,
-    unexplored: 0,
-    showroom: 0,
-  },
+  items: [],
+  stats: { total: 0, unexplored: 0, showroom: 0 },
   loading: false,
   error: null,
 };
@@ -69,20 +67,16 @@ const initialState = {
 const studioSlice = createSlice({
   name: "studio",
   initialState,
-  reducers: {
-    // We might add reducers later to handle "Story Created" events instantly
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchStudioData.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(fetchStudioData.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
-
-        // Calculate Stats automatically
+        // Recalculate Stats
         state.stats.total = action.payload.length;
         state.stats.showroom = action.payload.filter((i) => i.hasStory).length;
         state.stats.unexplored = action.payload.filter(
