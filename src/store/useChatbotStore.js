@@ -5,6 +5,7 @@ export const useChatbotStore = create(
   subscribeWithSelector((set, get) => ({
     isOpen: false,
     messages: [],
+    isLoading: false,
     isTyping: false,
     suggestions: [],
 
@@ -63,7 +64,11 @@ export const useChatbotStore = create(
     },
 
     setTyping: (isTyping) => {
-      set({ isTyping });
+      set({ isTyping, isLoading: isTyping });
+    },
+
+    setLoading: (isLoading) => {
+      set({ isLoading });
     },
 
     setSuggestions: (suggestions) => {
@@ -93,22 +98,24 @@ export const useChatbotStore = create(
         return suggestions;
       }
 
-      // Scene-specific suggestions
-      if (currentScene?.type === 'intro_view') {
-        suggestions.push("What's the electric range?");
-        suggestions.push("How efficient is this hybrid?");
-      } else if (currentScene?.slide_content?.theme_tag) {
-        const theme = currentScene.slide_content.theme_tag.toLowerCase();
-        if (theme.includes('efficiency')) {
-          suggestions.push("What's the MPG rating?");
-          suggestions.push("How long does it take to charge?");
-        } else if (theme.includes('performance')) {
-          suggestions.push("What's the horsepower?");
-          suggestions.push("How quick is the acceleration?");
-        } else if (theme.includes('technology')) {
-          suggestions.push("What safety features are included?");
-          suggestions.push("Tell me about the infotainment system");
-        }
+      // Scene-specific suggestions - strictly defensive
+      const sceneTheme = (currentScene?.slide_content?.theme_tag ||
+        currentScene?.intro_content?.theme_tag ||
+        currentScene?.theme_tag ||
+        "").toLowerCase();
+
+      if (sceneTheme.includes('efficiency')) {
+        suggestions.push("How does the dual-source charging work?");
+        suggestions.push("Explain the 127 MPGe rating technicality");
+        suggestions.push("What is the real-world EV range?");
+      } else if (sceneTheme.includes('performance')) {
+        suggestions.push("Break down the 220 HP powertrain system");
+        suggestions.push("How does it compare to a sports sedan?");
+        suggestions.push("Tell me about the 0-60 acceleration feel");
+      } else if (sceneTheme.includes('safety')) {
+        suggestions.push("What is included in the TSS 3.0 suite?");
+        suggestions.push("Detail the active collision avoidance features");
+        suggestions.push("Is it safe for a long family road trip?");
       }
 
       // For general suggestions

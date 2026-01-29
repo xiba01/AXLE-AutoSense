@@ -14,6 +14,7 @@ export const ChatbotWidget = () => {
   const {
     isOpen,
     messages,
+    conversationHistory,
     isTyping,
     suggestions,
     toggleChatbot,
@@ -22,7 +23,9 @@ export const ChatbotWidget = () => {
     addBotMessage,
     addUserMessage,
     setTyping,
+    setLoading,
     setSuggestions,
+    isLoading,
     initializeChat,
     updateContextualSuggestions
   } = useChatbotStore();
@@ -33,6 +36,8 @@ export const ChatbotWidget = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef(null);
   const chatbotBackend = useRef(new ChatbotBackend());
+  // Subscribe to playback state for scene reactivity
+  const { currentSceneIndex } = useStoryStore(state => state.playback);
   const scene = getCurrentScene();
 
   const scrollToBottom = () => {
@@ -43,19 +48,18 @@ export const ChatbotWidget = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // This is just to initialize chat when first opened
+  // Handle initialization and scene-aware suggestions
   useEffect(() => {
-    if (isOpen && !isInitialized) {
+    if (!isOpen) return;
+
+    if (!isInitialized) {
       initializeChat(scene, selectedCar);
       setIsInitialized(true);
-    }
-  }, [isOpen, isInitialized, scene, selectedCar, initializeChat]);
-
-  useEffect(() => {
-    if (isOpen) {
+    } else {
+      // Refresh suggestions when scene or index changes
       updateContextualSuggestions(scene, selectedCar);
     }
-  }, [isOpen, scene, selectedCar, updateContextualSuggestions]);
+  }, [isOpen, scene, currentSceneIndex, selectedCar, isInitialized, initializeChat, updateContextualSuggestions]);
 
   const handleSendMessage = async (userMessage) => {
     if (!userMessage.trim()) return;
@@ -67,21 +71,26 @@ export const ChatbotWidget = () => {
     try {
       const currentScene = getCurrentScene();
 
-      // Generate lame bot response
+      console.log('Chatbot Sending Request:', {
+        message: userMessage,
+        car: selectedCar?.model,
+        scene: currentScene?.id,
+        theme: currentScene?.slide_content?.theme_tag,
+        stats: currentScene?.slide_content?.key_stats
+      });
+
       const response = await chatbotBackend.current.generateResponse(
         userMessage,
         selectedCar,
-        currentScene
+        currentScene,
+        conversationHistory
       );
 
-      setTimeout(() => {
-        addBotMessage(response, currentScene?.id);
-        setTyping(false);
+      addBotMessage(response, currentScene?.id);
+      setTyping(false);
 
-        // Update suggestions based on conversation context
-        const newSuggestions = chatbotBackend.current.getContextualSuggestions(currentScene, selectedCar);
-        setSuggestions(newSuggestions);
-      }, 1000 + Math.random() * 1000);
+      // Update suggestions based on conversation context using store logic
+      updateContextualSuggestions(currentScene, selectedCar);
 
     } catch (error) {
       logger.error('Error generating response:', error);
@@ -279,7 +288,7 @@ export const ChatbotWidget = () => {
                   <ChatInput
                     onSendMessage={handleSendMessage}
                     suggestions={suggestions}
-                    disabled={isTyping}
+                    disabled={isLoading}
                     placeholder="Ask about specs, features, or performance..."
                   />
                 </div>

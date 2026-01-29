@@ -5,8 +5,9 @@ import autosenseLogo from '../../assets/autosense-logo.png';
 import { HotspotLayer } from './HotspotLayer';
 import { Subtitles } from './Subtitles';
 import { AudioPlayer } from './AudioPlayer';
+import { cn } from '../../lib/utils';
 
-export const StoryContainer = () => {
+export const StoryContainer = ({ isEditor = false }) => {
     const { storyData, playback } = useStoryStore();
     const currentSceneIndex = playback?.currentSceneIndex ?? 0;
 
@@ -17,23 +18,26 @@ export const StoryContainer = () => {
     );
 
     return (
-        <div className="relative w-full h-full overflow-hidden bg-noir-900 text-chrome-100 selection:bg-neon-purple selection:text-white">
+        <div className={cn(
+            "relative w-full h-full overflow-hidden bg-noir-900 text-chrome-100 selection:bg-neon-purple selection:text-white",
+            isEditor && "pointer-events-none"
+        )}>
             {/* 1. Visual Layer (z-0) */}
-            <SceneLayer />
+            <SceneLayer isEditor={isEditor} />
 
             {/* 2. Narrative Layer (z-30) */}
             <div className="absolute inset-0 z-30 pointer-events-none">
-                <SlideContentLayer />
+                <SlideContentLayer isEditor={isEditor} />
             </div>
 
             {/* 3. Interactive Layer (z-40) */}
-            <HotspotLayer />
+            <HotspotLayer isEditor={isEditor} />
 
             {/* 4. Subtitle Layer (z-50) */}
-            <Subtitles />
+            <Subtitles isEditor={isEditor} />
 
             {/* 5. Audio Engine */}
-            <AudioPlayer />
+            {!isEditor && <AudioPlayer />}
         </div>
     );
 };

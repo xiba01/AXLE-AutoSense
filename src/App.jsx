@@ -1,10 +1,17 @@
 import { useAppStore, appStates } from './store/useAppStore';
+import { useStoryStore } from './store/useStoryStore';
+import { useEffect } from 'react';
 import { EditorView } from './components/Editor/EditorView';
 import { PlaybackView } from './components/Playback/PlaybackView';
 import { ErrorBoundary } from './components/Shared/ErrorBoundary';
 
 function App() {
   const { appState } = useAppStore();
+  const { initialize } = useStoryStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   return (
     <div className="relative min-h-screen">

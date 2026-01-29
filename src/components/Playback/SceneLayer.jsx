@@ -34,15 +34,15 @@ export const SceneLayer = () => {
                                 backgroundImage: `url(${imageUrl})`,
                                 backgroundColor: index % 2 === 0 ? '#0A0A0F' : '#151520',
                                 filter: `
-                                    brightness(${scene.slide_content?.brightness || 1})
-                                    contrast(${scene.slide_content?.contrast || 1})
+                                    brightness(${scene.brightness ?? scene.intro_content?.brightness ?? scene.slide_content?.brightness ?? scene.outro_content?.brightness ?? 1})
+                                    contrast(${scene.contrast ?? scene.intro_content?.contrast ?? scene.slide_content?.contrast ?? scene.outro_content?.contrast ?? 1})
                                 `
                             }}
                             animate={{
                                 scale: isActive ? 1.0 : 1.1,
                                 filter: `
-                                    brightness(${scene.slide_content?.brightness || 1})
-                                    contrast(${scene.slide_content?.contrast || 1})
+                                    brightness(${scene.brightness ?? scene.intro_content?.brightness ?? scene.slide_content?.brightness ?? scene.outro_content?.brightness ?? 1})
+                                    contrast(${scene.contrast ?? scene.intro_content?.contrast ?? scene.slide_content?.contrast ?? scene.outro_content?.contrast ?? 1})
                                 `
                             }}
                             transition={{
@@ -56,6 +56,6 @@ export const SceneLayer = () => {
                     </motion.div>
                 );
             })}
-        </div>
+        </div >
     );
 };

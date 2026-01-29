@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import storyJson from '../data/dummy_story.json';
+import { storyService } from '../services/storyService';
 
 export const useStoryStore = create((set, get) => ({
   storyData: storyJson,
@@ -19,6 +20,8 @@ export const useStoryStore = create((set, get) => ({
   themeConfig: {
     cardStyle: 'liquid',
   },
+  isLoading: false,
+  error: null,
 
   // Playback Actions
   nextScene: () => {
@@ -107,11 +110,32 @@ export const useStoryStore = create((set, get) => ({
   },
 
   // Story Data Actions
-  updateStoryData: (data) => {
+  initialize: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const storyData = await storyService.fetchStory();
+      set({ storyData, isLoading: false });
+    } catch (error) {
+      console.error('Failed to initialize story:', error);
+      set({ error: 'Failed to load story', isLoading: false });
+      // Fallback to dummy data
+      set({ storyData: storyJson });
+    }
+  },
+
+  updateStoryData: async (data, persist = true) => {
     set((state) => ({
       storyData: data,
       playback: { ...state.playback, currentSceneIndex: 0, currentTime: 0 }
     }));
+
+    if (persist) {
+      try {
+        await storyService.updateStory(data);
+      } catch (error) {
+        console.error('Failed to persist story data:', error);
+      }
+    }
   },
 
   updateCurrentScene: (updates) => {
@@ -122,29 +146,45 @@ export const useStoryStore = create((set, get) => ({
         const current = scenes[index];
         const type = current.type;
 
-        // Determine which content block to update
-        let contentKey = 'slide_content';
-        if (type === 'intro_view') contentKey = 'intro_content';
-        else if (type === 'outro_view') contentKey = 'outro_content';
-
         // Merge updates into the specific content block or the top level
         const updatedScene = { ...current };
 
-        if (updates[contentKey]) {
-          updatedScene[contentKey] = { ...current[contentKey], ...updates[contentKey] };
-        } else {
-          updatedScene[contentKey] = { ...current[contentKey], ...updates };
-        }
+        // Lists of known content blocks
+        const contentKeys = ['slide_content', 'intro_content', 'outro_content'];
+
+        // Find the active content key for this scene type
+        let activeContentKey = 'slide_content';
+        if (type === 'intro_view') activeContentKey = 'intro_content';
+        else if (type === 'outro_view') activeContentKey = 'outro_content';
+
+        // Known top-level fields that shouldn't go into content blocks
+        const topLevelFields = ['id', 'type', 'order', 'enabled', 'image_url', 'audio_url', 'duration', 'transition', 'layout'];
 
         Object.keys(updates).forEach(key => {
-          if (key !== 'slide_content' && key !== 'intro_content' && key !== 'outro_content') {
-            updatedScene[key] = updates[key];
+          const value = updates[key];
+
+          if (topLevelFields.includes(key) || contentKeys.includes(key)) {
+            // Apply directly to top level
+            updatedScene[key] = value;
+          } else {
+            // Apply to the active content block
+            updatedScene[activeContentKey] = {
+              ...updatedScene[activeContentKey],
+              [key]: value
+            };
           }
         });
 
         scenes[index] = updatedScene;
       }
-      return { storyData: { ...state.storyData, scenes } };
+      const newState = { storyData: { ...state.storyData, scenes } };
+
+      // Persist changes
+      storyService.updateStory(newState.storyData).catch(err => {
+        console.error('Failed to persist scene update:', err);
+      });
+
+      return newState;
     });
   },
 

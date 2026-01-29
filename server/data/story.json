@@ -19,7 +19,10 @@
                 "background_image": "/assets/images/intro_image.jpg",
                 "subtitle": "2024 Toyota Prius Prime",
                 "brand_logo": "/assets/logos/toyota_white.png",
-                "start_button_label": "Start Experience"
+                "start_button_label": "Start Experience",
+                "brightness": 1,
+                "contrast": 1,
+                "headlineSize": 4.8
             }
         },
         {
@@ -70,7 +73,9 @@
                         "value": "4",
                         "unit": "hrs"
                     }
-                ]
+                ],
+                "brightness": 1,
+                "contrast": 1
             },
             "hotspots": [
                 {
@@ -86,7 +91,7 @@
                 },
                 {
                     "id": "hs_2",
-                    "x": 59.0,
+                    "x": 59,
                     "y": 80.1,
                     "icon": "battery",
                     "label": "Lithium-Ion Pack",
@@ -99,7 +104,7 @@
             "subtitles": [
                 {
                     "text": "Imagine a morning where the engine never wakes up",
-                    "start": 0.0,
+                    "start": 0,
                     "end": 3.62
                 },
                 {
@@ -191,7 +196,7 @@
             "subtitles": [
                 {
                     "text": "But when the highway opens up, the hybrid system roars to life",
-                    "start": 0.0,
+                    "start": 0,
                     "end": 5.07
                 },
                 {
@@ -260,7 +265,7 @@
                 {
                     "id": "hs_5",
                     "x": 55.8,
-                    "y": 13.0,
+                    "y": 13,
                     "icon": "eye",
                     "label": "Pre-Collision",
                     "hover_content": {
@@ -283,7 +288,7 @@
             "subtitles": [
                 {
                     "text": "And through every curve, you are watched over",
-                    "start": 0.0,
+                    "start": 0,
                     "end": 3.6
                 },
                 {

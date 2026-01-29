@@ -47,7 +47,13 @@ export const SlideContentLayer = () => {
                             <h2 className="text-chrome-300 text-sm tracking-widest uppercase mb-2">
                                 {scene.intro_content.subtitle}
                             </h2>
-                            <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-gray-300 to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                            <h1
+                                className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-gray-300 to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                                style={{
+                                    fontSize: scene.intro_content.headlineSize ? `${scene.intro_content.headlineSize}rem` : undefined,
+                                    lineHeight: '1.1'
+                                }}
+                            >
                                 {scene.intro_content.title}
                             </h1>
                             <div className="flex gap-4">
@@ -173,11 +179,22 @@ export const SlideContentLayer = () => {
                     {/* TYPE: OUTRO */}
                     {scene.type === 'outro_view' && scene.outro_content && (
                         <div className="space-y-8 text-center w-full flex flex-col items-center">
-                            <h1 className="text-6xl md:text-7xl font-bold text-white">
+                            <h1
+                                className="text-6xl md:text-7xl font-bold text-white"
+                                style={{
+                                    fontSize: scene.outro_content.headlineSize ? `${scene.outro_content.headlineSize}rem` : undefined,
+                                    lineHeight: '1.1'
+                                }}
+                            >
                                 {scene.outro_content.headline}
                             </h1>
-                            <p className="text-xl text-chrome-300">
-                                {scene.outro_content.subheadline}
+                            <p
+                                className="text-xl text-chrome-300"
+                                style={{
+                                    fontSize: scene.outro_content.paragraphSize ? `${scene.outro_content.paragraphSize}rem` : undefined
+                                }}
+                            >
+                                {scene.outro_content.subheadline || scene.outro_content.paragraph}
                             </p>
                             <div className="flex gap-4 mt-6">
                                 {scene.outro_content.cta_buttons.map((btn, i) => (
