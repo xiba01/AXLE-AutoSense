@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "../../../../config/supabaseClient";
+import { CircularProgress, Card, CardBody } from "@heroui/react";
 import {
   Sparkles,
   Search,
@@ -16,95 +19,117 @@ import {
 } from "lucide-react";
 
 // --- CONFIGURATION ---
+// These IDs correspond to the array index (0-based) for mapping logic
 const GENERATION_STEPS = [
   {
-    id: 1,
+    id: 0,
+    key: "SYSTEM",
     icon: Zap,
     color: "text-blue-400",
     glow: "bg-blue-500",
     label: "SYSTEM",
     msg: "Initializing AutoSense Core...",
-    delay: 1000,
   },
   {
-    id: 2,
+    id: 1,
+    key: "INGESTION",
     icon: Search,
     color: "text-cyan-400",
     glow: "bg-cyan-500",
     label: "INGESTION",
-    msg: "Connecting to NHTSA Database...",
-    delay: 1500,
+    msg: "Connecting to RapidAPI & NHTSA...",
   },
   {
-    id: 3,
+    id: 2,
+    key: "BADGE_ORCHESTRATOR",
     icon: CheckCircle2,
     color: "text-emerald-400",
     glow: "bg-emerald-500",
     label: "VERIFICATION",
-    msg: "5-Star Safety Rating Confirmed.",
-    delay: 1200,
+    msg: "Collecting awards & certifications...",
   },
   {
-    id: 4,
+    id: 3,
+    key: "ANALYST",
     icon: BrainCircuit,
     color: "text-violet-400",
     glow: "bg-violet-500",
     label: "ANALYST",
-    msg: "Constructing Buyer Persona...",
-    delay: 2000,
+    msg: "Identifying buyer persona & USP...",
   },
   {
-    id: 5,
+    id: 4,
+    key: "DIRECTOR",
     icon: PenTool,
     color: "text-fuchsia-400",
     glow: "bg-fuchsia-500",
     label: "DIRECTOR",
-    msg: "Drafting Cinematic Script...",
-    delay: 1800,
+    msg: "Structuring narrative arc...",
+  },
+  {
+    id: 5,
+    key: "SCRIPTWRITER",
+    icon: PenTool,
+    color: "text-pink-400",
+    glow: "bg-pink-500",
+    label: "SCRIPTWRITER",
+    msg: "Composing scene narration...",
   },
   {
     id: 6,
-    icon: Mic2,
+    key: "IMAGE_GENERATOR",
+    icon: Sparkles,
     color: "text-rose-400",
     glow: "bg-rose-500",
-    label: "VOICE ENGINE",
-    msg: "Synthesizing Neural Audio...",
-    delay: 2200,
+    label: "IMAGE GEN",
+    msg: "Rendering cinematic assets (Flux)...",
   },
   {
     id: 7,
-    icon: Box,
+    key: "VISION_SCANNER",
+    icon: Scan,
     color: "text-amber-400",
     glow: "bg-amber-500",
-    label: "PHYSICS",
-    msg: "Compiling 3D Assets & Constraints...",
-    delay: 1500,
+    label: "VISION AI",
+    msg: "Scanning spatial coordinates & hotspots...",
   },
   {
     id: 8,
-    icon: Sparkles,
-    color: "text-white",
-    glow: "bg-white",
-    label: "FINALIZING",
-    msg: "Packaging Story Experience...",
-    delay: 1000,
+    key: "AUDIO_ENGINE",
+    icon: Mic2,
+    color: "text-orange-400",
+    glow: "bg-orange-500",
+    label: "AUDIO ENGINE",
+    msg: "Synthesizing neural voiceover...",
   },
   {
     id: 9,
+    key: "QA_SYSTEM",
+    icon: Box,
+    color: "text-lime-400",
+    glow: "bg-lime-500",
+    label: "QA SYSTEM",
+    msg: "Validating assets & assembling story...",
+  },
+  {
+    id: 10,
+    key: "COMPLETE",
     icon: CheckCircle2,
     color: "text-green-400",
     glow: "bg-green-500",
     label: "COMPLETE",
     msg: "Ready to Launch.",
-    delay: 800,
   },
 ];
 
-export default function GenerationVisualizer({ car, onComplete }) {
+export default function GenerationVisualizer({ car, config, onComplete }) {
   // PHASE STATE: 'scanning' -> 'generating' -> 'complete'
   const [phase, setPhase] = useState("scanning");
-
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [error, setError] = useState(null);
+
+  // Store the Story ID once created
+  const [activeStoryId, setActiveStoryId] = useState(null);
 
   // Particles for background effect
   const particles = useMemo(
@@ -119,55 +144,130 @@ export default function GenerationVisualizer({ car, onComplete }) {
     [],
   );
 
-  // 1. SCANNING LOGIC (Phase 1)
+  // 1. PHASE 1: SCANNER ANIMATION (Fixed Duration)
   useEffect(() => {
     if (phase === "scanning") {
       const timer = setTimeout(() => {
         setPhase("generating");
-      }, 3500); // Scan for 3.5 seconds
+      }, 3500); // 3.5s intro animation
       return () => clearTimeout(timer);
     }
   }, [phase]);
 
-  // 2. GENERATION LOGIC (Phase 2)
+  // 2. PHASE 2: TRIGGER API + START LISTENER
   useEffect(() => {
     if (phase !== "generating") return;
 
-    let isMounted = true;
+    const startJob = async () => {
+      try {
+        console.log("🚀 Triggering AI Backend...");
+        const payload = {
+          vin: car.vin || "UNKNOWN_VIN",
+          make: car.make,
+          model: car.model,
+          year: car.year,
+          color: car.color || "Standard",
+          mileage: car.mileage || 0,
+          trim_id: car.specs_raw?.id || null,
+          template: config.theme || "cinematic",
+          scenes: config.sceneCount || 4,
+          car_id: car.id, // Important: Pass the ID so backend knows which row to update
+        };
 
-    const processSteps = async () => {
-      for (let i = 0; i < GENERATION_STEPS.length; i++) {
-        if (!isMounted) return;
-
-        setCurrentStepIndex(i);
-        await new Promise((resolve) =>
-          setTimeout(resolve, GENERATION_STEPS[i].delay),
+        // This call returns IMMEDIATELY with { storyId: "..." }
+        const response = await axios.post(
+          "http://localhost:3000/api/ingest/context",
+          payload,
         );
-      }
 
-      if (isMounted) {
-        setTimeout(onComplete, 500);
+        if (response.data.success && response.data.storyId) {
+          console.log("✅ Job Started. ID:", response.data.storyId);
+          setActiveStoryId(response.data.storyId);
+        } else {
+          throw new Error("Failed to get Story ID from server.");
+        }
+      } catch (err) {
+        console.error("API Error:", err);
+        setError("Failed to start generation. Check server.");
       }
     };
 
-    processSteps();
+    startJob();
+  }, [phase, car, config]);
+
+  // 3. REAL-TIME LISTENER (The Magic)
+  useEffect(() => {
+    if (!activeStoryId) return;
+
+    console.log("📡 Listening for updates on:", activeStoryId);
+
+    // Subscribe to the specific row in 'stories' table
+    const channel = supabase
+      .channel(`story-${activeStoryId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "stories",
+          filter: `id=eq.${activeStoryId}`,
+        },
+        (payload) => {
+          const newAgent = payload.new.current_agent;
+          console.log("⚡ Realtime Update:", newAgent);
+
+          if (newAgent === "ERROR") {
+            setError("Pipeline failed on server.");
+            return;
+          }
+
+          // Map Backend String -> Frontend Index
+          const stepIndex = GENERATION_STEPS.findIndex(
+            (s) => s.key === newAgent,
+          );
+
+          if (stepIndex !== -1) {
+            setCurrentStepIndex(stepIndex);
+          }
+
+          // Finish
+          if (newAgent === "COMPLETE") {
+            setTimeout(() => {
+              onComplete();
+            }, 1000);
+          }
+        },
+      )
+      .subscribe();
 
     return () => {
-      isMounted = false;
+      supabase.removeChannel(channel);
     };
-  }, [phase, onComplete]);
+  }, [activeStoryId, onComplete]);
 
-  // Vars for Phase 2
+  // --- RENDERING VARS ---
   const currentStep = GENERATION_STEPS[currentStepIndex];
-  const Icon = currentStep?.icon || Sparkles;
+  const Icon = currentStep?.icon || Zap;
   const progressPercent =
     ((currentStepIndex + 1) / GENERATION_STEPS.length) * 100;
 
+  // ERROR STATE
+  if (error) {
+    return (
+      <div className="w-full h-[650px] flex flex-col items-center justify-center bg-black rounded-3xl border border-red-900/50 p-10 text-center">
+        <div className="p-4 bg-red-900/20 rounded-full mb-4">
+          <AlertTriangle className="size-10 text-red-500" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">System Error</h2>
+        <p className="text-neutral-400 mb-6 max-w-md">{error}</p>
+      </div>
+    );
+  }
+
+  // --- RENDER UI ---
   return (
     <div className="w-full h-[650px] flex flex-col items-center justify-center relative overflow-hidden bg-black rounded-3xl border border-white/10 shadow-2xl">
-      {/* ---------------------------------------------------- */}
-      {/* PHASE 1: COMPUTER VISION SCANNER                     */}
-      {/* ---------------------------------------------------- */}
+      {/* PHASE 1: SCANNER (Keeping your existing cool scanner UI) */}
       <AnimatePresence>
         {phase === "scanning" && (
           <motion.div
@@ -178,20 +278,21 @@ export default function GenerationVisualizer({ car, onComplete }) {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="absolute inset-0 z-20 flex items-center justify-center bg-black"
           >
-            {/* Background Image (The Car) */}
+            {/* ... (Your existing Scanner JSX Code goes here - pasted below for completeness) ... */}
             <div className="absolute inset-0 z-0 opacity-40">
               <img
-                src={car?.photos?.[0]}
+                src={
+                  car?.photos?.[0] ||
+                  "https://placehold.co/800x600?text=Scanning"
+                }
                 alt="Scanning Target"
                 className="w-full h-full object-cover filter grayscale contrast-125"
               />
               <div className="absolute inset-0 bg-blue-900/20 mix-blend-overlay" />
             </div>
 
-            {/* Grid Overlay */}
             <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
 
-            {/* The Scanning Beam */}
             <motion.div
               initial={{ top: "-10%" }}
               animate={{ top: "110%" }}
@@ -199,9 +300,7 @@ export default function GenerationVisualizer({ car, onComplete }) {
               className="absolute left-0 right-0 h-2 z-20 bg-cyan-400 shadow-[0_0_50px_rgba(0,255,255,0.8)]"
             />
 
-            {/* HUD Elements */}
             <div className="absolute inset-8 border-2 border-white/20 z-30 rounded-lg flex flex-col justify-between p-6">
-              {/* Top Bar */}
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2 text-cyan-400">
                   <Scan className="size-5 animate-pulse" />
@@ -209,13 +308,7 @@ export default function GenerationVisualizer({ car, onComplete }) {
                     TARGET_LOCKED
                   </span>
                 </div>
-                <div className="text-right font-mono text-[10px] text-white/50">
-                  <p>ISO: 800</p>
-                  <p>SHUTTER: 1/2000</p>
-                </div>
               </div>
-
-              {/* Center Reticle */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <motion.div
                   animate={{ rotate: 360, scale: [1, 1.1, 1] }}
@@ -227,58 +320,23 @@ export default function GenerationVisualizer({ car, onComplete }) {
                   <p className="text-cyan-400 font-bold text-2xl tracking-tighter">
                     ANALYZING
                   </p>
-                  <p className="text-white/50 text-[10px] tracking-widest font-mono mt-1">
-                    VOXEL MAPPING
-                  </p>
                 </div>
               </div>
-
-              {/* Bottom Corners */}
               <div className="flex justify-between items-end">
                 <Maximize className="size-6 text-white/30" />
                 <Maximize className="size-6 text-white/30 rotate-90" />
               </div>
             </div>
-
-            {/* Data Feed Simulation */}
-            <div className="absolute bottom-20 left-12 z-30 font-mono text-[10px] text-cyan-300/80 space-y-1">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                Detecting Geometry...
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2 }}
-              >
-                Normalizing Vertices...
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 2.0 }}
-              >
-                Extracting Feature Points...
-              </motion.div>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ---------------------------------------------------- */}
-      {/* PHASE 2: NEURAL CORE (The Brain)                     */}
-      {/* ---------------------------------------------------- */}
-
-      {/* 1. BACKGROUND ATMOSPHERE */}
+      {/* PHASE 2: NEURAL CORE (The Brain) */}
       <div className="absolute inset-0 z-0">
         <div
           className={`absolute inset-0 opacity-20 transition-colors duration-1000 ${currentStep.glow.replace("bg-", "bg-")}/20 blur-[100px]`}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-black/50 to-black" />
-
         {particles.map((p) => (
           <motion.div
             key={p.id}
@@ -295,7 +353,6 @@ export default function GenerationVisualizer({ car, onComplete }) {
         ))}
       </div>
 
-      {/* 2. THE NEURAL CORE (HUD) */}
       <div className="relative z-10 mb-16 size-64 flex items-center justify-center">
         {/* Ring 1: Progress Track */}
         <svg
@@ -337,13 +394,7 @@ export default function GenerationVisualizer({ car, onComplete }) {
           </defs>
         </svg>
 
-        {/* Ring 3: Spinning Loader */}
-        <div className="absolute inset-4 rounded-full border-t-2 border-white/50 animate-[spin_3s_linear_infinite]" />
-
-        {/* Ring 4: Counter-Spin */}
-        <div className="absolute inset-8 rounded-full border-b border-white/30 animate-[spin_5s_linear_infinite_reverse]" />
-
-        {/* CENTER PULSE */}
+        {/* Center Pulse */}
         <div className="relative flex items-center justify-center">
           <div
             className={`absolute inset-0 ${currentStep.glow} blur-2xl opacity-40 animate-pulse`}
@@ -364,7 +415,6 @@ export default function GenerationVisualizer({ car, onComplete }) {
         </div>
       </div>
 
-      {/* 3. INTELLIGENCE FEEDOUT */}
       <div className="relative z-10 w-full max-w-2xl text-center px-6 h-32">
         <AnimatePresence mode="wait">
           <motion.div
@@ -390,7 +440,6 @@ export default function GenerationVisualizer({ car, onComplete }) {
         </AnimatePresence>
       </div>
 
-      {/* 4. SYSTEM STATUS */}
       <div className="absolute bottom-8 z-10 w-full px-8 flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -403,18 +452,11 @@ export default function GenerationVisualizer({ car, onComplete }) {
           </div>
           <div className="flex flex-col text-left">
             <span className="text-[10px] uppercase font-bold text-white/40 tracking-wider">
-              System Notice
+              Real-Time Pipeline
             </span>
             <span className="text-xs text-white/80 font-medium">
-              Do not close this window. Processing heavy assets.
+              Generating assets. Do not close.
             </span>
-          </div>
-          <div className="w-px h-8 bg-white/10 mx-2" />
-          <div className="text-right">
-            <span className="text-[10px] uppercase font-bold text-white/40 tracking-wider">
-              Memory
-            </span>
-            <p className="text-xs text-primary font-mono">2048 MB</p>
           </div>
         </motion.div>
       </div>

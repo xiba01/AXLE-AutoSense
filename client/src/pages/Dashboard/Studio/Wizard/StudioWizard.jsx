@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@heroui/react";
 import { X, ChevronLeft } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+// Components
 import CarSelectorStep from "./CarSelectorStep";
 import ConfigStep from "./ConfigStep";
-// import GenerationTerminal from "./GenerationTerminal";
 import GenerationVisualizer from "./GenerationVisualizer";
 
 export default function StudioWizard() {
@@ -14,66 +14,81 @@ export default function StudioWizard() {
   const location = useLocation();
 
   // 1. STATE INITIALIZATION
-  // Did we come from a specific car card?
+  // Did we come from a specific car card in the Studio?
   const initialCar = location.state?.car || null;
 
+  // If car exists, start at Step 2 (Config). Else Step 1 (Select).
   const [step, setStep] = useState(initialCar ? 2 : 1);
   const [selectedCar, setSelectedCar] = useState(initialCar);
 
-  // NEW: Configuration State
+  // CONFIG STATE: Defaults for the API payload
   const [config, setConfig] = useState({
     theme: "cinematic",
-    length: "standard", // 4 scenes
+    sceneCount: 4,
     language: "en",
   });
 
   // 2. HANDLERS
   const handleClose = () => {
-    // Go back to the Studio grid
     navigate("/dashboard/studio");
   };
 
+  // Step 1 -> Step 2
   const handleCarSelect = (car) => {
     setSelectedCar(car);
-    // TODO: If car has story, show confirm dialog here.
-    // For now, proceed to config
     setStep(2);
   };
 
+  // Back Button Logic
   const handleBack = () => {
-    setStep(1);
-    setSelectedCar(null);
+    // If we started with a car, 'Back' should exit the wizard
+    if (step === 2 && initialCar) {
+      handleClose();
+    } else {
+      // Otherwise go back a step
+      setStep(step - 1);
+      if (step === 2) setSelectedCar(null); // Reset selection if going back to grid
+    }
   };
 
-  // NEW: Handler for Step 2 -> Step 3
+  // Step 2 -> Step 3 (The Handoff)
   const handleGenerateClick = (finalConfig) => {
-    setConfig(finalConfig);
-    setStep(3);
+    console.log("📝 Configuration locked:", finalConfig);
+    setConfig(finalConfig); // Update state so Visualizer can read it
+    setStep(3); // Start the AI Engine
   };
 
-  const handleGenerationComplete = () => {
-    // 1. TODO: Dispatch Redux action to add the new story to state locally
-    // 2. Navigate back to Studio Grid (Showroom Tab)
-    navigate("/dashboard/studio");
-    // 3. Optional: Show a Success Toast ("Story Ready!")
+  // Step 3 -> Finish (Redirect to Editor)
+  const handleGenerationComplete = (apiResult) => {
+    console.log("🎉 Pipeline Finished. Result:", apiResult);
+
+    // Check if we got a valid ID from the backend controller
+    if (apiResult && apiResult.storyId) {
+      // Redirect to the Full Screen Editor
+      navigate(`/dashboard/editor/${apiResult.storyId}`);
+    } else {
+      // Fallback if something weird happened
+      console.error("Missing Story ID in response");
+      navigate("/dashboard/studio");
+    }
   };
 
   return (
-    // FULL SCREEN OVERLAY (Covers Dashboard Layout)
-    <div className="fixed inset-0 z-[100] bg-black text-white flex flex-col overflow-hidden">
-      {/* BACKGROUND ART */}
+    <div className="fixed inset-0 z-[100] bg-black text-white flex flex-col overflow-hidden font-sans">
+      {/* BACKGROUND ART (Matches Visualizer Aesthetic) */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-black to-black z-0 pointer-events-none" />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
 
       {/* HEADER */}
       <header className="relative z-50 flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-4">
-          {step > 1 && !initialCar && (
+          {/* Only show back button on Steps 1 & 2 */}
+          {step < 3 && (
             <Button
               isIconOnly
               variant="light"
               className="text-white/50 hover:text-white"
-              onPress={handleBack}
+              onPress={step === 1 ? handleClose : handleBack}
             >
               <ChevronLeft size={24} />
             </Button>
@@ -89,25 +104,29 @@ export default function StudioWizard() {
                 ? "Select Vehicle"
                 : step === 2
                   ? "Configuration"
-                  : "Generation"}
+                  : "Processing"}
             </p>
           </div>
         </div>
 
-        <Button
-          isIconOnly
-          variant="light"
-          color="danger"
-          className="text-white/50 hover:text-white hover:bg-white/10"
-          onPress={handleClose}
-        >
-          <X size={24} />
-        </Button>
+        {/* Close Button (Hidden during generation to prevent accidental exit) */}
+        {step < 3 && (
+          <Button
+            isIconOnly
+            variant="light"
+            color="danger"
+            className="text-white/50 hover:text-white hover:bg-white/10"
+            onPress={handleClose}
+          >
+            <X size={24} />
+          </Button>
+        )}
       </header>
 
-      {/* MAIN CONTENT AREA */}
+      {/* CONTENT AREA */}
       <div className="relative z-10 flex-1 w-full max-w-7xl mx-auto p-6 md:p-8 flex flex-col">
         <AnimatePresence mode="wait">
+          {/* STEP 1: CAR SELECTOR */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -120,7 +139,8 @@ export default function StudioWizard() {
             </motion.div>
           )}
 
-          {step === 2 && (
+          {/* STEP 2: CONFIGURATION */}
+          {step === 2 && selectedCar && (
             <motion.div
               key="step2"
               initial={{ opacity: 0, x: 50 }}
@@ -128,7 +148,6 @@ export default function StudioWizard() {
               exit={{ opacity: 0, x: -50 }}
               className="h-full"
             >
-              {/* We will build this in Part 5 */}
               <ConfigStep
                 car={selectedCar}
                 onBack={handleBack}
@@ -137,17 +156,18 @@ export default function StudioWizard() {
             </motion.div>
           )}
 
+          {/* STEP 3: GENERATION VISUALIZER */}
           {step === 3 && (
             <motion.div
               key="step3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
               className="h-full flex items-center justify-center"
             >
-              {/* THE NEW CINEMATIC VISUALIZER */}
               <GenerationVisualizer
                 car={selectedCar}
+                config={config}
                 onComplete={handleGenerationComplete}
               />
             </motion.div>
