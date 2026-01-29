@@ -1,0 +1,886 @@
+{
+  "success": true,
+  "time_taken": "176.21s",
+  "story_id": "story_hyundai_ioniq 5_2023",
+  "car_id": "ctx_0ad4abb5-3421-408d-b9ae-987ab00b732d",
+  "title": "Family Futurist Journey: The 2023 Hyundai IONIQ 5",
+  "narrative_arc_summary": "",
+  "meta": {
+    "schema_version": "1.0.0",
+    "template": "Cinematic",
+    "language": "en",
+    "theme_color": "#007AFF",
+    "generated_at": "2026-01-29T00:19:33.989Z"
+  },
+  "scenes": [
+    {
+      "id": "scene_00",
+      "type": "intro_view",
+      "theme_tag": "INTRO",
+      "order": 1,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "establishing",
+        "focus_point": "IONIQ 5 silhouette against sunrise",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "centered-focus",
+        "content_alignment": "middle-center",
+        "motion": { "image": "static", "content": "fade-up" }
+      },
+      "image_url": "https://image.pollinations.ai/prompt/establishing%20of%20a%202023%20Hyundai%20IONIQ%205%2C%20Abyss%20Black%20Pear%2C%20glossy%20finish%2C%20SUV%2C%20focusing%20on%20IONIQ%205%20silhouette%20against%20sunrise.%20Modern%20Suburban%20Street%2C%20soft%20sunrise.%20photorealistic%2C%208k%2C%20highly%20detailed%2C%20automotive%20photography%2C%20commercial%20car%20advertisement%2C%20ray%20tracing%2C%20unreal%20engine%205%20render%2C%20sharp%20focus?model=flux&nologo=true",
+      "intro_content": {
+        "title": "Charge Into Tomorrow",
+        "subtitle": "2023 Hyundai IONIQ 5",
+        "start_button_label": "Start Experience",
+        "background_image": "https://image.pollinations.ai/prompt/establishing%20of%20a%202023%20Hyundai%20IONIQ%205%2C%20Abyss%20Black%20Pear%2C%20glossy%20finish%2C%20SUV%2C%20focusing%20on%20IONIQ%205%20silhouette%20against%20sunrise.%20Modern%20Suburban%20Street%2C%20soft%20sunrise.%20photorealistic%2C%208k%2C%20highly%20detailed%2C%20automotive%20photography%2C%20commercial%20car%20advertisement%2C%20ray%20tracing%2C%20unreal%20engine%205%20render%2C%20sharp%20focus?model=flux&nologo=true",
+        "brand_logo": "/assets/logos/toyota_white.png"
+      },
+      "hotspots": []
+    },
+    {
+      "id": "scene_01",
+      "type": "slide_view",
+      "theme_tag": "SAFETY",
+      "order": 2,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "wide-hero",
+        "focus_point": "Full‑front three‑quarter view of IONIQ 5",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "overlay-bottom",
+        "content_alignment": "bottom-center",
+        "motion": { "image": "slow-zoom-out", "content": "fade-up" }
+      },
+      "main_feature_slug": "5-star-safety",
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645965090_78610.jpg",
+      "slide_content": {
+        "headline": "Uncompromising Safety",
+        "paragraph": "The 2023 Hyundai IONIQ 5 is engineered with eight strategically placed airbags, advanced ABS, and dual assist systems, delivering a protective cocoon that anticipates hazards and safeguards every passenger, meeting the highest safety expectations.",
+        "voiceover_text": "Feel the confidence of eight airbags and intelligent assist systems, every journey wrapped in Hyundai’s unwavering safety promise.",
+        "key_stats": [
+          { "label": "Airbags", "value": "8", "unit": "airbags" },
+          { "label": "Assist Systems", "value": "2", "unit": "systems" },
+          { "label": "ABS", "value": "Standard", "unit": "feature" }
+        ],
+        "suggested_hotspots": [
+          {
+            "label": "Steering Wheel",
+            "icon": "shield",
+            "detail_title": "Airbag Integrated Wheel",
+            "detail_body": "The steering wheel houses a front-impact airbag, deploying instantly to protect the driver."
+          },
+          {
+            "label": "Dashboard",
+            "icon": "info",
+            "detail_title": "ABS Indicator",
+            "detail_body": "The dashboard displays ABS activation, ensuring optimal braking stability in emergency situations."
+          }
+        ],
+        "theme_tag": "SAFETY",
+        "badges": [
+          {
+            "id": "SAFETY_NHTSA_5",
+            "label": "NHTSA 5-Star Safety Rating",
+            "category": "Safety",
+            "visuals": {
+              "image_path": "safety_nhtsa_5star.png",
+              "alt_text": "Official NHTSA 5-Star Safety Rating Shield"
+            },
+            "retrieval_method": "API",
+            "logic_config": {
+              "region": ["US", "CA"],
+              "group": "NHTSA_RATING",
+              "rank": 100
+            }
+          },
+          {
+            "id": "SAFETY_EURONCAP_5",
+            "label": "Euro NCAP 5 Stars",
+            "category": "Safety",
+            "visuals": {
+              "image_path": "safety_euroncap_5.png",
+              "alt_text": "Euro NCAP 5-Star Rating"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 received a five-star safety rating from Euro NCAP",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["EU", "UK"],
+              "group": "EURONCAP_RATING",
+              "rank": 100
+            }
+          }
+        ]
+      },
+      "hotspots": [
+        {
+          "id": "hs_01_0",
+          "label": "Steering Wheel",
+          "icon": "shield",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Airbag Integrated Wheel",
+            "body": "The steering wheel houses a front-impact airbag, deploying instantly to protect the driver."
+          }
+        },
+        {
+          "id": "hs_01_1",
+          "label": "Dashboard",
+          "icon": "info",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "ABS Indicator",
+            "body": "The dashboard displays ABS activation, ensuring optimal braking stability in emergency situations."
+          }
+        }
+      ],
+      "audio_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/audio/generated/1769645971902_01.mp3",
+      "raw_voiceover": "Feel the confidence of eight airbags and intelligent assist systems, every journey wrapped in Hyundai’s unwavering safety promise.",
+      "subtitles": [
+        {
+          "text": "feel the confidence of eight",
+          "start": 0.16,
+          "end": 1.5999999,
+          "wordCount": 5
+        },
+        {
+          "text": "airbags and intelligent assist systems",
+          "start": 1.5999999,
+          "end": 4.08,
+          "wordCount": 5
+        },
+        {
+          "text": "every journey wrapped in hyundai's",
+          "start": 4.24,
+          "end": 6,
+          "wordCount": 5
+        },
+        {
+          "text": "unwavering safety promise",
+          "start": 6,
+          "end": 7.52,
+          "wordCount": 3
+        }
+      ]
+    },
+    {
+      "id": "scene_02",
+      "type": "slide_view",
+      "theme_tag": "SAFETY",
+      "order": 3,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "detail",
+        "focus_point": "Animated graphic of eight airbags inflating",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "overlay-bottom",
+        "content_alignment": "bottom-center",
+        "motion": { "image": "slow-zoom-out", "content": "fade-up" }
+      },
+      "main_feature_slug": "8-airbag-suite",
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645962662_99681.jpg",
+      "slide_content": {
+        "headline": "Eight‑Airbag Protection Suite",
+        "paragraph": "The IONIQ 5 safeguards every passenger with an eight‑airbag system, complemented by ABS and active traction control, delivering confidence on every road, rain or shine.",
+        "voiceover_text": "Feel the certainty of eight airbags, ABS and traction control watching over you.",
+        "key_stats": [
+          { "label": "Airbags", "value": "8", "unit": "units" },
+          { "label": "ABS", "value": "Standard", "unit": "Feature" },
+          {
+            "label": "Traction Control",
+            "value": "Standard",
+            "unit": "Feature"
+          }
+        ],
+        "suggested_hotspots": [
+          {
+            "label": "Steering Wheel",
+            "icon": "shield",
+            "detail_title": "Airbag Deployment",
+            "detail_body": "Front airbags are integrated into the steering wheel for optimal driver protection."
+          },
+          {
+            "label": "Dashboard",
+            "icon": "info",
+            "detail_title": "Safety Assist",
+            "detail_body": "ABS and traction control sensors monitor wheel slip, ensuring stable braking and handling."
+          }
+        ],
+        "theme_tag": "SAFETY",
+        "badges": [
+          {
+            "id": "SAFETY_NHTSA_5",
+            "label": "NHTSA 5-Star Safety Rating",
+            "category": "Safety",
+            "visuals": {
+              "image_path": "safety_nhtsa_5star.png",
+              "alt_text": "Official NHTSA 5-Star Safety Rating Shield"
+            },
+            "retrieval_method": "API",
+            "logic_config": {
+              "region": ["US", "CA"],
+              "group": "NHTSA_RATING",
+              "rank": 100
+            }
+          },
+          {
+            "id": "SAFETY_EURONCAP_5",
+            "label": "Euro NCAP 5 Stars",
+            "category": "Safety",
+            "visuals": {
+              "image_path": "safety_euroncap_5.png",
+              "alt_text": "Euro NCAP 5-Star Rating"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 received a five-star safety rating from Euro NCAP",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["EU", "UK"],
+              "group": "EURONCAP_RATING",
+              "rank": 100
+            }
+          }
+        ]
+      },
+      "hotspots": [
+        {
+          "id": "hs_02_0",
+          "label": "Steering Wheel",
+          "icon": "shield",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Airbag Deployment",
+            "body": "Front airbags are integrated into the steering wheel for optimal driver protection."
+          }
+        },
+        {
+          "id": "hs_02_1",
+          "label": "Dashboard",
+          "icon": "info",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Safety Assist",
+            "body": "ABS and traction control sensors monitor wheel slip, ensuring stable braking and handling."
+          }
+        }
+      ],
+      "audio_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/audio/generated/1769645970839_02.mp3",
+      "raw_voiceover": "Feel the certainty of eight airbags, ABS and traction control watching over you.",
+      "subtitles": [
+        {
+          "text": "feel the certainty of eight",
+          "start": 0.32,
+          "end": 1.5999999,
+          "wordCount": 5
+        },
+        {
+          "text": "airbags abs and traction control",
+          "start": 1.5999999,
+          "end": 4.16,
+          "wordCount": 5
+        },
+        {
+          "text": "watching over you",
+          "start": 4.16,
+          "end": 5.2,
+          "wordCount": 3
+        }
+      ]
+    },
+    {
+      "id": "scene_03",
+      "type": "slide_view",
+      "theme_tag": "UTILITY",
+      "order": 4,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "action",
+        "focus_point": "Trunk opening, revealing 1580 L of packed gear",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "split-image-left",
+        "content_alignment": "middle-left",
+        "motion": { "image": "static", "content": "slide-in-left" }
+      },
+      "main_feature_slug": "1580l-cargo-capacity",
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645963559_50805.jpg",
+      "slide_content": {
+        "headline": "Unrivaled Cargo Capacity",
+        "paragraph": "The 2023 Hyundai IONIQ 5 offers a staggering 1,580 L of cargo volume, comfortably seats five, and stretches 4,655 mm in length—delivering practical space without compromising style.",
+        "voiceover_text": "Load up, go further—1580 liters of space, five seats, and a sleek silhouette ready for any adventure.",
+        "key_stats": [
+          { "label": "Cargo Volume", "value": "1580", "unit": "Liters" },
+          { "label": "Seating", "value": "5", "unit": "People" },
+          { "label": "Length", "value": "4655", "unit": "mm" }
+        ],
+        "suggested_hotspots": [
+          {
+            "label": "Rear Seats",
+            "icon": "info",
+            "detail_title": "Fold‑Flat Rear Seats",
+            "detail_body": "Fold flat to unleash the full 1580 L cargo bay."
+          },
+          {
+            "label": "Cargo Floor",
+            "icon": "box",
+            "detail_title": "Spacious Cargo Floor",
+            "detail_body": "Flat, low floor maximizes usable space for bulky items."
+          }
+        ],
+        "theme_tag": "UTILITY",
+        "badges": [
+          {
+            "id": "TECH_APPLE_CARPLAY",
+            "label": "Apple CarPlay",
+            "category": "Technology",
+            "visuals": {
+              "image_path": "tech_apple_carplay.png",
+              "alt_text": "Apple CarPlay Integration"
+            },
+            "retrieval_method": "LOGIC",
+            "logic_config": {
+              "region": ["GLOBAL"],
+              "group": "FEATURE_IOS",
+              "rank": 100
+            }
+          },
+          {
+            "id": "TECH_ANDROID_AUTO",
+            "label": "Android Auto",
+            "category": "Technology",
+            "visuals": {
+              "image_path": "tech_android_auto.png",
+              "alt_text": "Android Auto Integration"
+            },
+            "retrieval_method": "LOGIC",
+            "logic_config": {
+              "region": ["GLOBAL"],
+              "group": "FEATURE_ANDROID",
+              "rank": 100
+            }
+          },
+          {
+            "id": "TECH_BLUETOOTH",
+            "label": "Bluetooth Connectivity",
+            "category": "Technology",
+            "visuals": {
+              "image_path": "tech_bluetooth.png",
+              "alt_text": "Bluetooth Wireless Technology"
+            },
+            "retrieval_method": "LOGIC",
+            "logic_config": {
+              "region": ["GLOBAL"],
+              "group": "FEATURE_BT",
+              "rank": 100
+            }
+          }
+        ]
+      },
+      "hotspots": [
+        {
+          "id": "hs_03_0",
+          "label": "Rear Seats",
+          "icon": "info",
+          "x": 49,
+          "y": 42,
+          "hover_content": {
+            "title": "Fold‑Flat Rear Seats",
+            "body": "Fold flat to unleash the full 1580 L cargo bay."
+          }
+        },
+        {
+          "id": "hs_03_1",
+          "label": "Cargo Floor",
+          "icon": "box",
+          "x": 51,
+          "y": 78,
+          "hover_content": {
+            "title": "Spacious Cargo Floor",
+            "body": "Flat, low floor maximizes usable space for bulky items."
+          }
+        }
+      ],
+      "audio_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/audio/generated/1769645972337_03.mp3",
+      "raw_voiceover": "Load up, go further—1580 liters of space, five seats, and a sleek silhouette ready for any adventure.",
+      "subtitles": [
+        {
+          "text": "load up go further fifteen",
+          "start": 0.16,
+          "end": 2.72,
+          "wordCount": 5
+        },
+        {
+          "text": "eighty liters of space five",
+          "start": 2.72,
+          "end": 4.88,
+          "wordCount": 5
+        },
+        {
+          "text": "seats and a sleek silhouette",
+          "start": 4.88,
+          "end": 7.12,
+          "wordCount": 5
+        },
+        {
+          "text": "ready for any adventure",
+          "start": 7.12,
+          "end": 8.48,
+          "wordCount": 4
+        }
+      ]
+    },
+    {
+      "id": "scene_04",
+      "type": "slide_view",
+      "theme_tag": "VALUE",
+      "order": 5,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "detail",
+        "focus_point": "Kelley Blue Book Best Buy badge beside the IONIQ 5 badge",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "split-image-right",
+        "content_alignment": "middle-right",
+        "motion": { "image": "static", "content": "slide-in-right" }
+      },
+      "main_feature_slug": "kbb-best-buy",
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645962529_76029.jpg",
+      "slide_content": {
+        "headline": "Spacious Value Unlocked",
+        "paragraph": "The 2023 Hyundai IONIQ 5 delivers premium practicality: 1,580 L of cargo space, five comfortable seats, and a sleek 4.66 m footprint, all without compromising style or efficiency.",
+        "voiceover_text": "Space, comfort, and style—value that moves you forward.",
+        "key_stats": [
+          { "label": "Cargo Space", "value": "1580", "unit": "Liters" },
+          { "label": "Seats", "value": "5", "unit": "Count" },
+          { "label": "Length", "value": "4655", "unit": "mm" }
+        ],
+        "suggested_hotspots": [
+          {
+            "label": "Touchscreen",
+            "icon": "info",
+            "detail_title": "Digital Cockpit",
+            "detail_body": "10‑inch portrait display puts navigation, media, and vehicle settings at your fingertips."
+          },
+          {
+            "label": "Rear Seats",
+            "icon": "users",
+            "detail_title": "Flexible Seating",
+            "detail_body": "Fold‑flat rear bench expands cargo capacity, adapting to passengers or luggage with ease."
+          }
+        ],
+        "theme_tag": "VALUE",
+        "badges": [
+          {
+            "id": "AWARD_KBB_BEST_BUY",
+            "label": "KBB Best Buy Award",
+            "category": "Award",
+            "visuals": {
+              "image_path": "award_kbb_best_buy.png",
+              "alt_text": "Kelley Blue Book Best Buy Seal"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 won Kelley Blue Book's Best Buy Award",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["US"],
+              "group": "KBB_AWARD",
+              "rank": 100
+            }
+          },
+          {
+            "id": "AWARD_MOTORTREND_SUV",
+            "label": "MotorTrend SUV of the Year",
+            "category": "Award",
+            "visuals": {
+              "image_path": "award_motortrend_suv.png",
+              "alt_text": "MotorTrend SUV of the Year Award"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 ... MotorTrend's SUV of the Year",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["US"],
+              "group": "MOTORTREND",
+              "rank": 100
+            }
+          }
+        ]
+      },
+      "hotspots": [
+        {
+          "id": "hs_04_0",
+          "label": "Touchscreen",
+          "icon": "info",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Digital Cockpit",
+            "body": "10‑inch portrait display puts navigation, media, and vehicle settings at your fingertips."
+          }
+        },
+        {
+          "id": "hs_04_1",
+          "label": "Rear Seats",
+          "icon": "users",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Flexible Seating",
+            "body": "Fold‑flat rear bench expands cargo capacity, adapting to passengers or luggage with ease."
+          }
+        }
+      ],
+      "audio_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/audio/generated/1769645970311_04.mp3",
+      "raw_voiceover": "Space, comfort, and style—value that moves you forward.",
+      "subtitles": [
+        {
+          "text": "space comfort and style value",
+          "start": 0.16,
+          "end": 2.72,
+          "wordCount": 5
+        },
+        {
+          "text": "that moves you forward",
+          "start": 2.72,
+          "end": 4,
+          "wordCount": 4
+        }
+      ]
+    },
+    {
+      "id": "scene_05",
+      "type": "slide_view",
+      "theme_tag": "VALUE",
+      "order": 6,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "detail",
+        "focus_point": "Close‑up of odometer showing low mileage",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "overlay-bottom",
+        "content_alignment": "bottom-center",
+        "motion": { "image": "slow-zoom-out", "content": "fade-up" }
+      },
+      "main_feature_slug": "low-mileage",
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645963815_13670.jpg",
+      "slide_content": {
+        "headline": "Unmatched Everyday Value",
+        "paragraph": "The 2023 Hyundai IONIQ 5, with barely any miles on the clock, offers premium practicality: a cavernous 1,580 L cargo bay, comfortable five‑seat layout, and a sleek 4,655 mm silhouette that maximizes every inch of space.",
+        "voiceover_text": "Barely driven, endlessly valuable—discover the IONIQ 5’s spacious elegance today.",
+        "key_stats": [
+          { "label": "Cargo Volume", "value": "1580", "unit": "Liters" },
+          { "label": "Seating", "value": "5", "unit": "Seats" },
+          { "label": "Length", "value": "4655", "unit": "mm" }
+        ],
+        "suggested_hotspots": [
+          {
+            "label": "Touchscreen",
+            "icon": "monitor",
+            "detail_title": "Digital Cockpit",
+            "detail_body": "A 12.3‑inch responsive display puts navigation, media, and vehicle settings at your fingertips."
+          },
+          {
+            "label": "Steering Wheel",
+            "icon": "dial",
+            "detail_title": "Driver‑Focused Controls",
+            "detail_body": "Integrated touch‑buttons let you command audio, cruise, and voice assistant without taking your eyes off the road."
+          }
+        ],
+        "theme_tag": "VALUE",
+        "badges": [
+          {
+            "id": "AWARD_KBB_BEST_BUY",
+            "label": "KBB Best Buy Award",
+            "category": "Award",
+            "visuals": {
+              "image_path": "award_kbb_best_buy.png",
+              "alt_text": "Kelley Blue Book Best Buy Seal"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 won Kelley Blue Book's Best Buy Award",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["US"],
+              "group": "KBB_AWARD",
+              "rank": 100
+            }
+          },
+          {
+            "id": "AWARD_MOTORTREND_SUV",
+            "label": "MotorTrend SUV of the Year",
+            "category": "Award",
+            "visuals": {
+              "image_path": "award_motortrend_suv.png",
+              "alt_text": "MotorTrend SUV of the Year Award"
+            },
+            "evidence": "The 2023 Hyundai IONIQ 5 ... MotorTrend's SUV of the Year",
+            "retrieval_method": "SEARCH",
+            "logic_config": {
+              "region": ["US"],
+              "group": "MOTORTREND",
+              "rank": 100
+            }
+          }
+        ]
+      },
+      "hotspots": [
+        {
+          "id": "hs_05_0",
+          "label": "Touchscreen",
+          "icon": "monitor",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Digital Cockpit",
+            "body": "A 12.3‑inch responsive display puts navigation, media, and vehicle settings at your fingertips."
+          }
+        },
+        {
+          "id": "hs_05_1",
+          "label": "Steering Wheel",
+          "icon": "dial",
+          "x": 50,
+          "y": 50,
+          "hover_content": {
+            "title": "Driver‑Focused Controls",
+            "body": "Integrated touch‑buttons let you command audio, cruise, and voice assistant without taking your eyes off the road."
+          }
+        }
+      ],
+      "audio_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/audio/generated/1769645971249_05.mp3",
+      "raw_voiceover": "Barely driven, endlessly valuable—discover the IONIQ 5’s spacious elegance today.",
+      "subtitles": [
+        {
+          "text": "barely driven endlessly valuable discover",
+          "start": 0.71999997,
+          "end": 3.36,
+          "wordCount": 5
+        },
+        {
+          "text": "the ioniq five's spacious elegance",
+          "start": 3.36,
+          "end": 5.68,
+          "wordCount": 5
+        },
+        { "text": "today", "start": 5.68, "end": 6.08, "wordCount": 1 }
+      ]
+    },
+    {
+      "id": "scene_99",
+      "type": "outro_view",
+      "theme_tag": "OUTRO",
+      "order": 7,
+      "visual_direction": {
+        "setting": "Modern Suburban Street",
+        "camera_angle": "establishing",
+        "focus_point": "IONIQ 5 driving away down the street",
+        "lighting": "soft sunrise"
+      },
+      "layout": {
+        "composition": "centered-focus",
+        "content_alignment": "middle-center",
+        "motion": { "image": "static", "content": "fade-up" }
+      },
+      "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645965065_9873.jpg",
+      "outro_content": {
+        "headline": "Drive the Future Today",
+        "subheadline": "Experience the 2023 Hyundai IONIQ 5 – reserve your test drive now.",
+        "cta_button_primary": "Book Test Drive",
+        "cta_button_secondary": "Explore More",
+        "cta_buttons": [
+          {
+            "label": "Book Test Drive",
+            "action": "OPEN_LEAD_FORM",
+            "style": "primary"
+          },
+          {
+            "label": "Explore More",
+            "action": "REPLAY_STORY",
+            "style": "secondary"
+          }
+        ],
+        "image_url": "https://npflttnopdotawchtfwd.supabase.co/storage/v1/object/public/stories/generated/1769645965065_9873.jpg"
+      },
+      "hotspots": []
+    }
+  ],
+  "badges": [
+    {
+      "id": "SAFETY_NHTSA_5",
+      "label": "NHTSA 5-Star Safety Rating",
+      "category": "Safety",
+      "visuals": {
+        "image_path": "safety_nhtsa_5star.png",
+        "alt_text": "Official NHTSA 5-Star Safety Rating Shield"
+      },
+      "retrieval_method": "API",
+      "logic_config": {
+        "region": ["US", "CA"],
+        "group": "NHTSA_RATING",
+        "rank": 100
+      }
+    },
+    {
+      "id": "SAFETY_EURONCAP_5",
+      "label": "Euro NCAP 5 Stars",
+      "category": "Safety",
+      "visuals": {
+        "image_path": "safety_euroncap_5.png",
+        "alt_text": "Euro NCAP 5-Star Rating"
+      },
+      "evidence": "The 2023 Hyundai IONIQ 5 received a five-star safety rating from Euro NCAP",
+      "retrieval_method": "SEARCH",
+      "logic_config": {
+        "region": ["EU", "UK"],
+        "group": "EURONCAP_RATING",
+        "rank": 100
+      }
+    },
+    {
+      "id": "TECH_APPLE_CARPLAY",
+      "label": "Apple CarPlay",
+      "category": "Technology",
+      "visuals": {
+        "image_path": "tech_apple_carplay.png",
+        "alt_text": "Apple CarPlay Integration"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": {
+        "region": ["GLOBAL"],
+        "group": "FEATURE_IOS",
+        "rank": 100
+      }
+    },
+    {
+      "id": "TECH_ANDROID_AUTO",
+      "label": "Android Auto",
+      "category": "Technology",
+      "visuals": {
+        "image_path": "tech_android_auto.png",
+        "alt_text": "Android Auto Integration"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": {
+        "region": ["GLOBAL"],
+        "group": "FEATURE_ANDROID",
+        "rank": 100
+      }
+    },
+    {
+      "id": "TECH_BLUETOOTH",
+      "label": "Bluetooth Connectivity",
+      "category": "Technology",
+      "visuals": {
+        "image_path": "tech_bluetooth.png",
+        "alt_text": "Bluetooth Wireless Technology"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": {
+        "region": ["GLOBAL"],
+        "group": "FEATURE_BT",
+        "rank": 100
+      }
+    },
+    {
+      "id": "AWARD_KBB_BEST_BUY",
+      "label": "KBB Best Buy Award",
+      "category": "Award",
+      "visuals": {
+        "image_path": "award_kbb_best_buy.png",
+        "alt_text": "Kelley Blue Book Best Buy Seal"
+      },
+      "evidence": "The 2023 Hyundai IONIQ 5 won Kelley Blue Book's Best Buy Award",
+      "retrieval_method": "SEARCH",
+      "logic_config": { "region": ["US"], "group": "KBB_AWARD", "rank": 100 }
+    },
+    {
+      "id": "AWARD_MOTORTREND_SUV",
+      "label": "MotorTrend SUV of the Year",
+      "category": "Award",
+      "visuals": {
+        "image_path": "award_motortrend_suv.png",
+        "alt_text": "MotorTrend SUV of the Year Award"
+      },
+      "evidence": "The 2023 Hyundai IONIQ 5 ... MotorTrend's SUV of the Year",
+      "retrieval_method": "SEARCH",
+      "logic_config": { "region": ["US"], "group": "MOTORTREND", "rank": 100 }
+    },
+    {
+      "id": "ECO_DE_UMWELT_4",
+      "label": "Umweltplakette 4 (Green)",
+      "category": "Regulatory",
+      "visuals": {
+        "image_path": "eco_de_umwelt_4.png",
+        "alt_text": "German Green Zone Sticker"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": { "region": ["DE"], "group": "DE_EMISSION", "rank": 100 }
+    },
+    {
+      "id": "ECO_UK_ULEZ",
+      "label": "ULEZ Compliant",
+      "category": "Regulatory",
+      "visuals": {
+        "image_path": "eco_uk_ulez.png",
+        "alt_text": "Ultra Low Emission Zone Compliant"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": {
+        "region": ["UK", "GB"],
+        "group": "UK_EMISSION",
+        "rank": 100
+      }
+    },
+    {
+      "id": "ECO_BE_LEZ",
+      "label": "LEZ Compliant (Belgium)",
+      "category": "Regulatory",
+      "visuals": {
+        "image_path": "eco_be_lez.png",
+        "alt_text": "Low Emission Zone Belgium"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": { "region": ["BE"], "group": "BE_EMISSION", "rank": 100 }
+    },
+    {
+      "id": "ECO_CRITAIR_1",
+      "label": "Crit'Air 1 (Gas Euro 5/6)",
+      "category": "Regulatory",
+      "visuals": {
+        "image_path": "eco_critair_1.png",
+        "alt_text": "French Crit'Air 1 Purple Sticker"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": { "region": ["FR"], "group": "FR_CRITAIR", "rank": 90 }
+    },
+    {
+      "id": "ECO_ES_DGT_C",
+      "label": "Etiqueta C (Green)",
+      "category": "Regulatory",
+      "visuals": {
+        "image_path": "eco_es_dgt_c.png",
+        "alt_text": "Spanish DGT C Green Sticker"
+      },
+      "retrieval_method": "LOGIC",
+      "logic_config": { "region": ["ES"], "group": "ES_DGT", "rank": 80 }
+    }
+  ],
+  "car": {
+    "make": "Hyundai",
+    "model": "IONIQ 5",
+    "year": 2023,
+    "trim": "Standard Range 63 kWh (170 Hp) Electric",
+    "body_type": "SUV",
+    "color": "Abyss Black Pear, glossy finish"
+  }
+}

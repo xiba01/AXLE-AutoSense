@@ -16,11 +16,13 @@ import Home from "./pages/Landing/Home";
 import Login from "./pages/Auth/Login";
 import Inventory from "./pages/Dashboard/Inventory";
 import StudioPage from "./pages/Dashboard/Studio/StudioPage";
+import ViewerPage from "./pages/Player/ViewerPage";
 
 // Onboarding Pages
 import AccountStep from "./pages/Onboarding/AccountStep";
 import PaymentStep from "./pages/Onboarding/PaymentStep";
 import BrandingStep from "./pages/Onboarding/BrandingStep";
+import EditorPage from "./pages/Dashboard/Studio/EditorPage";
 
 import StudioWizard from "./pages/Dashboard/Studio/Wizard/StudioWizard";
 
@@ -89,9 +91,11 @@ function App() {
           <Route path="studio/trash" element={<StudioPage />} />
 
           <Route path="studio/wizard" element={<StudioWizard />} />
+          <Route path="editor/:storyId" element={<EditorPage />} />
           <Route path="settings" element={<div>Settings Page</div>} />
         </Route>
       </Route>
+      <Route path="/experience/:storyId" element={<ViewerPage />} />
     </Routes>
   );
 }
