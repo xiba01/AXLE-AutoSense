@@ -1,18 +1,17 @@
 import React from "react";
 import { useStoryStore } from "../../../store/useStoryStore";
+import { X } from "lucide-react";
+
 import { SceneLayer } from "./SceneLayer";
+import { CanvasWrapper } from "../3d/CanvasWrapper";
 import { SlideContentLayer } from "./SlideContentLayer";
+import { HotspotLayer } from "../interactive/HotspotLayer";
 import { Subtitles } from "../playback/Subtitles";
-// import { HotspotLayer } from '../interactive/HotspotLayer'; // Part 5
-// import { Subtitles } from '../playback/Subtitles'; // Part 5
-// import { AudioPlayer } from '../playback/AudioPlayer'; // Part 5
+import { AudioPlayer } from "../playback/AudioPlayer";
 
-// Mocks for now
-const HotspotLayer = () => null;
-const AudioPlayer = () => null;
-
-export const StoryContainer = () => {
-  const { storyData } = useStoryStore();
+// 1. ADD PROP DEFAULT TRUE
+export const StoryContainer = ({ enableAudio = true }) => {
+  const { storyData, isFreeRoam, setFreeRoam } = useStoryStore();
 
   if (!storyData || !storyData.scenes)
     return (
@@ -22,23 +21,34 @@ export const StoryContainer = () => {
     );
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-black text-white selection:bg-purple-500 selection:text-white">
-      {/* 1. Visual Layer (z-0) */}
+    <div className="relative w-full h-full overflow-hidden bg-black text-white">
+      {/* 3D Engine */}
+      <CanvasWrapper />
+
+      {/* 2D Layers */}
       <SceneLayer />
 
-      {/* 2. Narrative Layer (z-30) */}
       <div className="absolute inset-0 z-30 pointer-events-none">
         <SlideContentLayer />
       </div>
 
-      {/* 3. Interactive Layer (z-40) */}
       <HotspotLayer />
-
-      {/* 4. Subtitle Layer (z-50) */}
       <Subtitles />
 
-      {/* 5. Audio Engine */}
-      <AudioPlayer />
+      {/* Free roam exit control */}
+      {isFreeRoam && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4">
+          <button
+            onClick={() => setFreeRoam(false)}
+            className="flex items-center gap-2 px-6 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full text-white text-sm font-bold shadow-2xl hover:bg-white hover:text-black transition-colors"
+          >
+            <X size={16} /> Exit Explore Mode
+          </button>
+        </div>
+      )}
+
+      {/* 2. CONDITIONAL RENDER */}
+      {enableAudio && <AudioPlayer />}
     </div>
   );
 };

@@ -7,9 +7,6 @@ import { StoryContainer } from "../layers/StoryContainer";
 import { PlaybackControls } from "./PlaybackControls";
 import { KeyboardShortcuts } from "./KeyboardShortcuts";
 import { AIIntentOrchestrator } from "../ai/AIIntentOrchestrator";
-import { AudioPlayer } from "./AudioPlayer";
-import { Subtitles } from "./Subtitles";
-import { HotspotLayer } from "../interactive/HotspotLayer";
 
 // 🚀 EXPORT TYPE: Named Export (Must match import { PlaybackView } in ViewerPage)
 export const PlaybackView = () => {
@@ -97,14 +94,10 @@ export const PlaybackView = () => {
   // --- RENDER ---
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden font-sans">
-      {/* 1. VISUAL LAYER (3D Scene + Text) */}
+      {/* 1. VISUAL LAYER (3D Scene + Text + Audio) */}
       <div className="absolute inset-0">
-        <StoryContainer />
+        <StoryContainer enableAudio={true} />
       </div>
-
-      {/* 1b. Interactive & subtitle layers */}
-      <HotspotLayer />
-      <Subtitles />
 
       {/* 2. UI LAYER (Controls) */}
       <motion.div
@@ -130,9 +123,6 @@ export const PlaybackView = () => {
           onExit={handleExit}
         />
       </motion.div>
-
-      {/* 2b. Audio engine (hidden element) */}
-      <AudioPlayer />
 
       {/* 3. ASSISTANT LAYER (Overlays) */}
       <KeyboardShortcuts />

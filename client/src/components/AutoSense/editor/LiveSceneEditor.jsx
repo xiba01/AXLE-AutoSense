@@ -145,7 +145,7 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
         <div className="flex-1 relative bg-black flex items-center justify-center p-8">
           {previewEnabled ? (
             <div className="w-full h-full max-w-[1200px] aspect-video relative border border-white/10 shadow-2xl rounded-lg overflow-hidden">
-              <StoryContainer />
+              <StoryContainer nableAudio={false} />
 
               {/* Overlay Label */}
               <div className="absolute top-4 left-4 bg-red-500/20 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest border border-red-500/50 rounded">

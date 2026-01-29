@@ -4,25 +4,21 @@ import { useStoryStore } from "../../../store/useStoryStore";
 export const AudioPlayer = () => {
   const { getCurrentScene, nextScene, playback, setAudioCurrentTime } =
     useStoryStore();
-
   const { isPlaying, isPaused, autoAdvance = true } = playback;
   const currentScene = getCurrentScene();
   const audioRef = useRef(null);
-  const previousSceneIdRef = useRef(null);
 
-  // Handle track switching & play/pause
+  // 1. PLAYBACK LOGIC
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const sceneId = currentScene?.id;
     const audioUrl = currentScene?.audio_url;
 
-    // No audio for this scene (e.g., intro/outro)
+    // A. If no audio for this scene, ensure silence
     if (!audioUrl) {
       audio.pause();
-      setAudioCurrentTime(0);
-      previousSceneIdRef.current = sceneId;
+      audio.currentTime = 0;
       return;
     }
 
@@ -30,47 +26,39 @@ export const AudioPlayer = () => {
       ? audioUrl
       : `${window.location.origin}${audioUrl}`;
 
-    // Load new track when scene changes
-    if (previousSceneIdRef.current !== sceneId || audio.src !== fullUrl) {
-      console.log("🎵 Loading Audio:", fullUrl);
+    // B. Load Track (Only if different)
+    // We check decodeURIComponent to avoid mismatch issues
+    if (decodeURIComponent(audio.src) !== decodeURIComponent(fullUrl)) {
       audio.src = fullUrl;
       audio.load();
-      previousSceneIdRef.current = sceneId;
     }
 
+    // C. Play/Pause
     if (isPlaying && !isPaused) {
       const playPromise = audio.play();
-      if (playPromise?.catch) {
-        playPromise.catch((error) => {
-          console.warn("Audio autoplay blocked by browser:", error);
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Auto-play blocked, ignore
         });
       }
     } else {
       audio.pause();
     }
-  }, [
-    currentScene?.id,
-    currentScene?.audio_url,
-    isPlaying,
-    isPaused,
-    setAudioCurrentTime,
-  ]);
 
+    // --- 🚨 THE CRITICAL FIX: CLEANUP 🚨 ---
+    // When this effect re-runs (or component unmounts), PAUSE IMMEDIATELY.
+    return () => {
+      if (audio) audio.pause();
+    };
+  }, [currentScene?.id, currentScene?.audio_url, isPlaying, isPaused]);
+
+  // 2. EVENTS
   const handleEnded = () => {
-    if (autoAdvance) {
-      nextScene();
-    }
+    if (autoAdvance) nextScene();
   };
 
   const handleTimeUpdate = () => {
-    const audio = audioRef.current;
-    if (audio) {
-      setAudioCurrentTime(audio.currentTime);
-    }
-  };
-
-  const handleError = (e) => {
-    console.error("Audio loading error", e);
+    if (audioRef.current) setAudioCurrentTime(audioRef.current.currentTime);
   };
 
   return (
@@ -78,7 +66,6 @@ export const AudioPlayer = () => {
       ref={audioRef}
       onEnded={handleEnded}
       onTimeUpdate={handleTimeUpdate}
-      onError={handleError}
       className="hidden"
       preload="auto"
     />

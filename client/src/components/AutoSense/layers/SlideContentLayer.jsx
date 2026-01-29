@@ -1,5 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button, Tooltip } from "@heroui/react";
+import { Rotate3d } from "lucide-react";
 import { useStoryStore } from "../../../store/useStoryStore";
 import * as Icons from "lucide-react";
 import { cn } from "../../../lib/utils"; // Adjust path to lib/utils
@@ -17,28 +19,53 @@ export const SlideContentLayer = () => {
     setScene,
     activeHotspotId,
     startExperience,
+    activeCameraView,
+    setCameraView,
+    setFreeRoam,
+    isFreeRoam,
   } = useStoryStore();
   const scene = getCurrentScene();
   const [activeBadgeIndex, setActiveBadgeIndex] = React.useState(null);
 
-  if (!scene) return null;
+  // Hide overlay entirely when free roam is enabled or no scene
+  if (!scene || isFreeRoam) return null;
 
+  // Allow alignment for slide_view and tech_view
   const alignment =
-    (scene.type === "slide_view" ? scene.slide_content?.alignment : "left") ||
-    "left";
+    (scene.type === "slide_view" || scene.type === "tech_view"
+      ? scene.slide_content?.alignment
+      : "left") || "left";
+
+  const getViewLabels = (theme) => {
+    switch (theme) {
+      case "SAFETY":
+        return { a: "Front Sensors", b: "Rear Sensors" };
+      case "UTILITY":
+        return { a: "Dimensions", b: "Cargo Volume" };
+      case "PERFORMANCE":
+        return { a: "Powertrain", b: "Axle View" };
+      default:
+        return { a: "View A", b: "View B" };
+    }
+  };
+
+  const labels = getViewLabels(scene.theme_tag);
 
   return (
     <div
       className={cn(
         "absolute inset-0 pointer-events-none z-30 flex flex-col justify-center p-6 md:p-20 transition-all duration-500",
+        // Force tech_view away from center to avoid blocking car
+        scene.type === "tech_view"
+          ? "items-end text-right"
+          : alignment === "right"
+            ? "items-end text-right"
+            : alignment === "center"
+              ? "items-center text-center"
+              : "items-start text-left",
         activeHotspotId
           ? "opacity-20 blur-sm grayscale"
           : "opacity-100 blur-0 grayscale-0",
-        alignment === "right"
-          ? "items-end text-right"
-          : alignment === "center"
-            ? "items-center text-center"
-            : "items-start text-left",
       )}
     >
       <AnimatePresence mode="wait">
@@ -88,149 +115,194 @@ export const SlideContentLayer = () => {
           )}
 
           {/* TYPE: SLIDE */}
-          {scene.type === "slide_view" && scene.slide_content && (
-            <div className="space-y-6">
-              <div
-                className={cn(
-                  "flex gap-4 mb-6",
-                  alignment === "center"
-                    ? "justify-center"
-                    : alignment === "right"
-                      ? "justify-end"
-                      : "justify-start",
-                )}
-              >
-                {scene.slide_content.badges?.map((badge, i) => {
-                  const Icon = Icons[toPascalCase(badge.icon)] || Icons.Circle;
-                  const isHovered = activeBadgeIndex === i;
-
-                  return (
-                    <div
-                      key={i}
-                      className="relative group"
-                      onMouseEnter={() => setActiveBadgeIndex(i)}
-                      onMouseLeave={() => setActiveBadgeIndex(null)}
-                    >
-                      <div
+          {(scene.type === "slide_view" || scene.type === "tech_view") &&
+            scene.slide_content && (
+              <div className="space-y-6">
+                {scene.type === "tech_view" && (
+                  <div className="flex items-center justify-end gap-2 mb-4 border-b border-white/10 pb-4">
+                    <div className="bg-white/10 rounded-lg p-1 flex">
+                      <button
+                        onClick={() => setCameraView("primary")}
                         className={cn(
-                          "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider shadow-sm transition-all duration-300 cursor-help",
-                          "border border-white/10 bg-white/5 text-chrome-300",
-                          "group-hover:bg-white/10 group-hover:border-white/30 group-hover:text-white",
+                          "px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all",
+                          activeCameraView === "primary"
+                            ? "bg-primary text-white shadow-sm"
+                            : "text-gray-400 hover:text-white",
                         )}
                       >
-                        <Icon
-                          size={14}
-                          className={cn(
-                            "transition-colors",
-                            badge.color === "green"
-                              ? "text-green-400"
-                              : badge.color === "blue"
-                                ? "text-blue-400"
-                                : "text-amber-400",
-                          )}
-                        />
-                        <span>{badge.label}</span>
-                      </div>
-
-                      {/* Badge Tooltip / Expansion */}
-                      <AnimatePresence>
-                        {isHovered && (
-                          <motion.div
-                            initial={{ opacity: 0, x: -10, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -10, scale: 0.9 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 300,
-                              damping: 25,
-                            }}
-                            className={cn(
-                              "absolute top-0 w-64 p-4 z-50",
-                              alignment === "right"
-                                ? "right-full mr-4"
-                                : "left-full ml-4",
-                              "bg-gradient-to-br from-black/80 to-black/40",
-                              "backdrop-blur-xl border border-white/10 rounded-2xl",
-                              "shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]",
-                            )}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div
-                                className={cn(
-                                  "p-2 rounded-xl border border-white/10 shrink-0",
-                                  badge.color === "green"
-                                    ? "bg-green-500/20 text-green-400"
-                                    : badge.color === "blue"
-                                      ? "bg-blue-500/20 text-blue-400"
-                                      : "bg-amber-500/20 text-amber-400",
-                                )}
-                              >
-                                <Icon size={16} />
-                              </div>
-                              <div>
-                                <h4 className="text-white text-sm font-bold mb-1">
-                                  {badge.label}
-                                </h4>
-                                <p className="text-xs text-gray-300 leading-snug">
-                                  {/* Mock description generator since we don't have it in JSON yet */}
-                                  {badge.color === "green"
-                                    ? "Certified eco-friendly materials and zero-emission capability."
-                                    : badge.color === "blue"
-                                      ? "Advanced technology package included as standard."
-                                      : "Premium feature highlighting luxury and performance."}
-                                </p>
-                              </div>
-                            </div>
-                          </motion.div>
+                        {labels.a}
+                      </button>
+                      <button
+                        onClick={() => setCameraView("secondary")}
+                        className={cn(
+                          "px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all",
+                          activeCameraView === "secondary"
+                            ? "bg-primary text-white shadow-sm"
+                            : "text-gray-400 hover:text-white",
                         )}
-                      </AnimatePresence>
+                      >
+                        {labels.b}
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
 
-              <h1
-                className="font-bold text-white mb-4 tracking-tight"
-                style={{
-                  fontSize: scene.slide_content.headlineSize
-                    ? `${scene.slide_content.headlineSize}rem`
-                    : undefined,
-                  lineHeight: "1.1",
-                }}
-              >
-                {scene.slide_content.headline}
-              </h1>
-              <p
-                className="text-chrome-100/80 leading-relaxed font-light"
-                style={{
-                  fontSize: scene.slide_content.paragraphSize
-                    ? `${scene.slide_content.paragraphSize}rem`
-                    : undefined,
-                }}
-              >
-                {scene.slide_content.paragraph}
-              </p>
+                    <Tooltip content="Explore 3D Mode">
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className="text-white/60 hover:text-white"
+                        onPress={() => setFreeRoam(true)}
+                      >
+                        <Rotate3d size={20} />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                )}
 
-              {/* Stats Grid */}
-              {scene.slide_content.key_stats && (
-                <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-white/10">
-                  {scene.slide_content.key_stats.map((stat, i) => (
-                    <div key={i}>
-                      <div className="text-2xl font-bold text-white">
-                        {stat.value}
-                        <span className="text-sm font-normal text-chrome-500 ml-1">
-                          {stat.unit}
-                        </span>
+                <div
+                  className={cn(
+                    "flex gap-4 mb-6",
+                    scene.type === "tech_view"
+                      ? "justify-end"
+                      : alignment === "center"
+                        ? "justify-center"
+                        : alignment === "right"
+                          ? "justify-end"
+                          : "justify-start",
+                  )}
+                >
+                  {scene.slide_content.badges?.map((badge, i) => {
+                    const Icon =
+                      Icons[toPascalCase(badge.icon)] || Icons.Circle;
+                    const isHovered = activeBadgeIndex === i;
+
+                    return (
+                      <div
+                        key={i}
+                        className="relative group"
+                        onMouseEnter={() => setActiveBadgeIndex(i)}
+                        onMouseLeave={() => setActiveBadgeIndex(null)}
+                      >
+                        <div
+                          className={cn(
+                            "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider shadow-sm transition-all duration-300 cursor-help",
+                            "border border-white/10 bg-white/5 text-chrome-300",
+                            "group-hover:bg-white/10 group-hover:border-white/30 group-hover:text-white",
+                          )}
+                        >
+                          <Icon
+                            size={14}
+                            className={cn(
+                              "transition-colors",
+                              badge.color === "green"
+                                ? "text-green-400"
+                                : badge.color === "blue"
+                                  ? "text-blue-400"
+                                  : "text-amber-400",
+                            )}
+                          />
+                          <span>{badge.label}</span>
+                        </div>
+
+                        {/* Badge Tooltip / Expansion */}
+                        <AnimatePresence>
+                          {isHovered && (
+                            <motion.div
+                              initial={{ opacity: 0, x: -10, scale: 0.9 }}
+                              animate={{ opacity: 1, x: 0, scale: 1 }}
+                              exit={{ opacity: 0, x: -10, scale: 0.9 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 25,
+                              }}
+                              className={cn(
+                                "absolute top-0 w-64 p-4 z-50",
+                                alignment === "right"
+                                  ? "right-full mr-4"
+                                  : "left-full ml-4",
+                                "bg-gradient-to-br from-black/80 to-black/40",
+                                "backdrop-blur-xl border border-white/10 rounded-2xl",
+                                "shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]",
+                              )}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className={cn(
+                                    "p-2 rounded-xl border border-white/10 shrink-0",
+                                    badge.color === "green"
+                                      ? "bg-green-500/20 text-green-400"
+                                      : badge.color === "blue"
+                                        ? "bg-blue-500/20 text-blue-400"
+                                        : "bg-amber-500/20 text-amber-400",
+                                  )}
+                                >
+                                  <Icon size={16} />
+                                </div>
+                                <div>
+                                  <h4 className="text-white text-sm font-bold mb-1">
+                                    {badge.label}
+                                  </h4>
+                                  <p className="text-xs text-gray-300 leading-snug">
+                                    {/* Mock description generator since we don't have it in JSON yet */}
+                                    {badge.color === "green"
+                                      ? "Certified eco-friendly materials and zero-emission capability."
+                                      : badge.color === "blue"
+                                        ? "Advanced technology package included as standard."
+                                        : "Premium feature highlighting luxury and performance."}
+                                  </p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                      <div className="text-xs text-chrome-500 uppercase tracking-wider">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          )}
+
+                <h1
+                  className="font-bold text-white mb-4 tracking-tight"
+                  style={{
+                    fontSize: scene.slide_content.headlineSize
+                      ? `${scene.slide_content.headlineSize}rem`
+                      : undefined,
+                    lineHeight: "1.1",
+                  }}
+                >
+                  {scene.slide_content.headline}
+                </h1>
+                <p
+                  className="text-chrome-100/80 leading-relaxed font-light"
+                  style={{
+                    fontSize: scene.slide_content.paragraphSize
+                      ? `${scene.slide_content.paragraphSize}rem`
+                      : undefined,
+                  }}
+                >
+                  {scene.slide_content.paragraph}
+                </p>
+
+                {/* Stats Grid */}
+                {scene.slide_content.key_stats && (
+                  <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-white/10">
+                    {scene.slide_content.key_stats.map((stat, i) => (
+                      <div key={i}>
+                        <div className="text-2xl font-bold text-white">
+                          {stat.value}
+                          <span className="text-sm font-normal text-chrome-500 ml-1">
+                            {stat.unit}
+                          </span>
+                        </div>
+                        <div className="text-xs text-chrome-500 uppercase tracking-wider">
+                          {stat.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* TYPE: OUTRO */}
           {scene.type === "outro_view" && scene.outro_content && (

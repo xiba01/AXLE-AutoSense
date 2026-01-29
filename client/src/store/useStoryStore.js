@@ -15,6 +15,8 @@ export const useStoryStore = create((set, get) => ({
     currentTime: 0,
   },
   audioCurrentTime: 0,
+  activeCameraView: "primary", // 'primary' | 'secondary' | 'free'
+  isFreeRoam: false,
 
   // --- LOADERS ---
   loadStory: (storyData) => {
@@ -130,6 +132,15 @@ export const useStoryStore = create((set, get) => ({
     }));
   },
 
+  // --- CAMERA / VIEW STATE ---
+  setCameraView: (view) => set({ activeCameraView: view }),
+
+  setFreeRoam: (enabled) =>
+    set({
+      isFreeRoam: enabled,
+      activeCameraView: enabled ? "free" : "primary",
+    }),
+
   // --- HOTSPOTS ---
   activeHotspotId: null,
   setActiveHotspot: (id) => set({ activeHotspotId: id }),
@@ -160,5 +171,19 @@ export const useStoryStore = create((set, get) => ({
   },
 
   // --- ALIASES FOR COMPAT ---
-  setScene: (index) => get().goToScene(index),
+  setScene: (index) => {
+    const { storyData } = get();
+    if (storyData && index >= 0 && index < (storyData.scenes?.length || 0)) {
+      set({
+        playback: {
+          ...get().playback,
+          currentSceneIndex: index,
+          currentTime: 0,
+        },
+        activeCameraView: "primary",
+        isFreeRoam: false,
+        audioCurrentTime: 0,
+      });
+    }
+  },
 }));
