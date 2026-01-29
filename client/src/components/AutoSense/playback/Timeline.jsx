@@ -4,16 +4,12 @@ import { useStoryStore } from "../../../store/useStoryStore";
 import { cn } from "../../../lib/utils";
 
 export const Timeline = () => {
-  const {
-    storyData,
-    playback,
-    setCurrentTime,
-    setScrubbing,
-    setScene,
-    isFrozen,
-  } = useStoryStore();
+  const { storyData, playback, setCurrentTime, setScrubbing, setScene } =
+    useStoryStore();
 
-  const { currentSceneIndex, currentTime, isPlaying, isScrubbing } = playback;
+  // Destructure playback state directly from the store object
+  const { currentSceneIndex, currentTime, isPlaying, isScrubbing, isFrozen } =
+    playback;
 
   const timelineRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -31,8 +27,8 @@ export const Timeline = () => {
     [totalScenes],
   );
 
-  // Click / Drag Logic
-  const handleTimelineInteraction = useCallback(
+  // Click & Drag Logic
+  const handleTimelineClick = useCallback(
     (e) => {
       if (!timelineRef.current) return;
 
@@ -41,33 +37,60 @@ export const Timeline = () => {
       const percentage = (x / rect.width) * 100;
       const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
-      // Update Store
       setCurrentTime(clampedPercentage);
+      setScrubbing(true);
 
-      // Jump to scene if we crossed a boundary
       const newSceneIndex = getCurrentSceneFromTime(clampedPercentage);
+
+      // Only update scene if index actually changed to prevent jitter
       if (newSceneIndex !== currentSceneIndex) {
         setScene(newSceneIndex);
       }
+
+      // Debounce the scrubbing state release
+      setTimeout(() => setScrubbing(false), 100);
     },
-    [setCurrentTime, getCurrentSceneFromTime, currentSceneIndex, setScene],
+    [
+      setCurrentTime,
+      setScrubbing,
+      getCurrentSceneFromTime,
+      currentSceneIndex,
+      setScene,
+    ],
   );
 
   const handleMouseDown = useCallback(
     (e) => {
       setIsDragging(true);
       setScrubbing(true);
-      handleTimelineInteraction(e);
+      handleTimelineClick(e);
     },
-    [handleTimelineInteraction, setScrubbing],
+    [handleTimelineClick, setScrubbing],
   );
 
   const handleMouseMove = useCallback(
     (e) => {
-      if (!isDragging) return;
-      handleTimelineInteraction(e);
+      if (!isDragging || !timelineRef.current) return;
+
+      const rect = timelineRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = (x / rect.width) * 100;
+      const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+      setCurrentTime(clampedPercentage);
+
+      const newSceneIndex = getCurrentSceneFromTime(clampedPercentage);
+      if (newSceneIndex !== currentSceneIndex) {
+        setScene(newSceneIndex);
+      }
     },
-    [isDragging, handleTimelineInteraction],
+    [
+      isDragging,
+      setCurrentTime,
+      getCurrentSceneFromTime,
+      currentSceneIndex,
+      setScene,
+    ],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -75,27 +98,29 @@ export const Timeline = () => {
     setScrubbing(false);
   }, [setScrubbing]);
 
-  // Global Event Listeners for Dragging outside the bar
+  // Global Event Listeners for dragging outside the bar
   useEffect(() => {
+    const handleGlobalMouseMove = (e) => handleMouseMove(e);
+    const handleGlobalMouseUp = () => handleMouseUp();
+
     if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("mousemove", handleGlobalMouseMove);
+      document.addEventListener("mouseup", handleGlobalMouseUp);
     }
+
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Auto-Progress Interval (Visual driver)
-  // Note: AudioPlayer also drives time, but this ensures smoothness
-  // when audio is missing or muted.
+  // Visual Progression Interval
+  // (Ensures smooth bar movement even if audio engine updates strictly on timeupdate)
   useEffect(() => {
     let interval;
+
     if (isPlaying && !isFrozen && !isScrubbing) {
       interval = setInterval(() => {
-        // Increment visual time
-        // Note: Real audio sync happens in AudioPlayer.jsx
         const nextTime =
           playback.currentTime >= 100 ? 0 : playback.currentTime + 0.05;
         setCurrentTime(nextTime);
@@ -108,51 +133,62 @@ export const Timeline = () => {
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-4 w-full">
-      {/* Header Info */}
-      <div className="flex items-center justify-between mb-3 text-xs">
+      {/* Timeline Header */}
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <span className="text-white font-bold">
+          <span className="text-sm font-medium text-white">
             Scene {currentSceneIndex + 1}
           </span>
-          <span className="text-zinc-500">of {totalScenes}</span>
-
+          <span className="text-xs text-zinc-400">of {totalScenes}</span>
           {isFrozen && (
-            <span className="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded border border-blue-400/20">
-              Focus Mode
+            <span className="text-xs text-blue-400 bg-blue-400/10 px-2 py-1 rounded border border-blue-400/20">
+              Frozen
             </span>
           )}
           {isScrubbing && (
-            <span className="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+            <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded border border-yellow-400/20">
               Scrubbing
             </span>
           )}
         </div>
-        <div className="font-mono text-zinc-400">
-          {Math.round(currentTime)}%
+        <div className="text-xs text-zinc-400 font-mono">
+          {Math.round(currentTime)}% •{" "}
+          {Math.round((currentTime / duration) * 60)}s
         </div>
       </div>
 
-      {/* The Track */}
+      {/* Timeline Track */}
       <div className="relative h-8 group">
         {/* Scene Markers (Background) */}
         <div className="absolute inset-0 flex pointer-events-none">
           {storyData.scenes.map((_, index) => {
-            const width = (1 / totalScenes) * 100;
+            const sceneStart = (index / totalScenes) * 100;
+            const sceneWidth = (1 / totalScenes) * 100;
             const isActive = index === currentSceneIndex;
 
             return (
               <div
                 key={index}
                 className={cn(
-                  "relative border-r border-white/5 h-full transition-colors duration-300",
-                  isActive ? "bg-white/5" : "bg-transparent",
+                  "relative border-r border-white/10 transition-all duration-300",
+                  isActive ? "bg-blue-500/10" : "bg-white/5",
                 )}
-                style={{ width: `${width}%` }}
+                style={{
+                  left: `${sceneStart}%`,
+                  width: `${sceneWidth}%`,
+                }}
               >
-                {/* Scene Number Label */}
-                <div className="absolute top-2 left-2 text-[10px] font-bold text-zinc-600 group-hover:text-zinc-400 transition-colors">
+                <div className="absolute top-1 left-2 text-[10px] font-bold text-zinc-600 group-hover:text-zinc-400 transition-colors">
                   {index + 1}
                 </div>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeScene"
+                    className="absolute inset-0 bg-blue-500/20 border-l-2 border-blue-500"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
               </div>
             );
           })}
@@ -177,13 +213,19 @@ export const Timeline = () => {
           {/* Thumb / Handle */}
           <motion.div
             className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 cursor-grab active:cursor-grabbing hover:scale-125 transition-transform"
-            style={{ left: `${currentTime}%`, marginLeft: "-8px" }} // Center the thumb
+            style={{ left: `${currentTime}%`, marginLeft: "-8px" }}
             transition={{ duration: isScrubbing ? 0 : 0.1, ease: "linear" }}
           >
             {isDragging && (
               <div className="absolute inset-0 bg-blue-400 animate-ping rounded-full opacity-50" />
             )}
           </motion.div>
+        </div>
+
+        <div className="flex justify-between mt-2 px-1">
+          <span className="text-[10px] text-zinc-600">0:00</span>
+          <span className="text-[10px] text-zinc-600">0:30</span>
+          <span className="text-[10px] text-zinc-600">1:00</span>
         </div>
       </div>
     </div>
