@@ -1,13 +1,19 @@
 const { buildImagePrompt } = require("./promptBuilder");
 const { generateImage } = require("./imageGenerator");
-const { scanHotspots } = require("./visionScanner"); // <--- Import logic
+const { scanHotspots } = require("./visionScanner");
 
 /**
  * THE VISUALIZER AGENT
  */
 async function visualizeStory(carContext, storyboard) {
+  // Count scene types for logging
+  const techViewCount = storyboard.scenes.filter(
+    (s) => s.scene_type === "tech_view",
+  ).length;
+  const imageSceneCount = storyboard.scenes.length - techViewCount;
+
   console.log(
-    `🎨 Visualizer Agent: Generating images & coords for ${storyboard.scenes.length} scenes...`
+    `🎨 Visualizer Agent: Processing ${storyboard.scenes.length} scenes (${imageSceneCount} images, ${techViewCount} 3D tech views)...`,
   );
 
   try {
@@ -27,6 +33,26 @@ async function visualizeStory(carContext, storyboard) {
 
 async function processSingleScene(scene, carContext) {
   try {
+    // =========================================================
+    // TECH VIEW CHECK: Skip image generation for 3D scenes
+    // =========================================================
+    if (scene.scene_type === "tech_view") {
+      console.log(
+        `   🔷 Scene ${scene.scene_id}: tech_view (${scene.theme_tag}) - Skipping image (3D mode)`,
+      );
+
+      // Return scene with null image_url - frontend will render 3D instead
+      return {
+        ...scene,
+        image_url: null,
+        hotspots: [], // 3D scenes use interactive 3D hotspots instead
+      };
+    }
+
+    // =========================================================
+    // STANDARD PROCESSING: Generate image for other scenes
+    // =========================================================
+
     // 1. Generate Image (Phase 1)
     const prompt = buildImagePrompt(scene, carContext);
 
@@ -34,14 +60,10 @@ async function processSingleScene(scene, carContext) {
     const seed = Math.floor(Math.random() * 100000) + (scene.order || 1);
     const imageUrl = await generateImage(prompt, seed);
 
-    // 2. Scan for Hotspots (Phase 2 - NEW)
+    // 2. Scan for Hotspots (Phase 2)
     let updatedHotspots = scene.hotspots || [];
 
     // Only scan if we have hotspots defined by Scriptwriter
-    // (Note: Scriptwriter usually defines hotspots, but they might be empty in some scenes)
-    // If the Scriptwriter didn't define hotspots, we can check if the Director asked for specific focus points.
-    // For now, let's assume we are scanning existing hotspots to update their X/Y.
-
     if (updatedHotspots.length > 0 && imageUrl) {
       const coordsMap = await scanHotspots(imageUrl, updatedHotspots);
 
@@ -50,7 +72,7 @@ async function processSingleScene(scene, carContext) {
         const discovered = coordsMap[spot.id];
         return {
           ...spot,
-          x: discovered?.x || spot.x || 50, // Use Vision X, or Default, or Center
+          x: discovered?.x || spot.x || 50,
           y: discovered?.y || spot.y || 50,
         };
       });
@@ -77,7 +99,7 @@ async function processSingleScene(scene, carContext) {
   } catch (err) {
     console.error(
       `⚠️ Failed to visualize scene ${scene.scene_id}:`,
-      err.message
+      err.message,
     );
     return scene;
   }

@@ -11,7 +11,7 @@ const AIWhisper = ({ text }) => (
     animate={{ opacity: 1, y: 0, scale: 1 }}
     exit={{ opacity: 0, y: 10, scale: 0.9 }}
     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    className="absolute bottom-32 right-6 z-[80] pointer-events-none"
+    className="absolute top-10  right-6 z-[80] pointer-events-none"
   >
     <div className="bg-black/80 backdrop-blur-md border border-primary/30 p-4 rounded-xl shadow-2xl max-w-xs flex gap-3 items-start">
       <div className="p-2 bg-primary/20 rounded-full shrink-0 animate-pulse">

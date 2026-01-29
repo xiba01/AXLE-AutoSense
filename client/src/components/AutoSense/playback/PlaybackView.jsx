@@ -7,6 +7,7 @@ import { StoryContainer } from "../layers/StoryContainer";
 import { PlaybackControls } from "./PlaybackControls";
 import { KeyboardShortcuts } from "./KeyboardShortcuts";
 import { AIIntentOrchestrator } from "../ai/AIIntentOrchestrator";
+import { ExperienceLoader } from "../ui/ExperienceLoader";
 
 // 🚀 EXPORT TYPE: Named Export (Must match import { PlaybackView } in ViewerPage)
 export const PlaybackView = () => {
@@ -94,6 +95,9 @@ export const PlaybackView = () => {
   // --- RENDER ---
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden font-sans">
+      {/* 0. 3D ASSET LOADER (waits for Three.js assets) */}
+      <ExperienceLoader />
+
       {/* 1. VISUAL LAYER (3D Scene + Text + Audio) */}
       <div className="absolute inset-0">
         <StoryContainer enableAudio={true} />

@@ -10,8 +10,7 @@ const CAMERA_PRESETS = {
   SAFETY: {
     primary: { pos: [4.23, 2.1, 6.24], target: [1.52, 0.37, -0.09] },
     secondary: { pos: [3.47, 1.47, -6.54], target: [-0.53, 0.47, -2.54] },
-    // 🆕 NEW TOP VIEW (Drone Shot)
-    tertiary: { pos: [0.1, 11, 0], target: [0, 0, 0] },
+    tertiary: { pos: [0.1, 10, -2.25], target: [0, 0, -2.25] },
   },
   UTILITY: {
     primary: { pos: [3.96, 3.91, 7.02], target: [1.57, -0.19, -0.53] },

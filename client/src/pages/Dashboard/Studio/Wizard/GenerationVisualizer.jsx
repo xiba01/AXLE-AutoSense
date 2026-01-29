@@ -82,7 +82,7 @@ const GENERATION_STEPS = [
     color: "text-rose-400",
     glow: "bg-rose-500",
     label: "IMAGE GEN",
-    msg: "Rendering cinematic assets (Flux)...",
+    msg: "Rendering cinematic assets...",
   },
   {
     id: 7,

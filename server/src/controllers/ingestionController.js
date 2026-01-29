@@ -13,9 +13,8 @@ const generateContext = async (req, res) => {
     }
 
     // ---------------------------------------------------------
-    // STEP 0: LOOK UP DEALER ID (The Fix)
+    // STEP 0: LOOK UP DEALER ID
     // ---------------------------------------------------------
-    // We need to know who owns this car to assign the story correctly.
     const { data: carData, error: carError } = await supabase
       .from("cars")
       .select("dealer_id")
@@ -32,26 +31,52 @@ const generateContext = async (req, res) => {
     const dealerId = carData.dealer_id;
 
     // ---------------------------------------------------------
-    // STEP 1: CREATE STORY ROW
+    // STEP 1: RESOLVE STORY ID (Manual Upsert Logic)
     // ---------------------------------------------------------
-    const storyId = uuidv4();
-
-    const { error: dbError } = await supabase
+    // Check if there is already an ACTIVE (non-deleted) story for this car
+    const { data: existingStory } = await supabase
       .from("stories")
-      .upsert({
-        id: storyId,
-        car_id: car_id,
-        dealer_id: dealerId, // <--- NOW WE HAVE THE VALID ID
-        generation_status: "processing",
-        current_agent: "SYSTEM",
-        progress_percent: 0,
-        progress_logs: ["Pipeline initialized"],
-      })
-      .select()
-      .single();
+      .select("id")
+      .eq("car_id", car_id)
+      .is("deleted_at", null) // Only look for active ones
+      .maybeSingle();
+
+    let storyId;
+    let dbError;
+
+    // DATA TO WRITE
+    const storyPayload = {
+      car_id: car_id,
+      dealer_id: dealerId,
+      generation_status: "processing",
+      current_agent: "SYSTEM",
+      progress_percent: 0,
+      progress_logs: ["Pipeline initialized"],
+      deleted_at: null, // Ensure it's active
+    };
+
+    if (existingStory) {
+      // UPDATE EXISTING ACTIVE STORY
+      storyId = existingStory.id;
+      console.log(`🔄 Overwriting existing story: ${storyId}`);
+
+      const { error } = await supabase
+        .from("stories")
+        .update(storyPayload)
+        .eq("id", storyId);
+      dbError = error;
+    } else {
+      // INSERT NEW STORY
+      storyId = uuidv4();
+      storyPayload.id = storyId;
+      console.log(`✨ Creating new story: ${storyId}`);
+
+      const { error } = await supabase.from("stories").insert(storyPayload);
+      dbError = error;
+    }
 
     if (dbError) {
-      throw new Error("DB Init Failed: " + dbError.message);
+      throw new Error("DB Operation Failed: " + dbError.message);
     }
 
     // ---------------------------------------------------------

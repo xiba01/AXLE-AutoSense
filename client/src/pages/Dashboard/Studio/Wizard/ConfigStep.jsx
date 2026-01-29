@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Image,
-  Chip,
-  Slider,
-  Select,
-  SelectItem,
-  Divider,
-  Card,
-  CardBody,
-} from "@heroui/react";
+import { Slider, Select, SelectItem } from "@heroui/react";
 import {
   ChevronLeft,
   Sparkles,
@@ -45,51 +35,46 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 h-full animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* ---------------------------------------------------------- */}
       {/* LEFT COLUMN: THE ASSET (Car Summary) */}
       {/* ---------------------------------------------------------- */}
-      <div className="w-full lg:w-5/12 flex flex-col gap-6">
+      <div className="w-full lg:w-5/12 flex flex-col gap-5">
         {/* Car Hero Card */}
-        <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl group bg-black">
-          <Image
-            removeWrapper
+        <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-black">
+          <img
             src={car.photos?.[0]}
-            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+            alt={car.model}
+            className="w-full h-full object-cover opacity-70"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-          <div className="absolute bottom-6 left-6 right-6">
-            <h2 className="text-4xl font-bold text-white mb-2 tracking-tight">
+          <div className="absolute bottom-5 left-5 right-5">
+            <h2 className="text-3xl font-semibold text-white mb-1.5 tracking-tight">
               {car.model}
             </h2>
-            <div className="flex items-center gap-2">
-              <Chip
-                size="sm"
-                variant="flat"
-                className="bg-white/10 text-white backdrop-blur-md border border-white/10 uppercase font-bold tracking-wider text-[10px]"
-              >
-                {car.year}
-              </Chip>
-              <span className="text-white/60 font-medium uppercase tracking-wider text-xs">
-                {car.make} • {car.trim}
-              </span>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-white/90 font-medium">{car.year}</span>
+              <span className="text-white/40">•</span>
+              <span className="text-white/60">{car.make}</span>
+              <span className="text-white/40">•</span>
+              <span className="text-white/50 text-xs">{car.trim}</span>
             </div>
           </div>
         </div>
 
-        {/* Technical HUD Grid */}
+        {/* Technical Stats Grid */}
         <div className="grid grid-cols-3 gap-3">
           {stats.map((stat, i) => (
             <div
               key={i}
-              className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center text-center backdrop-blur-md group hover:border-primary/50 transition-colors"
+              className="bg-white/[0.04] rounded-xl p-4 flex flex-col items-center justify-center text-center"
             >
-              <stat.icon className="text-default-500 group-hover:text-primary mb-2 size-5 transition-colors" />
-              <span className="text-xl font-bold text-white tracking-tight">
+              <stat.icon className="text-white/40 mb-2 w-4 h-4" />
+              <span className="text-lg font-semibold text-white tracking-tight">
                 {stat.value}
               </span>
-              <span className="text-[10px] uppercase text-white/30 font-bold tracking-widest">
+              <span className="text-[10px] text-white/40 font-medium tracking-wider mt-0.5">
                 {stat.label}
               </span>
             </div>
@@ -97,118 +82,94 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
         </div>
 
         {/* AI Insight Card */}
-        <Card className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 shadow-none">
-          <CardBody className="flex flex-row gap-4 items-start p-4">
-            <div className="p-2 bg-primary/20 rounded-full shrink-0">
-              <Sparkles className="size-5 text-primary animate-pulse" />
+        {/* <div className="bg-white/[0.04] rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+              <Sparkles className="w-4 h-4 text-white/90" />
             </div>
-            <div>
-              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
-                AutoSense Insight
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-white/90 mb-1.5">
+                AI Suggestion
               </p>
-              <p className="text-sm text-white/80 leading-relaxed">
-                Perfect candidate for a high-energy story. We will highlight the{" "}
-                <span className="text-white font-semibold underline decoration-primary decoration-2 underline-offset-2">
-                  {specs.driveWheels || "Handling"}
-                </span>{" "}
-                and the{" "}
-                <span className="text-white font-semibold underline decoration-primary decoration-2 underline-offset-2">
-                  Interior
-                </span>{" "}
-                based on the {car.year} model profile.
+              <p className="text-sm text-white/60 leading-relaxed">
+                We'll emphasize the {specs.driveWheels || "handling"} and
+                interior details based on the {car.year} model profile.
               </p>
             </div>
-          </CardBody>
-        </Card>
+          </div>
+        </div> */}
       </div>
 
       {/* ---------------------------------------------------------- */}
       {/* RIGHT COLUMN: THE DIRECTOR (Configuration) */}
       {/* ---------------------------------------------------------- */}
-      <div className="flex-1 bg-neutral-900/40 border border-white/10 rounded-3xl p-8 flex flex-col justify-between backdrop-blur-xl shadow-2xl relative overflow-hidden">
-        {/* Subtle Background Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
-
-        <div className="space-y-10 relative z-10">
+      <div className="flex-1 bg-white/[0.04] rounded-2xl p-7 flex flex-col justify-between">
+        <div className="space-y-8">
           <div>
-            <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-              <Clapperboard className="text-primary" /> Story Direction
+            <h3 className="text-xl font-semibold text-white tracking-tight flex items-center gap-2.5">
+              <Clapperboard className="w-5 h-5 text-white/70" /> Story Settings
             </h3>
-            <p className="text-default-400 mt-1 text-sm">
-              Define the mood, pacing, and target audience.
+            <p className="text-white/50 mt-1 text-sm">
+              Configure the style and pacing
             </p>
           </div>
 
           {/* 1. Theme Selector */}
-          <div className="space-y-4">
-            <label className="text-xs font-bold text-default-500 uppercase tracking-widest">
+          <div className="space-y-3">
+            <label className="text-xs font-medium text-white/60 tracking-wide">
               Visual Theme
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* CINEMATIC (Selected) */}
+            <div className="grid mt-4 grid-cols-1 md:grid-cols-2 gap-3">
+              {/* CINEMATIC */}
               <button
                 onClick={() => setTheme("cinematic")}
                 className={`
-                  relative p-1 rounded-xl transition-all duration-300 group text-left
-                  ${theme === "cinematic" ? "ring-2 ring-primary shadow-[0_0_20px_rgba(0,136,255,0.2)] scale-[1.02]" : "hover:scale-[1.01]"}
+                  p-4 rounded-xl text-left transition-all
+                  ${theme === "cinematic" ? "bg-white/[0.12] ring-1 ring-white/20" : "bg-white/[0.06] hover:bg-white/[0.08]"}
                 `}
               >
-                <div
-                  className={`
-                    absolute inset-0 rounded-xl bg-gradient-to-br from-neutral-800 to-black opacity-90
-                    ${theme === "cinematic" ? "from-neutral-800 to-primary/10" : ""}
-                `}
-                />
-
-                <div className="relative z-10 p-4 h-full flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-2">
-                    <span
-                      className={`font-bold ${theme === "cinematic" ? "text-white" : "text-default-400"}`}
-                    >
-                      Cinematic
-                    </span>
-                    {theme === "cinematic" && (
-                      <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_#0088ff]" />
-                    )}
-                  </div>
-                  <p className="text-xs text-default-500 leading-relaxed">
-                    Dramatic lighting, slow pans, high-contrast emotional
-                    storytelling.
-                  </p>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-semibold text-white text-sm">
+                    Cinematic
+                  </span>
+                  {theme === "cinematic" && (
+                    <div className="w-2 h-2 rounded-full bg-white" />
+                  )}
                 </div>
+                <p className="text-xs text-white/50 leading-relaxed">
+                  Dramatic lighting and emotional storytelling
+                </p>
               </button>
 
-              {/* MODERN (Disabled) */}
-              <div className="relative p-5 rounded-xl border border-white/5 opacity-40 grayscale select-none bg-black/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-white">Minimalist</span>
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    className="bg-white/10 text-white/50 text-[10px] h-5"
-                  >
-                    SOON
-                  </Chip>
+              {/* MINIMALIST (Disabled) */}
+              <div className="p-4 rounded-xl bg-white/[0.02] opacity-40 select-none">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-semibold text-white text-sm">
+                    Minimalist
+                  </span>
+                  <span className="text-[10px] text-white/50 font-medium">
+                    Soon
+                  </span>
                 </div>
-                <p className="text-xs text-default-500">
-                  Clean white background, studio lighting, focus on details.
+                <p className="text-xs text-white/50 leading-relaxed">
+                  Clean studio lighting and detailed focus
                 </p>
               </div>
             </div>
           </div>
 
-          <Divider className="bg-white/10" />
+          <div className="h-px bg-white/[0.08]" />
 
-          {/* 2. Pacing & Language */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* 2. Duration & Language */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Scene Count */}
-            <div className="space-y-6">
-              <div className="flex justify-between items-end">
-                <label className="text-xs font-bold text-default-500 uppercase tracking-widest flex items-center gap-2">
-                  <Clock size={14} /> Duration
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-medium text-white/60 tracking-wide flex items-center gap-2">
+                  <Clock size={13} /> Duration
                 </label>
-                <span className="text-sm text-primary font-bold bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
-                  ~{sceneCount * 12} Seconds
+                <span className="text-xs text-white/90 font-medium">
+                  ~{sceneCount * 12}s
                 </span>
               </div>
               <Slider
@@ -217,7 +178,6 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                 maxValue={6}
                 minValue={3}
                 aria-label="Scene Count"
-                defaultValue={4}
                 value={sceneCount}
                 onChange={setSceneCount}
                 className="max-w-md"
@@ -228,37 +188,34 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                   { value: 6, label: "Long" },
                 ]}
                 classNames={{
-                  mark: "text-default-400 text-[10px]",
-                  thumb: "bg-white border-primary border-2 shadow-lg w-5 h-5",
-                  track: "bg-default-100",
-                  filler: "bg-primary",
+                  mark: "text-white/40 text-[10px]",
+                  thumb: "bg-white w-4 h-4 shadow-lg",
+                  track: "bg-white/[0.08]",
+                  filler: "bg-white",
                 }}
               />
             </div>
 
             {/* Language */}
-            <div className="space-y-6">
-              <label className="text-xs font-bold text-default-500 uppercase tracking-widest flex items-center gap-2">
-                <Languages size={14} /> Narration
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-white/60 tracking-wide flex items-center gap-2">
+                <Languages size={13} /> Language
               </label>
               <Select
-                placeholder="Select Language"
-                aria-label="Narration language"
+                aria-label="Language"
                 defaultSelectedKeys={["en"]}
                 selectedKeys={[language]}
                 onSelectionChange={(keys) => {
                   const [next] = Array.from(keys);
-                  if (next) {
-                    setLanguage(next);
-                  }
+                  if (next) setLanguage(next);
                 }}
                 className="max-w-full"
                 variant="bordered"
                 classNames={{
                   trigger:
-                    "border-white/20 hover:border-white/40 bg-black/20 text-white min-h-[48px]",
+                    "border-white/[0.12] hover:border-white/20 bg-white/[0.04] text-white h-11 rounded-xl",
                   popoverContent:
-                    "bg-neutral-900 border border-white/10 text-white",
+                    "bg-neutral-900 border border-white/10 text-white rounded-xl",
                   value: "text-sm font-medium",
                 }}
                 renderValue={(items) => {
@@ -271,30 +228,31 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                 }}
               >
                 <SelectItem
+                  className="text-white"
                   key="en"
-                  textValue="English (US)"
-                  startContent={<span className="text-lg">🇺🇸</span>}
+                  textValue="English"
+                  startContent={<span>🇺🇸</span>}
                 >
-                  English (US)
+                  English
                 </SelectItem>
                 <SelectItem
                   key="es"
                   textValue="Spanish"
-                  startContent={<span className="text-lg">🇪🇸</span>}
+                  startContent={<span>🇪🇸</span>}
                 >
                   Spanish
                 </SelectItem>
                 <SelectItem
                   key="fr"
                   textValue="French"
-                  startContent={<span className="text-lg">🇫🇷</span>}
+                  startContent={<span>🇫🇷</span>}
                 >
                   French
                 </SelectItem>
                 <SelectItem
                   key="de"
                   textValue="German"
-                  startContent={<span className="text-lg">🇩🇪</span>}
+                  startContent={<span>🇩🇪</span>}
                 >
                   German
                 </SelectItem>
@@ -304,24 +262,22 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
         </div>
 
         {/* 3. Footer Actions */}
-        <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-auto relative z-10">
-          <Button
-            variant="light"
-            className="text-white/50 hover:text-white"
-            onPress={onBack}
-            startContent={<ChevronLeft size={18} />}
+        <div className="flex items-center justify-between pt-6 border-t border-white/[0.08] mt-auto">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-medium transition-colors"
           >
+            <ChevronLeft size={16} />
             Back
-          </Button>
+          </button>
 
-          <Button
-            size="lg"
-            className="bg-white text-black font-bold px-8 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] transition-all hover:scale-105 active:scale-95"
-            endContent={<ArrowRight size={18} />}
-            onPress={handleLaunch}
+          <button
+            onClick={handleLaunch}
+            className="flex items-center gap-2 bg-white text-black font-semibold px-6 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-transform text-sm"
           >
             Generate Story
-          </Button>
+            <ArrowRight size={16} />
+          </button>
         </div>
       </div>
     </div>

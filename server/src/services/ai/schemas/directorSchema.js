@@ -34,10 +34,42 @@ const LayoutSchema = z.object({
   }),
 });
 
-// ... (Rest of the file remains exactly the same)
+// 2. Tech Config Schema (for 3D Digital Twin scenes)
+const TechConfigSchema = z
+  .object({
+    mode: z.enum(["PERFORMANCE", "SAFETY", "UTILITY"]),
+
+    // PERFORMANCE mode fields
+    drivetrain: z.string().optional(),
+    engine_hp: z.number().nullable().optional(),
+    torque_nm: z.number().nullable().optional(),
+    zero_to_sixty_sec: z.number().nullable().optional(),
+
+    // SAFETY mode fields
+    airbag_count: z.number().optional(),
+    has_front_sensors: z.boolean().optional(),
+    has_rear_sensors: z.boolean().optional(),
+    safety_rating: z.string().nullable().optional(),
+    assist_systems: z.array(z.string()).optional(),
+
+    // UTILITY mode fields
+    dimensions: z
+      .object({
+        length_mm: z.number().nullable().optional(),
+        width_mm: z.number().nullable().optional(),
+        height_mm: z.number().nullable().optional(),
+        wheelbase_mm: z.number().nullable().optional(),
+      })
+      .optional(),
+    trunk_capacity_liters: z.number().nullable().optional(),
+    seat_count: z.number().optional(),
+  })
+  .optional();
+
+// 3. Director Scene Schema (UPDATED to include tech_view)
 const DirectorSceneSchema = z.object({
   scene_id: z.string(),
-  scene_type: z.enum(["intro_view", "slide_view", "outro_view"]),
+  scene_type: z.enum(["intro_view", "slide_view", "tech_view", "outro_view"]),
   main_feature_slug: z.string().optional(),
   theme_tag: z
     .string()
@@ -51,6 +83,8 @@ const DirectorSceneSchema = z.object({
     lighting: z.string(),
   }),
   layout: LayoutSchema.optional(),
+  // Flag for the Director to indicate this should be a 3D scene
+  use_3d_mode: z.boolean().optional(),
 });
 
 const DirectorOutputSchema = z.object({
@@ -59,4 +93,4 @@ const DirectorOutputSchema = z.object({
   scenes: z.array(DirectorSceneSchema),
 });
 
-module.exports = { DirectorOutputSchema, LayoutSchema };
+module.exports = { DirectorOutputSchema, LayoutSchema, TechConfigSchema };

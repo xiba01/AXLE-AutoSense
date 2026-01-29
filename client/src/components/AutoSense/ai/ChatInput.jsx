@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Lightbulb } from "lucide-react";
-import { Input, Button } from "@heroui/react";
+import { Send } from "lucide-react";
 
 export const ChatInput = ({
   onSendMessage,
@@ -33,20 +32,21 @@ export const ChatInput = ({
       <AnimatePresence>
         {showSuggestions && suggestions.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-full left-0 right-0 mb-3 p-2 bg-background/80 backdrop-blur-xl border border-default-200 rounded-xl shadow-lg z-10"
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+            className="absolute bottom-full left-0 right-0 mb-2 p-2 bg-white/10 backdrop-blur-xl rounded-2xl z-10"
           >
-            <div className="flex items-center gap-2 mb-2 px-2 text-xs font-bold text-default-400 uppercase tracking-wider">
-              <Lightbulb className="w-3 h-3" /> Suggested
+            <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider px-3 py-2">
+              Suggestions
             </div>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {suggestions.slice(0, 3).map((s, i) => (
                 <button
                   key={i}
                   onClick={() => handleSuggestionClick(s)}
-                  className="w-full text-left px-3 py-2 text-xs font-medium text-foreground hover:bg-default-100 rounded-lg transition-colors truncate"
+                  className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors truncate"
                 >
                   {s}
                 </button>
@@ -58,39 +58,38 @@ export const ChatInput = ({
 
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="flex gap-2 items-center">
-        <Input
-          ref={inputRef}
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setShowSuggestions(e.target.value === "" && suggestions.length > 0);
-          }}
-          onFocus={() => {
-            if (inputValue === "") setShowSuggestions(true);
-          }}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-          placeholder="Ask about range, safety, or specs..."
-          disabled={disabled}
-          variant="flat"
-          radius="full"
-          classNames={{
-            inputWrapper:
-              "bg-default-100 hover:bg-default-200 focus-within:bg-default-200 shadow-inner",
-            input: "text-sm",
-          }}
-        />
+        <div className="flex-1 relative">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setShowSuggestions(
+                e.target.value === "" && suggestions.length > 0,
+              );
+            }}
+            onFocus={() => {
+              if (inputValue === "") setShowSuggestions(true);
+            }}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            placeholder="Ask me anything..."
+            disabled={disabled}
+            className="w-full px-4 py-2.5 bg-white/10 text-white text-sm placeholder:text-white/40 rounded-full focus:outline-none focus:bg-white/[0.15] transition-colors disabled:opacity-50"
+          />
+        </div>
 
-        <Button
-          isIconOnly
+        <button
           type="submit"
           disabled={!inputValue.trim() || disabled}
-          color={inputValue.trim() ? "primary" : "default"}
-          variant="shadow"
-          radius="full"
-          className="shrink-0"
+          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+            inputValue.trim() && !disabled
+              ? "bg-white text-black hover:scale-105"
+              : "bg-white/20 text-white/40"
+          } disabled:cursor-not-allowed`}
         >
-          <Send size={18} />
-        </Button>
+          <Send size={16} />
+        </button>
       </form>
     </div>
   );
