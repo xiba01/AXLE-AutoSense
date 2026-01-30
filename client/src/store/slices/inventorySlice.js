@@ -22,11 +22,14 @@ export const fetchInventory = createAsyncThunk(
 );
 
 // ------------------------------------------------------------------
-// 2. ASYNC THUNK: ADD CAR (Uploads Images + Saves DB Row)
+// 2. ASYNC THUNK: ADD CAR (Uploads Images + 3D Assets + Saves DB Row)
 // ------------------------------------------------------------------
 export const addCar = createAsyncThunk(
   "inventory/add",
-  async ({ formData, specsList, photos }, { getState, rejectWithValue }) => {
+  async (
+    { formData, specsList, photos, model3dFile, image360File },
+    { getState, rejectWithValue },
+  ) => {
     const { user } = getState().auth;
     console.log("🚨 ATTEMPTING SAVE");
     console.log("User Object:", user);
@@ -62,7 +65,45 @@ export const addCar = createAsyncThunk(
         }
       }
 
-      // B. PREPARE DB ROW
+      // B. UPLOAD 3D MODEL (.glb) to 3d_cars bucket
+      let model3dUrl = null;
+      if (model3dFile) {
+        const fileExt = model3dFile.name.split(".").pop();
+        const filePath = `${user.id}/${formData.vin}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("3d_cars")
+          .upload(filePath, model3dFile);
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("3d_cars").getPublicUrl(filePath);
+
+        model3dUrl = publicUrl;
+      }
+
+      // C. UPLOAD 360 IMAGE (.jpg) to 360_cars bucket
+      let image360Url = null;
+      if (image360File) {
+        const fileExt = image360File.name.split(".").pop();
+        const filePath = `${user.id}/${formData.vin}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("360_cars")
+          .upload(filePath, image360File);
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("360_cars").getPublicUrl(filePath);
+
+        image360Url = publicUrl;
+      }
+
+      // D. PREPARE DB ROW
       // We convert the dynamic specs array back into a JSON object for storage
       // giving us a "Golden Record" of the car's tech data.
       const technicalData = specsList.reduce((acc, item) => {
@@ -86,6 +127,10 @@ export const addCar = createAsyncThunk(
         color: formData.color,
         condition: formData.condition,
 
+        // 3D Assets
+        model_3d_url: model3dUrl,
+        image_360_url: image360Url,
+
         specs_raw: {
           ...technicalData,
           // We keep them in specs_raw too for the AI to read easily later
@@ -96,7 +141,7 @@ export const addCar = createAsyncThunk(
 
       console.log("📦 Payload sending to Supabase:", newCar);
 
-      // C. INSERT INTO SUPABASE
+      // E. INSERT INTO SUPABASE
       const { data, error } = await supabase
         .from("cars")
         .insert(newCar)
@@ -135,7 +180,17 @@ export const deleteCar = createAsyncThunk(
 export const updateCar = createAsyncThunk(
   "inventory/update",
   async (
-    { carId, formData, specsList, photos, existingPhotos },
+    {
+      carId,
+      formData,
+      specsList,
+      photos,
+      existingPhotos,
+      model3dFile,
+      image360File,
+      existing3dUrl,
+      existing360Url,
+    },
     { getState, rejectWithValue },
   ) => {
     const { user } = getState().auth;
@@ -167,7 +222,45 @@ export const updateCar = createAsyncThunk(
       // Merge existing (kept) photos with new uploads
       const finalPhotoArray = [...(existingPhotos || []), ...newPhotoUrls];
 
-      // B. PREPARE SPECS JSON
+      // B. HANDLE 3D MODEL UPLOAD
+      let model3dUrl = existing3dUrl || null;
+      if (model3dFile) {
+        const fileExt = model3dFile.name.split(".").pop();
+        const filePath = `${user.id}/${formData.vin}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("3d_cars")
+          .upload(filePath, model3dFile);
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("3d_cars").getPublicUrl(filePath);
+
+        model3dUrl = publicUrl;
+      }
+
+      // C. HANDLE 360 IMAGE UPLOAD
+      let image360Url = existing360Url || null;
+      if (image360File) {
+        const fileExt = image360File.name.split(".").pop();
+        const filePath = `${user.id}/${formData.vin}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("360_cars")
+          .upload(filePath, image360File);
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("360_cars").getPublicUrl(filePath);
+
+        image360Url = publicUrl;
+      }
+
+      // D. PREPARE SPECS JSON
       const technicalData = specsList.reduce((acc, item) => {
         acc[item.key] = item.value;
         return acc;
@@ -185,6 +278,8 @@ export const updateCar = createAsyncThunk(
         color: formData.color,
 
         photos: finalPhotoArray,
+        model_3d_url: model3dUrl,
+        image_360_url: image360Url,
         specs_raw: {
           ...technicalData,
           color_name: formData.color,
@@ -193,7 +288,7 @@ export const updateCar = createAsyncThunk(
         updated_at: new Date().toISOString(),
       };
 
-      // C. UPDATE SUPABASE
+      // E. UPDATE SUPABASE
       const { data, error } = await supabase
         .from("cars")
         .update(updates)

@@ -58,8 +58,13 @@ const Measurement = ({ start, end, label, rotation }) => {
 // --------------------------------------------------------
 // 📐 DIMENSIONS MANAGER
 // --------------------------------------------------------
-export const Dimensions = ({ nodes }) => {
+export const Dimensions = ({ nodes, data = {} }) => {
   if (!nodes?.Wheel_FL || !nodes?.Wheel_FR || !nodes?.Wheel_RL) return null;
+
+  // Fallbacks if data is missing
+  const length = data.length_mm ?? 4341;
+  const width = data.width_mm ?? 1804;
+  const height = data.height_mm ?? 1440;
 
   // --------------------------------------------------
   // LENGTH (side view)
@@ -96,15 +101,15 @@ export const Dimensions = ({ nodes }) => {
       <Measurement
         start={lengthStart}
         end={lengthEnd}
-        label="4,341 mm"
-        rotation={[-Math.PI / 2, 0, Math.PI / 2]} // Updated rotation to match typical axis orientation
+        label={`${length.toLocaleString()} mm`}
+        rotation={[-Math.PI / 2, 0, Math.PI / 2]}
       />
 
       {/* WIDTH */}
       <Measurement
         start={widthStart}
         end={widthEnd}
-        label="1,804 mm"
+        label={`${width.toLocaleString()} mm`}
         rotation={[-Math.PI / 2, 0, 0]}
       />
 
@@ -112,7 +117,7 @@ export const Dimensions = ({ nodes }) => {
       <Measurement
         start={heightStart}
         end={heightEnd}
-        label="1,440 mm"
+        label={`${height.toLocaleString()} mm`}
         rotation={[0, Math.PI / 2, 0]}
       />
     </group>

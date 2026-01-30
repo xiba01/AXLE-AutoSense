@@ -53,6 +53,7 @@ export const CarModel = ({
   mode = "SHOWROOM",
   drivetrain = "AWD",
   bodyType = "Sedan",
+  techConfig = {},
 }) => {
   // 1. DETERMINE WHICH MODEL TO LOAD
   // Normalize input: 'SUV', 'Sedan', 'Coupe' -> 'suv_hologram.glb'
@@ -390,7 +391,7 @@ export const CarModel = ({
           )}
 
           <PowerFlow nodes={nodes} drivetrain={drivetrain} />
-          <PerformanceRing hp={220} />
+          <PerformanceRing hp={techConfig.engine_hp ?? 220} />
           <WindLines count={60} />
         </>
       )}
@@ -398,18 +399,31 @@ export const CarModel = ({
       {mode === "SAFETY" && nodes.Anchor_Sensor_Front && (
         <>
           {/* <SafetyShield /> */}
-          <LidarScanner anchor={nodes.Anchor_Sensor_Front} />
-          <BlindSpotSensor anchor={nodes.Anchor_BlindSpot_L} side="left" />
-          <BlindSpotSensor anchor={nodes.Anchor_BlindSpot_R} side="right" />
+          {(techConfig.has_front_sensors ?? true) && (
+            <LidarScanner anchor={nodes.Anchor_Sensor_Front} />
+          )}
+          {(techConfig.has_rear_sensors ?? true) && (
+            <>
+              <BlindSpotSensor anchor={nodes.Anchor_BlindSpot_L} side="left" />
+              <BlindSpotSensor anchor={nodes.Anchor_BlindSpot_R} side="right" />
+            </>
+          )}
         </>
       )}
 
       {mode === "UTILITY" && (
         <>
           {nodes.Anchor_Trunk && (
-            <CargoVolume anchor={nodes.Anchor_Trunk} isOpen={true} />
+            <CargoVolume
+              anchor={nodes.Anchor_Trunk}
+              isOpen={true}
+              capacity={techConfig.trunk_capacity_liters}
+            />
           )}
-          <Dimensions nodes={nodes} />
+          <Dimensions
+            nodes={nodes}
+            data={techConfig.dimensions}
+          />
         </>
       )}
     </group>

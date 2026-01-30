@@ -31,6 +31,9 @@ export const CanvasWrapper = () => {
     }
   }, [storyData, bodyType, drivetrain]);
 
+  // Extract tech_config from currentScene (for tech_view)
+  const techConfig = isTechView ? currentScene.tech_config : undefined;
+
   return (
     <>
       <div className="absolute inset-0 z-0 bg-black">
@@ -51,7 +54,12 @@ export const CanvasWrapper = () => {
 
             <Environment />
 
-            <CarModel mode={mode} drivetrain={drivetrain} bodyType={bodyType} />
+            <CarModel
+              mode={mode}
+              drivetrain={drivetrain}
+              bodyType={bodyType}
+              techConfig={techConfig}
+            />
           </Suspense>
         </Canvas>
       </div>

@@ -116,10 +116,10 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
 
           {/* 1. Theme Selector */}
           <div className="space-y-3">
-            <label className="text-xs font-medium text-white/60 tracking-wide">
+            <label className="text-xs mb-6 font-medium text-white/60 tracking-wide">
               Visual Theme
             </label>
-            <div className="grid mt-4 grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid mt-3 grid-cols-1 md:grid-cols-2 gap-3">
               {/* CINEMATIC */}
               <button
                 onClick={() => setTheme("cinematic")}
@@ -209,7 +209,7 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                   const [next] = Array.from(keys);
                   if (next) setLanguage(next);
                 }}
-                className="max-w-full"
+                className="max-w-full text-white"
                 variant="bordered"
                 classNames={{
                   trigger:
@@ -220,7 +220,10 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                 }}
                 renderValue={(items) => {
                   return items.map((item) => (
-                    <div key={item.key} className="flex items-center gap-2">
+                    <div
+                      key={item.key}
+                      className="flex items-center gap-2 text-white"
+                    >
                       {item.data?.startContent}
                       <span>{item.textValue}</span>
                     </div>
@@ -228,7 +231,6 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
                 }}
               >
                 <SelectItem
-                  className="text-white"
                   key="en"
                   textValue="English"
                   startContent={<span>🇺🇸</span>}

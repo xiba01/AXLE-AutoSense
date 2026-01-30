@@ -8,6 +8,8 @@ import {
   ModalFooter,
   Select,
   SelectItem,
+  Tabs,
+  Tab,
 } from "@heroui/react";
 import {
   UploadCloud,
@@ -19,6 +21,8 @@ import {
   Layers,
   Sparkles,
   Check,
+  Box,
+  Image,
 } from "lucide-react";
 
 import { fetchTrimSpecs } from "../../../services/carSpecsService";
@@ -55,11 +59,22 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
   const [techSpecs, setTechSpecs] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // C2. Active Tab for right column
+  const [activeTab, setActiveTab] = useState("details");
+
   // D. Visuals
   const [photoFiles, setPhotoFiles] = useState([]); // File Objects (for upload)
   const [photoPreviews, setPhotoPreviews] = useState([]); // Blob URLs (for UI)
   const [existingPhotos, setExistingPhotos] = useState([]); // Existing URLs from DB
   const fileInputRef = useRef(null);
+
+  // E. 3D Assets
+  const [model3dFile, setModel3dFile] = useState(null);
+  const [model3dPreview, setModel3dPreview] = useState(null); // filename or existing URL
+  const [image360File, setImage360File] = useState(null);
+  const [image360Preview, setImage360Preview] = useState(null);
+  const model3dInputRef = useRef(null);
+  const image360InputRef = useRef(null);
 
   // --- EFFECT: PRE-FILL WHEN EDITING ---
   React.useEffect(() => {
@@ -96,6 +111,12 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
       setPhotoPreviews(initialData.photos || []);
       setPhotoFiles([]);
       setTrimId(initialData.trimId || "");
+
+      // Pre-fill 3D assets
+      setModel3dPreview(initialData.model_3d_url || null);
+      setImage360Preview(initialData.image_360_url || null);
+      setModel3dFile(null);
+      setImage360File(null);
     } else {
       setMainInfo({
         vin: "",
@@ -115,6 +136,10 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
       setPhotoFiles([]);
       setExistingPhotos([]);
       setTrimId("");
+      setModel3dFile(null);
+      setModel3dPreview(null);
+      setImage360File(null);
+      setImage360Preview(null);
     }
   }, [initialData, isOpen]);
 
@@ -193,6 +218,10 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
             specsList: techSpecs,
             photos: photoFiles,
             existingPhotos,
+            model3dFile,
+            image360File,
+            existing3dUrl: model3dFile ? null : model3dPreview,
+            existing360Url: image360File ? null : image360Preview,
           }),
         ).unwrap();
       } else {
@@ -201,6 +230,8 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
             formData: mainInfo,
             specsList: techSpecs,
             photos: photoFiles,
+            model3dFile,
+            image360File,
           }),
         ).unwrap();
       }
@@ -293,7 +324,7 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
                   </div>
                 </div>
 
-                <div className="h-px bg-foreground/[0.06]" />
+                <div className="h-px bg-foreground/6" />
 
                 {/* Form Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -358,166 +389,331 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
                     </div>
                   </div>
 
-                  {/* Right Column: Form Fields */}
+                  {/* Right Column: Tabbed Content */}
                   <div className="lg:col-span-2 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Info className="size-4 text-foreground/40" />
-                      <h3 className="text-sm font-medium text-foreground">
-                        Vehicle Details
-                      </h3>
-                    </div>
+                    <Tabs
+                      selectedKey={activeTab}
+                      onSelectionChange={setActiveTab}
+                      variant="underlined"
+                      classNames={{
+                        tabList:
+                          "gap-6 w-full relative rounded-none p-0 border-b border-foreground/10",
+                        cursor: "w-full bg-foreground",
+                        tab: "max-w-fit px-0 h-10",
+                        tabContent:
+                          "group-data-[selected=true]:text-foreground text-foreground/50",
+                      }}
+                    >
+                      <Tab
+                        key="details"
+                        title={
+                          <div className="flex items-center gap-2">
+                            <Info className="size-4" />
+                            <span className="text-sm font-medium">
+                              Vehicle Details
+                            </span>
+                          </div>
+                        }
+                      >
+                        <div className="space-y-4 pt-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                VIN *
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="17 characters"
+                                value={mainInfo.vin}
+                                onChange={(e) =>
+                                  handleInputChange("vin", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Make *
+                              </label>
+                              <input
+                                type="text"
+                                value={mainInfo.make}
+                                onChange={(e) =>
+                                  handleInputChange("make", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Model *
+                              </label>
+                              <input
+                                type="text"
+                                value={mainInfo.model}
+                                onChange={(e) =>
+                                  handleInputChange("model", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Year *
+                              </label>
+                              <input
+                                type="number"
+                                value={mainInfo.year}
+                                onChange={(e) =>
+                                  handleInputChange("year", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                          </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          VIN *
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="17 characters"
-                          value={mainInfo.vin}
-                          onChange={(e) =>
-                            handleInputChange("vin", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Make *
-                        </label>
-                        <input
-                          type="text"
-                          value={mainInfo.make}
-                          onChange={(e) =>
-                            handleInputChange("make", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Model *
-                        </label>
-                        <input
-                          type="text"
-                          value={mainInfo.model}
-                          onChange={(e) =>
-                            handleInputChange("model", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Year *
-                        </label>
-                        <input
-                          type="number"
-                          value={mainInfo.year}
-                          onChange={(e) =>
-                            handleInputChange("year", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                    </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Trim / Series
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="e.g. M Sport"
+                                value={mainInfo.trim}
+                                onChange={(e) =>
+                                  handleInputChange("trim", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Color
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Alpine White"
+                                value={mainInfo.color}
+                                onChange={(e) =>
+                                  handleInputChange("color", e.target.value)
+                                }
+                                className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                              />
+                            </div>
+                          </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Trim / Series
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. M Sport"
-                          value={mainInfo.trim}
-                          onChange={(e) =>
-                            handleInputChange("trim", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Color
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. Alpine White"
-                          value={mainInfo.color}
-                          onChange={(e) =>
-                            handleInputChange("color", e.target.value)
-                          }
-                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Price
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground/40">
-                            $
-                          </span>
-                          <input
-                            type="number"
-                            value={mainInfo.price}
-                            onChange={(e) =>
-                              handleInputChange("price", e.target.value)
-                            }
-                            className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                          />
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Price
+                              </label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground/40">
+                                  $
+                                </span>
+                                <input
+                                  type="number"
+                                  value={mainInfo.price}
+                                  onChange={(e) =>
+                                    handleInputChange("price", e.target.value)
+                                  }
+                                  className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Mileage
+                              </label>
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  value={mainInfo.mileage}
+                                  onChange={(e) =>
+                                    handleInputChange("mileage", e.target.value)
+                                  }
+                                  className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground/40">
+                                  mi
+                                </span>
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-foreground/50">
+                                Condition
+                              </label>
+                              <Select
+                                aria-label="Condition"
+                                selectedKeys={[mainInfo.condition]}
+                                onChange={(e) =>
+                                  handleInputChange("condition", e.target.value)
+                                }
+                                classNames={{
+                                  trigger:
+                                    "h-[38px] min-h-[38px] bg-background border border-foreground/10 rounded-lg",
+                                  value: "text-sm",
+                                }}
+                              >
+                                <SelectItem key="New">New</SelectItem>
+                                <SelectItem key="Used">Used</SelectItem>
+                                <SelectItem key="CPO">CPO</SelectItem>
+                              </Select>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Mileage
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            value={mainInfo.mileage}
-                            onChange={(e) =>
-                              handleInputChange("mileage", e.target.value)
-                            }
-                            className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground/40">
-                            mi
-                          </span>
+                      </Tab>
+
+                      <Tab
+                        key="assets"
+                        title={
+                          <div className="flex items-center gap-2">
+                            <Box className="size-4" />
+                            <span className="text-sm font-medium">
+                              3D Assets
+                            </span>
+                            {(model3dFile ||
+                              model3dPreview ||
+                              image360File ||
+                              image360Preview) && (
+                              <div className="size-1.5 rounded-full bg-emerald-500" />
+                            )}
+                          </div>
+                        }
+                      >
+                        <div className="space-y-4 pt-4">
+                          <p className="text-sm text-foreground/50">
+                            Upload optional 3D assets for an immersive viewing
+                            experience on the public vehicle page.
+                          </p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* 3D Model Upload */}
+                            <div className="space-y-2">
+                              <label className="text-xs text-foreground/50 font-medium">
+                                3D Model (.glb)
+                              </label>
+                              <div
+                                onClick={() => model3dInputRef.current?.click()}
+                                className="relative aspect-3/2 rounded-xl border border-dashed border-foreground/15 hover:border-foreground/30 hover:bg-foreground/2 cursor-pointer flex flex-col items-center justify-center transition-all group overflow-hidden"
+                              >
+                                {model3dPreview || model3dFile ? (
+                                  <>
+                                    <div className="absolute inset-0 bg-linear-to-br from-violet-500/10 to-blue-500/10 flex items-center justify-center">
+                                      <Box className="size-10 text-foreground/30" />
+                                    </div>
+                                    <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg truncate">
+                                      {model3dFile?.name || "Model uploaded"}
+                                    </div>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setModel3dFile(null);
+                                        setModel3dPreview(null);
+                                      }}
+                                      className="absolute top-2 right-2 size-6 bg-black/60 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+                                    >
+                                      <X className="size-3" />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Box className="size-6 text-foreground/30 group-hover:text-foreground/50 mb-1.5" />
+                                    <span className="text-xs text-foreground/40 group-hover:text-foreground/60">
+                                      Upload GLB
+                                    </span>
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept=".glb"
+                                  className="hidden"
+                                  ref={model3dInputRef}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      setModel3dFile(file);
+                                      setModel3dPreview(file.name);
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* 360 Image Upload */}
+                            <div className="space-y-2">
+                              <label className="text-xs text-foreground/50 font-medium">
+                                Interior 360° (.jpg)
+                              </label>
+                              <div
+                                onClick={() =>
+                                  image360InputRef.current?.click()
+                                }
+                                className="relative aspect-3/2 rounded-xl border border-dashed border-foreground/15 hover:border-foreground/30 hover:bg-foreground/2 cursor-pointer flex flex-col items-center justify-center transition-all group overflow-hidden"
+                              >
+                                {image360Preview || image360File ? (
+                                  <>
+                                    {image360Preview?.startsWith("http") ||
+                                    image360Preview?.startsWith("blob:") ? (
+                                      <img
+                                        src={image360Preview}
+                                        alt="360 preview"
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="absolute inset-0 bg-linear-to-br from-amber-500/10 to-orange-500/10 flex items-center justify-center">
+                                        <Image className="size-10 text-foreground/30" />
+                                      </div>
+                                    )}
+                                    <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg truncate">
+                                      {image360File?.name || "360° uploaded"}
+                                    </div>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setImage360File(null);
+                                        setImage360Preview(null);
+                                      }}
+                                      className="absolute top-2 right-2 size-6 bg-black/60 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+                                    >
+                                      <X className="size-3" />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Image className="size-6 text-foreground/30 group-hover:text-foreground/50 mb-1.5" />
+                                    <span className="text-xs text-foreground/40 group-hover:text-foreground/60">
+                                      Upload 360°
+                                    </span>
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept=".jpg,.jpeg"
+                                  className="hidden"
+                                  ref={image360InputRef}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      setImage360File(file);
+                                      setImage360Preview(
+                                        URL.createObjectURL(file),
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-foreground/50">
-                          Condition
-                        </label>
-                        <Select
-                          aria-label="Condition"
-                          selectedKeys={[mainInfo.condition]}
-                          onChange={(e) =>
-                            handleInputChange("condition", e.target.value)
-                          }
-                          classNames={{
-                            trigger:
-                              "h-[38px] min-h-[38px] bg-background border border-foreground/10 rounded-lg",
-                            value: "text-sm",
-                          }}
-                        >
-                          <SelectItem key="New">New</SelectItem>
-                          <SelectItem key="Used">Used</SelectItem>
-                          <SelectItem key="CPO">CPO</SelectItem>
-                        </Select>
-                      </div>
-                    </div>
+                      </Tab>
+                    </Tabs>
                   </div>
                 </div>
               </ModalBody>
 
-              <ModalFooter className="border-t border-foreground/[0.06] pt-4">
+              <ModalFooter className="border-t border-foreground/6 pt-4">
                 <button
                   onClick={onClose}
                   className="px-4 py-2 text-sm text-foreground/60 hover:text-foreground transition-colors"

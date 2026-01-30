@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublicCar } from "../../store/slices/micrositeSlice";
@@ -49,8 +49,14 @@ import {
   X,
   ZoomIn,
   ExternalLink,
+  Rotate3D,
+  Eye,
+  Maximize2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Lazy load the 3D Experience component
+const Experience = lazy(() => import("../../components/Showcase/Experience"));
 
 export default function VehicleDetail() {
   const { carId, dealerId } = useParams();
@@ -73,25 +79,16 @@ export default function VehicleDetail() {
   });
   const [leadStatus, setLeadStatus] = useState("idle");
 
+  // 3D Viewer State
+  const [is3DViewerOpen, setIs3DViewerOpen] = useState(false);
+  const [viewer3DMode, setViewer3DMode] = useState("exterior"); // "exterior" | "interior"
+  const [is3DLoading, setIs3DLoading] = useState(false);
+
   useEffect(() => {
     if (carId && (!activeCar || activeCar.id !== carId)) {
       dispatch(fetchPublicCar(carId));
     }
   }, [carId, dispatch, activeCar]);
-
-  // Calculate estimated monthly payment
-  const monthlyPayment = useMemo(() => {
-    if (!activeCar?.price) return null;
-    const price = activeCar.price;
-    const downPayment = price * 0.1; // 10% down
-    const loanAmount = price - downPayment;
-    const interestRate = 0.069 / 12; // 6.9% APR
-    const months = 60;
-    const payment =
-      (loanAmount * interestRate * Math.pow(1 + interestRate, months)) /
-      (Math.pow(1 + interestRate, months) - 1);
-    return Math.round(payment);
-  }, [activeCar?.price]);
 
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
@@ -205,6 +202,11 @@ export default function VehicleDetail() {
       : ["https://placehold.co/1200x800?text=No+Image"];
   const currentPhoto = photos[activeImageIndex];
 
+  // 3D Assets availability
+  const has3DModel = !!activeCar.model_3d_url;
+  const has360Interior = !!activeCar.image_360_url;
+  const has3DExperience = has3DModel || has360Interior;
+
   // Extract key features for highlights
   const highlights = [
     specs.transmission && { icon: Settings, label: specs.transmission },
@@ -309,21 +311,119 @@ export default function VehicleDetail() {
               LEFT COLUMN (8/12) - Gallery & Details
              ============================================ */}
           <div className="lg:col-span-8 space-y-6">
-            {/* IMAGE GALLERY */}
+            {/* IMAGE GALLERY / 3D VIEWER */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-              {/* Main Image */}
+              {/* Main Image / 3D Viewer Container */}
               <div className="relative aspect-[16/10] bg-gray-100 group">
+                {/* Loading Overlay */}
+                <AnimatePresence>
+                  {is3DLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 z-30 bg-[#151515] flex items-center justify-center"
+                    >
+                      <div className="text-center">
+                        <div className="relative size-16 mx-auto mb-4">
+                          {/* Outer ring */}
+                          <div className="absolute inset-0 border-2 border-white/10 rounded-full" />
+                          {/* Spinning ring */}
+                          <div className="absolute inset-0 border-2 border-transparent border-t-violet-500 border-r-blue-500 rounded-full animate-spin" />
+                          {/* Inner icon */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Rotate3D className="text-white/60" size={24} />
+                          </div>
+                        </div>
+                        <p className="text-white font-medium text-sm mb-1">
+                          Initializing 3D View
+                        </p>
+                        <p className="text-white/50 text-xs">Please wait...</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImageIndex}
-                    src={currentPhoto}
-                    alt={`${activeCar.make} ${activeCar.model} - Photo ${activeImageIndex + 1}`}
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
+                  {is3DViewerOpen && has3DExperience ? (
+                    // === 3D EXPERIENCE VIEWER ===
+                    <motion.div
+                      key="3d-viewer"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 bg-[#151515]"
+                    >
+                      <Suspense
+                        fallback={
+                          <div className="absolute inset-0 flex items-center justify-center bg-[#151515]">
+                            <div className="text-center">
+                              <div className="size-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-3" />
+                              <p className="text-white/60 text-sm">
+                                Loading 3D Experience...
+                              </p>
+                            </div>
+                          </div>
+                        }
+                      >
+                        <Experience
+                          modelUrl={activeCar.model_3d_url}
+                          panoramaUrl={activeCar.image_360_url}
+                          mode={viewer3DMode}
+                        />
+                      </Suspense>
+
+                      {/* 3D Viewer Controls Overlay */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 p-1 rounded-full bg-black/60 backdrop-blur-lg border border-white/10">
+                        {has3DModel && (
+                          <button
+                            onClick={() => setViewer3DMode("exterior")}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                              viewer3DMode === "exterior"
+                                ? "bg-white text-black"
+                                : "text-white/70 hover:text-white hover:bg-white/10"
+                            }`}
+                          >
+                            <Car size={16} />
+                            Exterior
+                          </button>
+                        )}
+                        {has360Interior && (
+                          <button
+                            onClick={() => setViewer3DMode("interior")}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                              viewer3DMode === "interior"
+                                ? "bg-white text-black"
+                                : "text-white/70 hover:text-white hover:bg-white/10"
+                            }`}
+                          >
+                            <Eye size={16} />
+                            Interior 360°
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Fullscreen button */}
+                      <button
+                        onClick={() => setIsGalleryOpen(true)}
+                        className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full backdrop-blur-sm hover:bg-black/80 transition-colors"
+                      >
+                        <Maximize2 size={18} />
+                      </button>
+                    </motion.div>
+                  ) : (
+                    // === PHOTO GALLERY ===
+                    <motion.img
+                      key={activeImageIndex}
+                      src={currentPhoto}
+                      alt={`${activeCar.make} ${activeCar.model} - Photo ${activeImageIndex + 1}`}
+                      className="w-full h-full object-cover"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
                 </AnimatePresence>
 
                 {/* Overlay badges */}
@@ -334,24 +434,37 @@ export default function VehicleDetail() {
                   >
                     {specs.condition || "Pre-Owned"}
                   </Chip>
+                  {has3DExperience && (
+                    <Chip
+                      size="sm"
+                      className="bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold"
+                      startContent={<Rotate3D size={12} />}
+                    >
+                      3D Available
+                    </Chip>
+                  )}
                 </div>
 
-                {/* Photo counter */}
-                <div className="absolute bottom-4 left-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-1.5">
-                  <Camera size={14} />
-                  {activeImageIndex + 1} / {photos.length}
-                </div>
+                {/* Photo counter (only when showing photos) */}
+                {!is3DViewerOpen && (
+                  <div className="absolute bottom-4 left-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                    <Camera size={14} />
+                    {activeImageIndex + 1} / {photos.length}
+                  </div>
+                )}
 
-                {/* Fullscreen button */}
-                <button
-                  onClick={() => setIsGalleryOpen(true)}
-                  className="absolute bottom-4 right-4 bg-black/60 text-white p-2 rounded-full backdrop-blur-sm hover:bg-black/80 transition-colors"
-                >
-                  <ZoomIn size={18} />
-                </button>
+                {/* Fullscreen button (for photos) */}
+                {!is3DViewerOpen && (
+                  <button
+                    onClick={() => setIsGalleryOpen(true)}
+                    className="absolute bottom-4 right-4 bg-black/60 text-white p-2 rounded-full backdrop-blur-sm hover:bg-black/80 transition-colors"
+                  >
+                    <ZoomIn size={18} />
+                  </button>
+                )}
 
-                {/* Nav arrows */}
-                {photos.length > 1 && (
+                {/* Nav arrows (only for photos) */}
+                {!is3DViewerOpen && photos.length > 1 && (
                   <>
                     <button
                       onClick={() =>
@@ -377,21 +490,54 @@ export default function VehicleDetail() {
                 )}
               </div>
 
-              {/* Thumbnail strip */}
-              {photos.length > 1 && (
-                <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide">
+              {/* Thumbnail strip + 3D Toggle */}
+              <div className="flex items-center gap-2 p-3 border-t border-gray-100">
+                {/* View Toggle */}
+                {has3DExperience && (
+                  <button
+                    onClick={() => {
+                      if (!is3DViewerOpen) {
+                        setIs3DLoading(true);
+                        setViewer3DMode(has3DModel ? "exterior" : "interior");
+                        // Small delay to show loader before mounting 3D
+                        setTimeout(() => {
+                          setIs3DViewerOpen(true);
+                          setTimeout(() => setIs3DLoading(false), 500);
+                        }, 100);
+                      } else {
+                        setIs3DViewerOpen(false);
+                      }
+                    }}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all flex-shrink-0 ${
+                      is3DViewerOpen
+                        ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-md"
+                        : "bg-foreground/5 text-foreground border border-foreground/10 hover:bg-foreground/10 hover:border-foreground/20"
+                    }`}
+                  >
+                    <Rotate3D size={16} />
+                    {is3DViewerOpen ? "Exit 3D" : "View in 3D"}
+                  </button>
+                )}
+
+                {/* Thumbnail photos - scrollable */}
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
                   {photos.map((photo, i) => (
                     <button
                       key={i}
-                      onClick={() => setActiveImageIndex(i)}
+                      onClick={() => {
+                        setActiveImageIndex(i);
+                        setIs3DViewerOpen(false);
+                      }}
                       className={`flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden transition-all ${
-                        i === activeImageIndex
+                        i === activeImageIndex && !is3DViewerOpen
                           ? "ring-2 ring-offset-2 opacity-100"
                           : "opacity-60 hover:opacity-100"
                       }`}
                       style={{
                         ringColor:
-                          i === activeImageIndex ? brandColor : "transparent",
+                          i === activeImageIndex && !is3DViewerOpen
+                            ? brandColor
+                            : "transparent",
                       }}
                     >
                       <img
@@ -402,7 +548,7 @@ export default function VehicleDetail() {
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* QUICK HIGHLIGHTS */}
@@ -525,14 +671,6 @@ export default function VehicleDetail() {
                         }).format(activeCar.price)}
                       </p>
                     </div>
-                    {monthlyPayment && (
-                      <div className="text-right">
-                        <p className="text-white/80 text-xs">Est. Payment</p>
-                        <p className="text-xl font-bold">
-                          ${monthlyPayment}/mo
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -765,7 +903,7 @@ export default function VehicleDetail() {
       </div>
 
       {/* ============================================
-          FULLSCREEN GALLERY MODAL
+          FULLSCREEN GALLERY / 3D MODAL
          ============================================ */}
       <AnimatePresence>
         {isGalleryOpen && (
@@ -782,37 +920,88 @@ export default function VehicleDetail() {
               <X size={24} />
             </button>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-4 py-2 rounded-full">
-              {activeImageIndex + 1} / {photos.length}
-            </div>
+            {/* Show 3D Viewer in fullscreen if it was active */}
+            {is3DViewerOpen && has3DExperience ? (
+              <div className="w-full h-full relative">
+                <Suspense
+                  fallback={
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="size-12 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <Experience
+                    modelUrl={activeCar.model_3d_url}
+                    panoramaUrl={activeCar.image_360_url}
+                    mode={viewer3DMode}
+                  />
+                </Suspense>
 
-            <button
-              onClick={() =>
-                setActiveImageIndex((prev) =>
-                  prev === 0 ? photos.length - 1 : prev - 1,
-                )
-              }
-              className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-            >
-              <ChevronLeft size={28} />
-            </button>
+                {/* Mode Toggle in fullscreen */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 p-1 rounded-full bg-black/60 backdrop-blur-lg border border-white/10">
+                  {has3DModel && (
+                    <button
+                      onClick={() => setViewer3DMode("exterior")}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                        viewer3DMode === "exterior"
+                          ? "bg-white text-black"
+                          : "text-white/70 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <Car size={16} />
+                      Exterior
+                    </button>
+                  )}
+                  {has360Interior && (
+                    <button
+                      onClick={() => setViewer3DMode("interior")}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                        viewer3DMode === "interior"
+                          ? "bg-white text-black"
+                          : "text-white/70 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <Eye size={16} />
+                      Interior 360°
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-4 py-2 rounded-full">
+                  {activeImageIndex + 1} / {photos.length}
+                </div>
 
-            <img
-              src={currentPhoto}
-              alt={`${activeCar.make} ${activeCar.model}`}
-              className="max-w-[90vw] max-h-[85vh] object-contain"
-            />
+                <button
+                  onClick={() =>
+                    setActiveImageIndex((prev) =>
+                      prev === 0 ? photos.length - 1 : prev - 1,
+                    )
+                  }
+                  className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ChevronLeft size={28} />
+                </button>
 
-            <button
-              onClick={() =>
-                setActiveImageIndex((prev) =>
-                  prev === photos.length - 1 ? 0 : prev + 1,
-                )
-              }
-              className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-            >
-              <ChevronRight size={28} />
-            </button>
+                <img
+                  src={currentPhoto}
+                  alt={`${activeCar.make} ${activeCar.model}`}
+                  className="max-w-[90vw] max-h-[85vh] object-contain"
+                />
+
+                <button
+                  onClick={() =>
+                    setActiveImageIndex((prev) =>
+                      prev === photos.length - 1 ? 0 : prev + 1,
+                    )
+                  }
+                  className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ChevronRight size={28} />
+                </button>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

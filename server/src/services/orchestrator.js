@@ -223,19 +223,23 @@ function runQualityAssurance(storyboard, carContext, dealerInput) {
     };
 
     // Add tech_config for tech_view scenes
+    // Ensure tech_config is passed through correctly from scene and enriched with carContext data
     if (scene.scene_type === "tech_view") {
       const specs = carContext.normalized_specs || {};
       const performance = specs.performance || {};
       const safety = specs.safety || {};
       const dimensions = specs.dimensions || {};
+      const carYear = carContext.identity?.year || 0;
 
       // Start with existing tech_config or create base
       let techConfig = scene.tech_config || {
         mode: scene.theme_tag || "PERFORMANCE",
       };
 
-      // Ensure all required fields are populated from carContext
+      // Ensure all required fields are populated from carContext.normalized_specs
       if (techConfig.mode === "PERFORMANCE") {
+        // Map engine_hp from carContext.normalized_specs.performance.hp
+        // Map drivetrain from carContext.normalized_specs.performance.drivetrain
         techConfig = {
           ...techConfig,
           drivetrain: techConfig.drivetrain || performance.drivetrain || "FWD",
@@ -247,24 +251,58 @@ function runQualityAssurance(storyboard, carContext, dealerInput) {
             null,
         };
       } else if (techConfig.mode === "SAFETY") {
+        // Map airbag_count from carContext.normalized_specs.safety.airbags (default 6)
+        // Detect sensors from assist_systems and raw_api_dump
+        const assistSystems = safety.assist_systems || [];
+        const rawDump = carContext.raw_api_dump || {};
+        const assistText = assistSystems.join(" ").toLowerCase();
+        const rawDumpText = JSON.stringify(rawDump).toLowerCase();
+        const searchText = `${assistText} ${rawDumpText}`;
+
+        // Sensor detection keywords
+        const sensorKeywords = [
+          "parking sensor", "collision", "camera", "radar",
+          "blind spot", "parking assist", "surround view"
+        ];
+        const hasExplicitSensorData = sensorKeywords.some((kw) =>
+          searchText.includes(kw)
+        );
+
+        // Determine sensor availability with smart defaults
+        let hasFrontSensors = techConfig.has_front_sensors;
+        let hasRearSensors = techConfig.has_rear_sensors;
+
+        if (hasFrontSensors === undefined || hasFrontSensors === null) {
+          hasFrontSensors = hasExplicitSensorData || carYear > 2018;
+        }
+        if (hasRearSensors === undefined || hasRearSensors === null) {
+          hasRearSensors = hasExplicitSensorData || carYear > 2018;
+        }
+
         techConfig = {
           ...techConfig,
           airbag_count: techConfig.airbag_count ?? safety.airbags ?? 6,
-          has_front_sensors: techConfig.has_front_sensors ?? true,
-          has_rear_sensors: techConfig.has_rear_sensors ?? true,
+          has_front_sensors: hasFrontSensors,
+          has_rear_sensors: hasRearSensors,
           safety_rating: techConfig.safety_rating ?? safety.rating_text ?? null,
           assist_systems: techConfig.assist_systems ||
             safety.assist_systems || ["ABS", "Traction Control"],
         };
       } else if (techConfig.mode === "UTILITY") {
+        // Map trunk_capacity_liters from carContext.normalized_specs.dimensions.trunk_capacity_l
+        // Map dimensions with safe fallbacks for 3D viewer (prevents breaking)
+        // Safe defaults: Length: 4500, Width: 1800, Height: 1500
+        const existingDimensions = techConfig.dimensions || {};
+        const safeDimensions = {
+          length_mm: existingDimensions.length_mm ?? dimensions.length_mm ?? 4500,
+          width_mm: existingDimensions.width_mm ?? dimensions.width_mm ?? 1800,
+          height_mm: existingDimensions.height_mm ?? dimensions.height_mm ?? 1500,
+          wheelbase_mm: existingDimensions.wheelbase_mm ?? dimensions.wheelbase_mm ?? null,
+        };
+
         techConfig = {
           ...techConfig,
-          dimensions: techConfig.dimensions || {
-            length_mm: dimensions.length_mm || null,
-            width_mm: dimensions.width_mm || null,
-            height_mm: dimensions.height_mm || null,
-            wheelbase_mm: dimensions.wheelbase_mm || null,
-          },
+          dimensions: safeDimensions,
           trunk_capacity_liters:
             techConfig.trunk_capacity_liters ??
             dimensions.trunk_capacity_l ??
@@ -293,32 +331,49 @@ function runQualityAssurance(storyboard, carContext, dealerInput) {
   };
 
   // 6. Car Specs (For 3D engine to consume directly)
+  // This serves as the frontend's backup source of truth for normalized_specs
   const specs = carContext.normalized_specs || {};
+  const carYear = carContext.identity?.year || 0;
+
+  // Detect sensor capabilities for safety specs (same logic as tech_config)
+  const assistSystems = specs.safety?.assist_systems || [];
+  const rawDump = carContext.raw_api_dump || {};
+  const assistText = assistSystems.join(" ").toLowerCase();
+  const rawDumpText = JSON.stringify(rawDump).toLowerCase();
+  const searchText = `${assistText} ${rawDumpText}`;
+  const sensorKeywords = ["parking sensor", "collision", "camera", "radar", "blind spot"];
+  const hasExplicitSensorData = sensorKeywords.some((kw) => searchText.includes(kw));
+  const defaultSensors = hasExplicitSensorData || carYear > 2018;
+
   safeStory.car_specs = {
     performance: {
-      hp: specs.performance?.hp || null,
-      torque_nm: specs.performance?.torque_nm || null,
-      zero_to_sixty_sec: specs.performance?.zero_to_sixty_sec || null,
-      top_speed_kmh: specs.performance?.top_speed_kmh || null,
+      hp: specs.performance?.hp ?? null,
+      torque_nm: specs.performance?.torque_nm ?? null,
+      zero_to_sixty_sec: specs.performance?.zero_to_sixty_sec ?? null,
+      top_speed_kmh: specs.performance?.top_speed_kmh ?? null,
       drivetrain: specs.performance?.drivetrain || "FWD",
-      transmission: specs.performance?.transmission || null,
+      transmission: specs.performance?.transmission ?? null,
     },
     safety: {
-      airbags: specs.safety?.airbags || 6,
-      rating_text: specs.safety?.rating_text || null,
+      airbags: specs.safety?.airbags ?? 6,
+      rating_text: specs.safety?.rating_text ?? null,
       assist_systems: specs.safety?.assist_systems || [],
+      has_front_sensors: defaultSensors,
+      has_rear_sensors: defaultSensors,
     },
     dimensions: {
-      length_mm: specs.dimensions?.length_mm || null,
-      width_mm: specs.dimensions?.width_mm || null,
-      height_mm: specs.dimensions?.height_mm || null,
-      trunk_capacity_l: specs.dimensions?.trunk_capacity_l || null,
-      seats: specs.dimensions?.seats || 5,
-      weight_kg: specs.dimensions?.weight_kg || null,
+      // Safe defaults for 3D viewer: Length: 4500, Width: 1800, Height: 1500
+      length_mm: specs.dimensions?.length_mm ?? 4500,
+      width_mm: specs.dimensions?.width_mm ?? 1800,
+      height_mm: specs.dimensions?.height_mm ?? 1500,
+      trunk_capacity_l: specs.dimensions?.trunk_capacity_l ?? null,
+      seats: specs.dimensions?.seats ?? 5,
+      weight_kg: specs.dimensions?.weight_kg ?? null,
+      wheelbase_mm: specs.dimensions?.wheelbase_mm ?? null,
     },
     efficiency: {
-      fuel_combined_l_100km: specs.efficiency?.fuel_combined_l_100km || null,
-      range_km: specs.efficiency?.range_km || null,
+      fuel_combined_l_100km: specs.efficiency?.fuel_combined_l_100km ?? null,
+      range_km: specs.efficiency?.range_km ?? null,
       is_electric: specs.efficiency?.is_electric || false,
     },
   };

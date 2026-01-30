@@ -92,7 +92,93 @@ function detectTechViewMode(featureSlug, featureDescription) {
 }
 
 /**
+ * Detects if a car has front/rear sensors based on assist_systems array and raw_api_dump
+ * @param {Object} carContext - The full car context
+ * @returns {{ has_front_sensors: boolean, has_rear_sensors: boolean }}
+ */
+function detectSensorCapabilities(carContext) {
+  const specs = carContext.normalized_specs || {};
+  const safety = specs.safety || {};
+  const assistSystems = safety.assist_systems || [];
+  const rawDump = carContext.raw_api_dump || {};
+  const carYear = carContext.identity?.year || 0;
+
+  // Keywords that indicate front sensors
+  const frontSensorKeywords = [
+    "front parking",
+    "front sensor",
+    "forward collision",
+    "front camera",
+    "front radar",
+    "pedestrian detection",
+    "lane departure",
+    "lane assist",
+    "adaptive cruise",
+    "aeb",
+    "autonomous emergency",
+  ];
+
+  // Keywords that indicate rear sensors
+  const rearSensorKeywords = [
+    "rear parking",
+    "rear sensor",
+    "backup camera",
+    "rear camera",
+    "reverse camera",
+    "rearview camera",
+    "rear cross traffic",
+    "blind spot",
+    "parking assist",
+  ];
+
+  // Generic keywords that imply both sensors
+  const genericSensorKeywords = [
+    "parking sensor",
+    "collision warning",
+    "360 camera",
+    "surround view",
+    "parking assist",
+  ];
+
+  // Build searchable text from assist_systems and raw_api_dump
+  const assistText = assistSystems.join(" ").toLowerCase();
+  const rawDumpText = JSON.stringify(rawDump).toLowerCase();
+  const searchText = `${assistText} ${rawDumpText}`;
+
+  // Check for front sensors
+  let hasFrontSensors = frontSensorKeywords.some((kw) =>
+    searchText.includes(kw)
+  );
+
+  // Check for rear sensors
+  let hasRearSensors = rearSensorKeywords.some((kw) =>
+    searchText.includes(kw)
+  );
+
+  // Check for generic sensors (implies both)
+  const hasGenericSensors = genericSensorKeywords.some((kw) =>
+    searchText.includes(kw)
+  );
+
+  if (hasGenericSensors) {
+    hasFrontSensors = true;
+    hasRearSensors = true;
+  }
+
+  // Fallback: If no explicit data found, default to true for cars newer than 2018
+  if (!hasFrontSensors && !hasRearSensors) {
+    if (carYear > 2018) {
+      hasFrontSensors = true;
+      hasRearSensors = true;
+    }
+  }
+
+  return { has_front_sensors: hasFrontSensors, has_rear_sensors: hasRearSensors };
+}
+
+/**
  * Builds tech_config object from carContext specs
+ * Maps actual data from carContext.normalized_specs into scene tech_config
  */
 function buildTechConfig(themeTag, carContext) {
   const specs = carContext.normalized_specs || {};
@@ -104,36 +190,49 @@ function buildTechConfig(themeTag, carContext) {
 
   switch (themeTag) {
     case "PERFORMANCE":
+      // Map engine_hp from carContext.normalized_specs.performance.hp
+      // Map drivetrain from carContext.normalized_specs.performance.drivetrain
       return {
         ...baseConfig,
         drivetrain: performance.drivetrain || "FWD",
-        engine_hp: performance.hp || null,
-        torque_nm: performance.torque_nm || null,
-        zero_to_sixty_sec: performance.zero_to_sixty_sec || null,
+        engine_hp: performance.hp ?? null,
+        torque_nm: performance.torque_nm ?? null,
+        zero_to_sixty_sec: performance.zero_to_sixty_sec ?? null,
       };
 
-    case "SAFETY":
+    case "SAFETY": {
+      // Map airbag_count from carContext.normalized_specs.safety.airbags (default 6)
+      // Detect sensors from assist_systems and raw_api_dump
+      const sensorCaps = detectSensorCapabilities(carContext);
+
       return {
         ...baseConfig,
-        airbag_count: safety.airbags || 6,
-        has_front_sensors: true,
-        has_rear_sensors: true,
-        safety_rating: safety.rating_text || null,
+        airbag_count: safety.airbags ?? 6,
+        has_front_sensors: sensorCaps.has_front_sensors,
+        has_rear_sensors: sensorCaps.has_rear_sensors,
+        safety_rating: safety.rating_text ?? null,
         assist_systems: safety.assist_systems || ["ABS", "Traction Control"],
       };
+    }
 
-    case "UTILITY":
+    case "UTILITY": {
+      // Map trunk_capacity_liters from carContext.normalized_specs.dimensions.trunk_capacity_l
+      // Map dimensions with safe fallbacks for 3D viewer
+      // Default dimensions: Length: 4500, Width: 1800, Height: 1500 if null
+      const safeDimensions = {
+        length_mm: dimensions.length_mm ?? 4500,
+        width_mm: dimensions.width_mm ?? 1800,
+        height_mm: dimensions.height_mm ?? 1500,
+        wheelbase_mm: dimensions.wheelbase_mm ?? null,
+      };
+
       return {
         ...baseConfig,
-        dimensions: {
-          length_mm: dimensions.length_mm || null,
-          width_mm: dimensions.width_mm || null,
-          height_mm: dimensions.height_mm || null,
-          wheelbase_mm: dimensions.wheelbase_mm || null,
-        },
-        trunk_capacity_liters: dimensions.trunk_capacity_l || null,
-        seat_count: dimensions.seats || 5,
+        dimensions: safeDimensions,
+        trunk_capacity_liters: dimensions.trunk_capacity_l ?? null,
+        seat_count: dimensions.seats ?? 5,
       };
+    }
 
     default:
       return baseConfig;
@@ -142,11 +241,18 @@ function buildTechConfig(themeTag, carContext) {
 
 /**
  * Post-processes storyboard to inject tech_config and finalize scene types.
- * Each tech_view mode (SAFETY, UTILITY, PERFORMANCE) can only be used once.
+ * Tech_view limit based on total scene count:
+ * - Less than 9 scenes: 1 tech_view max
+ * - 9 or more scenes: 2 tech_views max
  */
 function postProcessStoryboard(storyboard, carContext) {
-  // Track which tech_view modes have been used (each mode only once)
+  // Determine max tech_views based on total scene count
+  const totalScenes = storyboard.scenes.length;
+  const maxTechViews = totalScenes < 9 ? 1 : 2;
+  
+  // Track which tech_view modes have been used and count
   const usedModes = new Set();
+  let techViewCount = 0;
 
   const processedScenes = storyboard.scenes.map((scene) => {
     // Check if Director flagged this as 3D mode
@@ -169,15 +275,23 @@ function postProcessStoryboard(storyboard, carContext) {
         }
       }
 
-      // Check if this mode has already been used
+      // Check if we've reached the tech_view limit
+      if (techViewCount >= maxTechViews) {
+        // Limit reached, convert to slide_view instead
+        const { use_3d_mode, tech_config, ...cleanScene } = scene;
+        return { ...cleanScene, scene_type: "slide_view" };
+      }
+
+      // Check if this mode has already been used (each mode only once)
       if (usedModes.has(themeTag)) {
         // Mode already used, convert to slide_view instead
         const { use_3d_mode, tech_config, ...cleanScene } = scene;
         return { ...cleanScene, scene_type: "slide_view" };
       }
 
-      // Mark this mode as used
+      // Mark this mode as used and increment counter
       usedModes.add(themeTag);
+      techViewCount++;
 
       // Build tech_config from car specs
       const techConfig = buildTechConfig(themeTag, carContext);
@@ -201,14 +315,21 @@ function postProcessStoryboard(storyboard, carContext) {
       );
 
       if (detection.useTechView) {
+        // Check if we've reached the tech_view limit
+        if (techViewCount >= maxTechViews) {
+          // Limit reached, keep as slide_view
+          return scene;
+        }
+
         // Check if this mode has already been used
         if (usedModes.has(detection.themeTag)) {
           // Mode already used, keep as slide_view
           return scene;
         }
 
-        // Mark this mode as used
+        // Mark this mode as used and increment counter
         usedModes.add(detection.themeTag);
+        techViewCount++;
 
         const techConfig = buildTechConfig(detection.themeTag, carContext);
         return {
@@ -290,4 +411,4 @@ async function planStory(carContext, analystReport, sceneCount = "automatic") {
   }
 }
 
-module.exports = { planStory, detectTechViewMode, buildTechConfig };
+module.exports = { planStory, detectTechViewMode, buildTechConfig, detectSensorCapabilities };

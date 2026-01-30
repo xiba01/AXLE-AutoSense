@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
 
-export const CargoVolume = ({ anchor, isOpen }) => {
+export const CargoVolume = ({ anchor, isOpen, capacity }) => {
   const volumeRef = useRef();
   const edgesRef = useRef();
 
@@ -13,12 +13,9 @@ export const CargoVolume = ({ anchor, isOpen }) => {
   const boxArgs = useMemo(() => [0.9, 0.45, 0.8], []);
 
   // --------------------------------------------------
-  // 2. RANDOM TRUNK CAPACITY (STATIC)
+  // 2. Use provided trunk capacity (liters)
   // --------------------------------------------------
-  const capacityLiters = useMemo(() => {
-    // realistic passenger car range
-    return Math.floor(380 + Math.random() * 220); // 380–600 L
-  }, []);
+  const capacityLiters = capacity ?? 500;
 
   // --------------------------------------------------
   // 3. GEOMETRIES (Memoized)
@@ -76,7 +73,7 @@ export const CargoVolume = ({ anchor, isOpen }) => {
         outlineWidth={0.01}
         outlineColor="#000000"
       >
-        {capacityLiters} L
+        {capacityLiters.toLocaleString()} L
       </Text>
 
       {/* Lower container so fill starts from trunk floor */}
