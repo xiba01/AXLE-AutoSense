@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, useDisclosure } from "@heroui/react";
-import { Plus } from "lucide-react";
+import { useDisclosure } from "@heroui/react";
+import { Plus, Package } from "lucide-react";
 
 // Components
 import InventoryTable from "../../components/dashboard/inventory/InventoryTable";
@@ -12,75 +12,69 @@ import { fetchInventory } from "../../store/slices/inventorySlice";
 
 export default function Inventory() {
   const dispatch = useDispatch();
-  // HeroUI hook for modal management
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // State for Edit Mode
   const [editingCar, setEditingCar] = useState(null);
 
-  // Get State from Redux
   const {
     list: cars,
     loading,
     error,
   } = useSelector((state) => state.inventory);
 
-  // Fetch data on mount
   useEffect(() => {
     dispatch(fetchInventory());
   }, [dispatch]);
 
-  // HANDLERS
   const handleCreate = () => {
-    setEditingCar(null); // Clear data for new car
+    setEditingCar(null);
     onOpen();
   };
 
   const handleEdit = (car) => {
-    setEditingCar(car); // Load car data
-    onOpen(); // Open modal
+    setEditingCar(car);
+    onOpen();
   };
 
   return (
-    <div className="space-y-6">
-      {/* 1. HEADER & ACTIONS */}
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Inventory</h2>
-          <p className="text-default-500">
-            Manage your fleet and generate stories.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="size-12 rounded-2xl bg-foreground/5 flex items-center justify-center">
+            <Package className="size-6 text-foreground/60" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Inventory
+            </h1>
+            <p className="text-sm text-foreground/50">
+              Manage your fleet and generate stories
+            </p>
+          </div>
         </div>
 
-        <Button
-          color="primary"
-          endContent={<Plus size={18} />}
-          onPress={handleCreate} // Triggers Create Mode
-          className="font-semibold shadow-md"
+        <button
+          onClick={handleCreate}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background text-sm font-medium rounded-xl hover:bg-foreground/90 active:scale-[0.98] transition-all"
         >
+          <Plus className="size-4" />
           Add Vehicle
-        </Button>
+        </button>
       </div>
 
-      {/* 2. THE TABLE */}
+      {/* Error State */}
       {error && (
-        <div className="p-4 bg-danger-50 text-danger border border-danger-200 rounded-lg">
-          Error loading inventory: {error}
+        <div className="flex items-center gap-3 p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl">
+          <div className="size-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-sm">Error loading inventory: {error}</span>
         </div>
       )}
 
-      <InventoryTable
-        cars={cars}
-        loading={loading}
-        onEdit={handleEdit} // Triggers Edit Mode
-      />
+      {/* Table */}
+      <InventoryTable cars={cars} loading={loading} onEdit={handleEdit} />
 
-      {/* 3. THE MODAL */}
-      <AddCarModal
-        isOpen={isOpen}
-        onClose={onClose}
-        initialData={editingCar} // Pass the data to the form
-      />
+      {/* Modal */}
+      <AddCarModal isOpen={isOpen} onClose={onClose} initialData={editingCar} />
     </div>
   );
 }

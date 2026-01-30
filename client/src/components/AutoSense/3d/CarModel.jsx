@@ -1,9 +1,9 @@
-import React, { useRef, useLayoutEffect, useMemo, useEffect } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 
-// --- MODULE IMPORTS (New Structure) ---
+// --- MODULE IMPORTS ---
 import { LidarScanner } from "./modules/Safety/LidarScanner";
 import { BlindSpotSensor } from "./modules/Safety/BlindSpotSensor";
 import { SafetyShield } from "./modules/Safety/SafetyShield";
@@ -49,9 +49,18 @@ const fresnelMaterial = new THREE.ShaderMaterial({
   `,
 });
 
-export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
-  // Load with Draco Decoder (ensure /draco/gltf/ exists in public)
-  const { nodes } = useGLTF("/models/sedan_hologram.glb", "/draco/gltf/");
+export const CarModel = ({
+  mode = "SHOWROOM",
+  drivetrain = "AWD",
+  bodyType = "Sedan",
+}) => {
+  // 1. DETERMINE WHICH MODEL TO LOAD
+  // Normalize input: 'SUV', 'Sedan', 'Coupe' -> 'suv_hologram.glb'
+  const modelFile = bodyType.toLowerCase().includes("suv")
+    ? "/models/suv_hologram.glb"
+    : "/models/sedan_hologram.glb";
+
+  const { nodes } = useGLTF(modelFile, "/draco/gltf/");
   const groupRef = useRef();
   const engineLightRef = useRef();
 
@@ -60,7 +69,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
   // -----------------------------------------------------
   const library = useMemo(() => {
     return {
-      // 1. SHOWROOM
       paint: new THREE.MeshPhysicalMaterial({
         color: "#ffffff",
         metalness: 0.6,
@@ -81,8 +89,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         transmission: 0.9,
         transparent: true,
       }),
-
-      // 2. SAFETY (Ghost)
       ghost: fresnelMaterial,
       techMesh: new THREE.MeshPhysicalMaterial({
         color: "#ff0000",
@@ -92,8 +98,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         roughness: 0.1,
         transparent: true,
       }),
-
-      // 3. UTILITY (Blueprint Look)
       graphite: new THREE.MeshStandardMaterial({
         color: "#181818",
         roughness: 0.6,
@@ -114,37 +118,30 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         opacity: 0.6,
         transparent: true,
       }),
-
-      // 4. PERFORMANCE (Power Core Skin)
       satin: new THREE.MeshStandardMaterial({
         color: "#111111",
         roughness: 0.4,
         metalness: 0.5,
         envMapIntensity: 0.8,
       }),
-
-      // A. The Heart (Pulsing Engine)
       magma: new THREE.MeshBasicMaterial({
-        color: "#ff4400", // Bright Orange/Yellow
+        color: "#ff4400",
         toneMapped: false,
-        depthTest: false, // X-Ray
+        depthTest: false,
         depthWrite: false,
         transparent: true,
         opacity: 0.9,
         side: THREE.DoubleSide,
       }),
-
-      // B. The Conduits (Wheels & Drivetrain)
       hotMetal: new THREE.MeshBasicMaterial({
-        color: "#ff2200", // Deep Red/Orange
+        color: "#ff2200",
         toneMapped: false,
-        depthTest: false, // X-Ray
+        depthTest: false,
         depthWrite: false,
         transparent: true,
         opacity: 0.8,
         side: THREE.DoubleSide,
       }),
-
       darkGlass: new THREE.MeshPhysicalMaterial({
         color: "#000000",
         metalness: 0.8,
@@ -207,7 +204,7 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
   };
 
   // -----------------------------------------------------
-  // THE LOGIC ENGINE (useEffect)
+  // THE LOGIC ENGINE
   // -----------------------------------------------------
   useEffect(() => {
     setupEdges(nodes.Chassis_Main);
@@ -272,7 +269,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         break;
 
       case "PERFORMANCE":
-        // 1. Stealth Body
         applyMaterial(nodes.Chassis_Main, library.satin, 0);
         applyMaterial(nodes.Trunk || nodes.trunk, library.satin, 0);
         toggleVisibility(nodes.Chassis_Glass, true);
@@ -283,13 +279,11 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
 
         const XRAY_ORDER = 999;
 
-        // 2. Engine & Exhaust (Always Hot)
         toggleVisibility(nodes.Engine_Block, true);
         applyMaterial(nodes.Engine_Block, library.magma, XRAY_ORDER);
         toggleVisibility(nodes.Exhaust_System, true);
         applyMaterial(nodes.Exhaust_System, library.magma, XRAY_ORDER);
 
-        // 3. DRIVETRAIN LOGIC
         const isFront =
           drivetrain === "AWD" || drivetrain === "FWD" || drivetrain === "4WD";
         const isRear =
@@ -303,13 +297,11 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         if (isRear)
           applyMaterial(nodes.Drivetrain_Rear, library.hotMetal, XRAY_ORDER);
 
-        // Front Wheels
         const frontWheelMat = isFront ? library.hotMetal : library.satin;
         const frontOrder = isFront ? XRAY_ORDER : 0;
         applyMaterial(nodes.Wheel_FL, frontWheelMat, frontOrder);
         applyMaterial(nodes.Wheel_FR, frontWheelMat, frontOrder);
 
-        // Rear Wheels
         const rearWheelMat = isRear ? library.hotMetal : library.satin;
         const rearOrder = isRear ? XRAY_ORDER : 0;
         applyMaterial(nodes.Wheel_RL, rearWheelMat, rearOrder);
@@ -338,13 +330,9 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
     }
   }, [mode, nodes, library, drivetrain]);
 
-  // -----------------------------------------------------
-  // ⚙️ ANIMATION LOOP (The Physics)
-  // -----------------------------------------------------
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
 
-    // 1. Trunk
     const trunkNode = nodes.Trunk || nodes.trunk;
     if (trunkNode) {
       const targetAngle = mode === "UTILITY" ? 1.3 : 0;
@@ -355,7 +343,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
       );
     }
 
-    // 2. Performance Physics
     if (mode === "PERFORMANCE") {
       const pulse = Math.sin(t * 8) * 0.5 + 0.5;
       const baseOrange = new THREE.Color("#ff4400");
@@ -366,20 +353,17 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         engineLightRef.current.intensity = 5 + pulse * 10;
       }
 
-      // Wheel Spin
       const wheelSpeed = 15 * delta;
       if (nodes.Wheel_FL) nodes.Wheel_FL.rotation.x += wheelSpeed;
       if (nodes.Wheel_FR) nodes.Wheel_FR.rotation.x += wheelSpeed;
       if (nodes.Wheel_RL) nodes.Wheel_RL.rotation.x += wheelSpeed;
       if (nodes.Wheel_RR) nodes.Wheel_RR.rotation.x += wheelSpeed;
 
-      // Chassis Vibration
       if (nodes.Car_Root) {
         nodes.Car_Root.position.y = Math.sin(t * 60) * 0.002;
         nodes.Car_Root.rotation.z = Math.sin(t * 40) * 0.001;
       }
     } else {
-      // Reset Physics
       if (nodes.Car_Root) {
         nodes.Car_Root.position.y = 0;
         nodes.Car_Root.rotation.z = 0;
@@ -391,7 +375,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
     <group ref={groupRef} dispose={null}>
       <primitive object={nodes.Car_Root} />
 
-      {/* PERFORMANCE EXTRAS */}
       {mode === "PERFORMANCE" && (
         <>
           {nodes.Anchor_Engine_Core && (
@@ -412,7 +395,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         </>
       )}
 
-      {/* SAFETY EXTRAS */}
       {mode === "SAFETY" && nodes.Anchor_Sensor_Front && (
         <>
           {/* <SafetyShield /> */}
@@ -422,7 +404,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
         </>
       )}
 
-      {/* UTILITY EXTRAS */}
       {mode === "UTILITY" && (
         <>
           {nodes.Anchor_Trunk && (
@@ -435,4 +416,6 @@ export const CarModel = ({ mode = "SHOWROOM", drivetrain = "AWD" }) => {
   );
 };
 
+// 4. Preload BOTH models to avoid lag when switching
 useGLTF.preload("/models/sedan_hologram.glb");
+useGLTF.preload("/models/suv_hologram.glb");

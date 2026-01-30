@@ -107,7 +107,7 @@ async function processSingleScene(scene, carContext, badges = []) {
       const relevantCategories = THEME_TO_BADGE_CATEGORIES[themeTag] || [];
       const sceneBadges = badges
         .filter((badge) => relevantCategories.includes(badge.category))
-        .slice(0, 3);
+        .slice(0, 2); // Limit to max 2 badges per scene
 
       updatedScene.slide_content = {
         ...result.slide_content,
@@ -148,7 +148,7 @@ async function processSingleScene(scene, carContext, badges = []) {
       const relevantCategories = THEME_TO_BADGE_CATEGORIES[themeTag] || [];
       const sceneBadges = badges
         .filter((badge) => relevantCategories.includes(badge.category))
-        .slice(0, 3); // Limit to max 3 badges per scene
+        .slice(0, 2); // Limit to max 2 badges per scene
 
       updatedScene.slide_content = {
         ...result.slide_content,

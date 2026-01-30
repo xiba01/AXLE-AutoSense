@@ -6,8 +6,7 @@ import {
   softDeleteStory,
   restoreStory,
 } from "../../../store/slices/studioSlice";
-import { Button, Spinner, Chip, Divider } from "@heroui/react";
-import { Sparkles, Grid, Film } from "lucide-react";
+import { Sparkles, LayoutGrid } from "lucide-react";
 import StudioCard from "../../../components/dashboard/studio/StudioCard";
 
 export default function StudioPage() {
@@ -106,16 +105,14 @@ export default function StudioPage() {
   const CarGrid = ({ data, emptyMessage, forceVariant }) => {
     if (data.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-default-400 border-2 border-dashed border-default-200 rounded-2xl bg-default-50/50">
-          <div className="p-3 bg-default-100 rounded-full mb-3">
-            <Grid size={24} className="opacity-50" />
-          </div>
-          <p className="text-sm">{emptyMessage}</p>
+        <div className="flex flex-col items-center justify-center py-16 text-default-400 border border-dashed border-default-200 rounded-2xl">
+          <LayoutGrid size={20} className="opacity-40 mb-2" />
+          <p className="text-sm text-default-500">{emptyMessage}</p>
         </div>
       );
     }
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {data.map((car) => (
           <StudioCard
             key={car.id}
@@ -124,8 +121,8 @@ export default function StudioPage() {
             onGenerate={handleGenerate}
             onPlay={handlePlay}
             onEdit={handleEdit}
-            onDelete={handleDelete} // Wired up
-            onRestore={handleRestore} // Wired up
+            onDelete={handleDelete}
+            onRestore={handleRestore}
           />
         ))}
       </div>
@@ -133,30 +130,29 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-8 h-full flex flex-col">
       {/* HEADER */}
-      <div className="flex justify-between items-end border-b border-default-200 pb-4">
+      <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-3">
             {getPageTitle()}
-            <Chip size="sm" variant="flat">
+            <span className="text-sm font-medium text-default-400 bg-default-100 px-2 py-0.5 rounded-md">
               {getCount()}
-            </Chip>
+            </span>
           </h1>
-          <p className="text-default-500 mt-1">
-            Manage your AutoSense inventory content.
+          <p className="text-default-500 mt-1 text-sm">
+            Manage your AutoSense content
           </p>
         </div>
 
         {isMainView && (
-          <Button
-            color="primary"
-            className="font-bold shadow-lg shadow-primary/20"
-            startContent={<Sparkles size={18} />}
-            onPress={() => navigate("/dashboard/studio/wizard")}
+          <button
+            onClick={() => navigate("/dashboard/studio/wizard")}
+            className="flex items-center gap-2 bg-foreground text-background font-medium px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity text-sm"
           >
-            Create New Story
-          </Button>
+            <Sparkles size={16} />
+            Create Story
+          </button>
         )}
       </div>
 
@@ -164,7 +160,12 @@ export default function StudioPage() {
       <div className="flex-1 pb-10">
         {loading ? (
           <div className="flex h-[400px] items-center justify-center">
-            <Spinner size="lg" color="primary" label="Scanning Inventory..." />
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
+              <span className="text-sm text-default-500">
+                Loading inventory...
+              </span>
+            </div>
           </div>
         ) : (
           <>
@@ -173,48 +174,34 @@ export default function StudioPage() {
               <div className="space-y-10">
                 {/* Section 1: Unexplored */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-default-500">
-                    {/* <Sparkles size={16} className="text-warning" /> */}
-                    <h3 className="text-sm font-bold uppercase tracking-wider">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-medium text-default-500">
                       Ready to Create
                     </h3>
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      color="warning"
-                      className="h-5 text-[10px]"
-                    >
+                    <span className="text-xs text-default-400">
                       {unexploredCars.length}
-                    </Chip>
+                    </span>
                   </div>
                   <CarGrid
                     data={unexploredCars}
-                    emptyMessage="All vehicles have stories! Add more inventory to generate new ones."
+                    emptyMessage="All vehicles have stories"
                     forceVariant="unexplored"
                   />
                 </div>
 
-                {/* <Divider /> */}
-
                 {/* Section 2: Showroom */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-default-500">
-                    {/* <Film size={16} className="text-success" /> */}
-                    <h3 className="text-sm font-bold uppercase tracking-wider">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-medium text-default-500">
                       Live Showroom
                     </h3>
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      color="success"
-                      className="h-5 text-[10px]"
-                    >
+                    <span className="text-xs text-default-400">
                       {showroomCars.length}
-                    </Chip>
+                    </span>
                   </div>
                   <CarGrid
                     data={showroomCars}
-                    emptyMessage="No stories generated yet. Pick a car above to start!"
+                    emptyMessage="No stories generated yet"
                     forceVariant="showroom"
                   />
                 </div>
@@ -225,14 +212,14 @@ export default function StudioPage() {
             {isPublishedView && (
               <CarGrid
                 data={showroomCars}
-                emptyMessage="No published stories found."
+                emptyMessage="No published stories found"
               />
             )}
 
             {isTrashView && (
               <CarGrid
                 data={trashCars}
-                emptyMessage="Trash is empty."
+                emptyMessage="Trash is empty"
                 forceVariant="trash"
               />
             )}

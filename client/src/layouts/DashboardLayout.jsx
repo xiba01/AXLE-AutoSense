@@ -1,16 +1,12 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  Button,
   Avatar,
   Drawer,
   DrawerContent,
   DrawerBody,
   useDisclosure,
-  Divider,
-  User,
   Tooltip,
   Dropdown,
   DropdownTrigger,
@@ -33,7 +29,6 @@ import {
   BarChart3,
   CreditCard,
   Users,
-  Archive,
 } from "lucide-react";
 import { supabase } from "../config/supabaseClient";
 import { logout } from "../store/slices/authSlice";
@@ -164,20 +159,19 @@ export default function DashboardLayout() {
   // 🎨 COMPONENT: PRIMARY RAIL
   // ----------------------------------------------------------------------
   const PrimaryRail = () => (
-    <div className="flex flex-col h-full bg-[#f7f7f5] dark:bg-[#151516] border-r border-default-200 w-[72px] shrink-0 z-30 items-center py-4">
-      <Link to="/dashboard" className="mb-6">
+    <div className="flex flex-col h-full bg-background border-r border-default-200 w-[72px] shrink-0 z-30 items-center py-4">
+      <Link to="/dashboard" className="mb-8">
         <div className="size-10 flex items-center justify-center">
           <img
             src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AXLE-logo-mini.png"
             alt="Logo"
-            className="w-10 h-auto object-contain group-hover:scale-110 transition-transform"
+            className="w-9 h-auto object-contain hover:opacity-80 transition-opacity"
           />
         </div>
       </Link>
 
-      <nav className="flex-1 flex flex-col gap-3 w-full px-2">
+      <nav className="flex-1 flex flex-col gap-2 w-full px-2">
         {PRIMARY_NAV.map((item) => {
-          // Check if this primary item is active (including sub-routes)
           const isActive =
             location.pathname === item.path ||
             (item.path !== "/dashboard" &&
@@ -189,21 +183,24 @@ export default function DashboardLayout() {
               key={item.key}
               content={item.label}
               placement="right"
-              color="foreground"
               closeDelay={0}
+              classNames={{
+                content:
+                  "bg-foreground text-background text-xs font-medium px-2 py-1.5 rounded-lg",
+              }}
             >
               <Link to={item.path} className="w-full flex justify-center">
                 <div
                   className={`
-                  size-10 rounded-xl flex items-center justify-center transition-all duration-200
+                  size-11 rounded-xl flex items-center justify-center transition-all
                   ${
                     isActive
-                      ? "bg-white dark:bg-default-100 text-primary shadow-sm border border-default-200"
-                      : "text-default-400 hover:text-default-600 hover:bg-default-100/50"
+                      ? "bg-default-100 text-foreground"
+                      : "text-default-400 hover:text-foreground hover:bg-default-50"
                   }
                 `}
                 >
-                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
                 </div>
               </Link>
             </Tooltip>
@@ -211,13 +208,20 @@ export default function DashboardLayout() {
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-3">
-        <Tooltip content="Sign Out" placement="right" color="danger">
+      <div className="mt-auto">
+        <Tooltip
+          content="Sign Out"
+          placement="right"
+          classNames={{
+            content:
+              "bg-foreground text-background text-xs font-medium px-2 py-1.5 rounded-lg",
+          }}
+        >
           <button
             onClick={handleLogout}
-            className="size-10 rounded-xl flex items-center justify-center text-default-400 hover:text-danger hover:bg-danger/10 transition-colors"
+            className="size-11 rounded-xl flex items-center justify-center text-default-400 hover:text-foreground hover:bg-default-50 transition-all"
           >
-            <LogOut size={20} />
+            <LogOut size={18} />
           </button>
         </Tooltip>
       </div>
@@ -233,24 +237,24 @@ export default function DashboardLayout() {
       <div className="h-16 flex items-center px-4 border-b border-default-100">
         <Dropdown placement="bottom-start" className="w-full">
           <DropdownTrigger>
-            <div className="flex items-center gap-3 w-full p-1.5 rounded-lg hover:bg-default-100 cursor-pointer transition-colors group">
+            <div className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-default-50 cursor-pointer transition-colors group">
               <div className="flex-1 text-left overflow-hidden">
-                <p className="text-sm font-semibold truncate leading-tight text-foreground">
+                <p className="text-sm font-medium truncate leading-tight text-foreground">
                   {dealerName}
                 </p>
-                <p className="text-[10px] text-default-400 uppercase tracking-wide font-medium">
-                  {subscription} Plan
+                <p className="text-[11px] text-default-400 tracking-wide font-medium">
+                  {subscription}
                 </p>
               </div>
               <ChevronDown
                 size={14}
-                className="text-default-400 group-hover:text-foreground"
+                className="text-default-400 group-hover:text-foreground transition-colors"
               />
             </div>
           </DropdownTrigger>
           <DropdownMenu aria-label="User Actions" variant="flat">
             <DropdownItem key="settings" startContent={<Settings size={14} />}>
-              Workspace Settings
+              Settings
             </DropdownItem>
             <DropdownItem key="billing" startContent={<CreditCard size={14} />}>
               Billing
@@ -262,26 +266,22 @@ export default function DashboardLayout() {
               startContent={<LogOut size={14} />}
               onPress={handleLogout}
             >
-              Log Out
+              Sign Out
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </div>
 
       {/* Menu Items */}
-      <div className="flex-1 overflow-y-auto py-6 px-3 space-y-6">
+      <div className="flex-1 overflow-y-auto py-5 px-3 space-y-5">
         {currentSecondaryItems.map((section, idx) => (
           <div key={idx}>
-            <div className="px-3 mb-2 text-[11px] font-bold text-default-400 uppercase tracking-wider">
+            <div className="px-3 mb-1.5 text-[11px] font-medium text-default-400 tracking-wide">
               {section.section}
             </div>
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const Icon = item.icon;
-
-                // Active Logic:
-                // 1. Exact Match (e.g. "All Stories" should only highlight on /dashboard/studio, not sub-routes)
-                // 2. Prefix Match (e.g. /dashboard/studio/published)
                 const isActive = item.exact
                   ? location.pathname === item.path
                   : location.pathname.startsWith(item.path);
@@ -291,24 +291,25 @@ export default function DashboardLayout() {
                     key={item.label}
                     to={item.path}
                     className={`
-                      flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group
+                      flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
                       ${
                         isActive
                           ? "bg-default-100 text-foreground font-medium"
                           : item.highlight
-                            ? "bg-primary/10 text-primary hover:bg-primary/20 font-medium mt-2"
+                            ? "text-foreground hover:bg-default-50 font-medium"
                             : "text-default-500 hover:bg-default-50 hover:text-foreground"
                       }
                     `}
                   >
                     <Icon
-                      size={18}
+                      size={17}
+                      strokeWidth={isActive ? 2 : 1.5}
                       className={
                         isActive
                           ? "text-foreground"
                           : item.highlight
-                            ? "text-primary"
-                            : "text-default-400 group-hover:text-default-600"
+                            ? "text-foreground"
+                            : "text-default-400"
                       }
                     />
                     {item.label}
@@ -322,22 +323,23 @@ export default function DashboardLayout() {
 
       {/* Upgrade Card */}
       {!isPro && (
-        <div className="p-4 mt-auto">
-          <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 rounded-xl p-4 text-center">
-            <Sparkles className="size-6 text-primary mx-auto mb-2" />
-            <p className="text-xs font-semibold text-primary-600 mb-2">
-              Upgrade to Pro
+        <div className="p-4 mt-auto border-t border-default-100">
+          <div className="bg-default-50 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-foreground" />
+              <p className="text-sm font-semibold text-foreground">
+                Upgrade to Pro
+              </p>
+            </div>
+            <p className="text-xs text-default-500 mb-3">
+              Unlock unlimited AI stories
             </p>
-            <Button
-              size="sm"
-              color="primary"
-              variant="shadow"
-              fullWidth
-              className="h-8 text-xs font-bold"
-              onPress={() => navigate("/dashboard/settings")}
+            <button
+              onClick={() => navigate("/dashboard/settings")}
+              className="w-full h-8 bg-foreground text-background text-xs font-medium rounded-lg hover:opacity-90 transition-opacity"
             >
-              Unlock AI
-            </Button>
+              View Plans
+            </button>
           </div>
         </div>
       )}
@@ -358,10 +360,14 @@ export default function DashboardLayout() {
         onOpenChange={onOpenChange}
         placement="left"
         size="xs"
+        classNames={{
+          base: "max-w-[312px]",
+          backdrop: "bg-black/40",
+        }}
       >
-        <DrawerContent className="max-w-[300px] flex flex-row p-0 gap-0">
+        <DrawerContent className="flex flex-row p-0 gap-0">
           {(onClose) => (
-            <DrawerBody className="p-0 flex flex-row gap-0">
+            <DrawerBody className="p-0 flex flex-row gap-0 overflow-hidden">
               <PrimaryRail />
               <SecondarySidebar />
             </DrawerBody>
@@ -370,18 +376,21 @@ export default function DashboardLayout() {
       </Drawer>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col h-screen min-w-0 bg-default-50/50">
-        <header className="h-14 lg:hidden shrink-0 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-default-200 px-4 flex items-center justify-between">
+      <div className="flex-1 flex flex-col h-screen min-w-0 bg-background">
+        <header className="h-14 lg:hidden shrink-0 sticky top-0 z-30 bg-background/90 backdrop-blur-xl border-b border-default-200 px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button isIconOnly variant="light" size="sm" onPress={onOpen}>
-              <Menu size={24} />
-            </Button>
-            <span className="font-bold text-large tracking-tight">AXLE</span>
+            <button
+              onClick={onOpen}
+              className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-default-100 transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <span className="font-semibold text-base tracking-tight">AXLE</span>
           </div>
           <Avatar src={dealerLogo} size="sm" />
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-[1600px] mx-auto h-full flex flex-col">
             <Outlet />
           </div>

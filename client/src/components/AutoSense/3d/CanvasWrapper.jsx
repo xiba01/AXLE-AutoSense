@@ -1,6 +1,5 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Loader } from "@react-three/drei";
 import { useStoryStore } from "../../../store/useStoryStore";
 
 // --- 3D COMPONENTS ---
@@ -15,7 +14,22 @@ export const CanvasWrapper = () => {
   // 1. Determine Logic Props
   const isTechView = currentScene?.type === "tech_view";
   const mode = isTechView ? currentScene.theme_tag || "SHOWROOM" : "SHOWROOM";
-  const drivetrain = storyData?.car_data?.specs?.drivetrain || "AWD";
+
+  // 2. Extract Car Data (FIXED PATHS)
+  // The log shows 'car_specs' is at the root, and 'car' contains body_type
+  const specs = storyData?.car_specs || {};
+  const identity = storyData?.car || {};
+
+  // Check 'performance' object inside specs, or fallback to root if flattened
+  const drivetrain = specs.performance?.drivetrain || specs.drivetrain || "AWD";
+  const bodyType = identity.body_type || "Sedan";
+
+  // Debugging (Verify it works now)
+  useEffect(() => {
+    if (storyData) {
+      console.log("✅ CanvasWrapper Fixed Data:", { bodyType, drivetrain });
+    }
+  }, [storyData, bodyType, drivetrain]);
 
   return (
     <>
@@ -33,18 +47,14 @@ export const CanvasWrapper = () => {
           <color attach="background" args={["#050505"]} />
 
           <Suspense fallback={null}>
-            {/* 
-               Pass isTechView so camera knows to shift 
-            */}
             <CameraController isTechView={isTechView} />
 
             <Environment />
 
-            <CarModel mode={mode} drivetrain={drivetrain} />
+            <CarModel mode={mode} drivetrain={drivetrain} bodyType={bodyType} />
           </Suspense>
         </Canvas>
       </div>
-      {/* <Loader /> */}
     </>
   );
 };

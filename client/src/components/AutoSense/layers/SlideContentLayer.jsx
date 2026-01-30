@@ -11,6 +11,8 @@ import {
   Circle,
   Trophy,
   Rotate3d,
+  Check,
+  X as XIcon,
 } from "lucide-react";
 import { useStoryStore } from "../../../store/useStoryStore";
 import { cn } from "../../../lib/utils";
@@ -57,12 +59,19 @@ const getBadgeColor = (badge) => {
   return "text-white border-white/20 bg-white/5";
 };
 
+// Get badge image URL from Supabase storage
+const getBadgeImageUrl = (badge) => {
+  if (!badge.visuals?.image_path) return null;
+
+  const SUPABASE_URL = "https://lvodepwdbesxputvetnk.supabase.co";
+  return `${SUPABASE_URL}/storage/v1/object/public/badges/${badge.visuals.image_path}`;
+};
+
 export const SlideContentLayer = () => {
   const {
     getCurrentScene,
-    setScene,
-    activeHotspotId,
     startExperience,
+    activeHotspotId,
     activeCameraView,
     setCameraView,
     setFreeRoam,
@@ -110,6 +119,55 @@ export const SlideContentLayer = () => {
           : "opacity-100 blur-0 grayscale-0",
       )}
     >
+      {/* Tech View Camera Controls - Above Container */}
+      {scene.type === "tech_view" && (
+        <div className="flex items-center justify-end gap-2 mb-4 pointer-events-auto max-w-xl w-full">
+          <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-xl p-1 flex gap-1">
+            <button
+              onClick={() => setCameraView("primary")}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                activeCameraView === "primary"
+                  ? "bg-white text-black"
+                  : "text-white/50 hover:text-white hover:bg-white/10",
+              )}
+            >
+              {labels.a}
+            </button>
+            <button
+              onClick={() => setCameraView("secondary")}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                activeCameraView === "secondary"
+                  ? "bg-white text-black"
+                  : "text-white/50 hover:text-white hover:bg-white/10",
+              )}
+            >
+              {labels.b}
+            </button>
+            {labels.c && (
+              <button
+                onClick={() => setCameraView("tertiary")}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                  activeCameraView === "tertiary"
+                    ? "bg-white text-black"
+                    : "text-white/50 hover:text-white hover:bg-white/10",
+                )}
+              >
+                {labels.c}
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setFreeRoam(true)}
+            className="p-2 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <Rotate3d size={18} />
+          </button>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         <motion.div
           key={scene.id}
@@ -120,26 +178,24 @@ export const SlideContentLayer = () => {
           className={cn(
             "max-w-xl pointer-events-auto",
             "p-10 rounded-[2rem]",
-            "bg-gradient-to-b from-black/80 via-black/40 to-black/20",
-            "backdrop-blur-3xl saturate-100",
+            "bg-black/80 backdrop-blur-2xl",
             "border border-white/10",
-            "shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)]",
-            "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]",
+            "shadow-2xl shadow-black/50",
           )}
         >
           {/* INTRO */}
           {scene.type === "intro_view" && scene.intro_content && (
             <div className="space-y-6">
-              <h2 className="text-zinc-400 text-sm tracking-widest uppercase mb-2">
+              <h2 className="text-white/50 text-sm tracking-widest uppercase mb-2">
                 {scene.intro_content.subtitle}
               </h2>
-              <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-gray-300 to-gray-500">
+              <h1 className="text-5xl md:text-7xl font-bold text-white">
                 {scene.intro_content.title}
               </h1>
               <div className="flex gap-4">
                 <button
                   onClick={startExperience}
-                  className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-white tracking-wide transition-all backdrop-blur-md shadow-lg"
+                  className="px-8 py-3 bg-white text-black font-medium rounded-full tracking-wide transition-all hover:bg-white/90 active:scale-[0.98]"
                 >
                   {scene.intro_content.start_button_label || "Start"}
                 </button>
@@ -170,15 +226,7 @@ export const SlideContentLayer = () => {
                         const Icon = getBadgeIcon(badge);
                         const colorClass = getBadgeColor(badge);
                         const isHovered = activeBadgeIndex === i;
-
-                        const hoverBg = (() => {
-                          const token = colorClass
-                            .split(" ")
-                            .find((c) => c.startsWith("text-"));
-                          return token
-                            ? token.replace("text-", "bg-")
-                            : "bg-white/10";
-                        })();
+                        const badgeImageUrl = getBadgeImageUrl(badge);
 
                         return (
                           <div
@@ -204,7 +252,7 @@ export const SlideContentLayer = () => {
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.9 }}
                                   className={cn(
-                                    "absolute bottom-full mb-3 w-64 p-4 z-50",
+                                    "absolute bottom-full mb-3 w-72 p-4 z-50",
                                     "bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl",
                                     alignment === "right" ||
                                       scene.type === "tech_view"
@@ -212,24 +260,45 @@ export const SlideContentLayer = () => {
                                       : "left-0",
                                   )}
                                 >
-                                  <div className="flex gap-3">
-                                    <div
-                                      className={cn(
-                                        "p-2 rounded-lg shrink-0 border border-white/5",
-                                        `${hoverBg}/20`,
-                                      )}
-                                    >
-                                      <Icon size={16} className="text-white" />
+                                  {badgeImageUrl ? (
+                                    // Real Badge Image Layout - Horizontal
+                                    <div className="flex gap-3">
+                                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0">
+                                        <img
+                                          src={badgeImageUrl}
+                                          alt={badge.label}
+                                          className="w-full h-full object-contain"
+                                          style={{ mixBlendMode: "multiply" }}
+                                        />
+                                      </div>
+                                      <div className="flex-1">
+                                        <h4 className="text-white font-bold text-sm mb-1.5">
+                                          {badge.label}
+                                        </h4>
+                                        <p className="text-xs text-white/60 leading-relaxed">
+                                          {badge.evidence || "Verified Feature"}
+                                        </p>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <h4 className="text-white font-bold text-xs mb-1">
-                                        {badge.label}
-                                      </h4>
-                                      <p className="text-[10px] text-zinc-400 leading-snug">
-                                        {badge.evidence || "Verified Feature"}
-                                      </p>
+                                  ) : (
+                                    // Fallback to Icon Layout
+                                    <div className="flex gap-3">
+                                      <div className="p-2.5 rounded-lg shrink-0 bg-white/10">
+                                        <Icon
+                                          size={20}
+                                          className="text-white"
+                                        />
+                                      </div>
+                                      <div>
+                                        <h4 className="text-white font-bold text-sm mb-1">
+                                          {badge.label}
+                                        </h4>
+                                        <p className="text-xs text-white/60 leading-snug">
+                                          {badge.evidence || "Verified Feature"}
+                                        </p>
+                                      </div>
                                     </div>
-                                  </div>
+                                  )}
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -240,79 +309,103 @@ export const SlideContentLayer = () => {
                   )}
 
                 <h1
-                  className="font-bold text-white mb-4 tracking-tight text-4xl"
-                  style={{ lineHeight: "1.1" }}
+                  className="font-semibold text-white mb-4 tracking-tight text-3xl"
+                  style={{ lineHeight: "1.15" }}
                 >
                   {scene.slide_content.headline}
                 </h1>
 
-                <p className="text-zinc-300 leading-relaxed font-light text-lg">
+                <p className="text-white/70 leading-relaxed font-normal text-base">
                   {scene.slide_content.paragraph}
                 </p>
 
+                {/* --- SMART STATS RENDERER (UPDATED) --- */}
                 {scene.slide_content.key_stats && (
-                  <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-white/10">
-                    {scene.slide_content.key_stats.map((stat, i) => (
-                      <div key={i}>
-                        <div className="text-2xl font-bold text-white">
-                          {stat.value}
-                          <span className="text-sm font-normal text-zinc-500 ml-1">
-                            {stat.unit}
-                          </span>
-                        </div>
-                        <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">
-                          {stat.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  <div className="flex justify-between flex-wrap gap-x-8 gap-y-6 mt-8 pt-6 border-t border-white/10">
+                    {scene.slide_content.key_stats.map((stat, i) => {
+                      // 1. CLEANING LOGIC
+                      let displayValue = String(stat.value || "--").trim();
+                      let displayUnit = (stat.unit || "").trim();
+                      let valueColor = "text-white";
 
-                {scene.type === "tech_view" && (
-                  <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-white/10">
-                    <div className="bg-white/10 rounded-lg p-1 flex gap-1">
-                      <button
-                        onClick={() => setCameraView("primary")}
-                        className={cn(
-                          "px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all",
-                          activeCameraView === "primary"
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-gray-400 hover:text-white",
-                        )}
-                      >
-                        {labels.a}
-                      </button>
-                      <button
-                        onClick={() => setCameraView("secondary")}
-                        className={cn(
-                          "px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all",
-                          activeCameraView === "secondary"
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-gray-400 hover:text-white",
-                        )}
-                      >
-                        {labels.b}
-                      </button>
-                      {labels.c && (
-                        <button
-                          onClick={() => setCameraView("tertiary")}
-                          className={cn(
-                            "px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all",
-                            activeCameraView === "tertiary"
-                              ? "bg-primary text-white shadow-sm"
-                              : "text-gray-400 hover:text-white",
-                          )}
+                      const valLower = displayValue.toLowerCase();
+                      const unitLower = displayUnit.toLowerCase();
+
+                      // A. Map Booleans / Statuses / Typos
+                      if (
+                        ["yes", "true", "present", "active"].includes(valLower)
+                      ) {
+                        displayValue = "Active";
+                        valueColor = "text-emerald-400"; // Green
+                      } else if (["no", "false", "absent"].includes(valLower)) {
+                        displayValue = "N/A";
+                        valueColor = "text-zinc-500";
+                      } else if (
+                        [
+                          "standard",
+                          "included",
+                          "std",
+                          "standar",
+                          "standart",
+                        ].includes(valLower)
+                      ) {
+                        displayValue = "Standard";
+                        valueColor = "text-blue-400"; // Blue
+                      }
+
+                      // B. Suppress Filler Units
+                      // If unit is "feature", "system", "type", or matches the value, hide it
+                      const fillerUnits = [
+                        "feature",
+                        "features",
+                        "system",
+                        "type",
+                        "mode",
+                        "std",
+                        "standard",
+                        "count",
+                        "units",
+                        "rating",
+                        "capacity",
+                        "option",
+                        "available",
+                        "enabled",
+                        "included",
+                      ];
+                      if (
+                        fillerUnits.includes(unitLower) ||
+                        unitLower === valLower ||
+                        unitLower.includes(valLower)
+                      ) {
+                        displayUnit = "";
+                      }
+
+                      return (
+                        <div
+                          key={i}
+                          className="flex flex-col gap-1 min-w-[80px]"
                         >
-                          {labels.c}
-                        </button>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => setFreeRoam(true)}
-                      className="p-2 bg-white/10 rounded-lg text-white hover:bg-white/20"
-                    >
-                      <Rotate3d size={18} />
-                    </button>
+                          <div className="flex items-baseline gap-1.5">
+                            <span
+                              className={cn(
+                                "text-3xl font-semibold leading-none",
+                                valueColor,
+                              )}
+                            >
+                              {displayValue}
+                            </span>
+                            {displayUnit && (
+                              <span className="text-sm font-medium text-white/40 leading-none">
+                                {displayUnit}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-white/50 uppercase tracking-widest font-bold leading-tight">
+                            {stat.label}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -321,13 +414,13 @@ export const SlideContentLayer = () => {
           {/* OUTRO */}
           {scene.type === "outro_view" && scene.outro_content && (
             <div className="space-y-8 text-center w-full flex flex-col items-center">
-              <h1 className="text-6xl md:text-7xl font-bold text-white">
+              <h1 className="text-5xl md:text-6xl font-semibold text-white">
                 {scene.outro_content.headline}
               </h1>
-              <p className="text-xl text-chrome-300">
+              <p className="text-lg text-white/60">
                 {scene.outro_content.subheadline}
               </p>
-              <div className="flex gap-4 mt-6">
+              <div className="flex gap-3 mt-6">
                 {scene.outro_content.cta_buttons.map((btn, i) => (
                   <button
                     key={i}
@@ -335,10 +428,10 @@ export const SlideContentLayer = () => {
                       if (btn.action === "REPLAY_STORY") setScene(0);
                     }}
                     className={cn(
-                      "px-8 py-3 rounded-full tracking-wide transition-all backdrop-blur-md",
+                      "px-8 py-3 rounded-full font-medium tracking-wide transition-all",
                       btn.style === "primary"
-                        ? "bg-white text-black hover:bg-gray-200 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-                        : "bg-transparent border border-white/20 text-white hover:bg-white/10",
+                        ? "bg-white text-black hover:bg-white/90 active:scale-[0.98]"
+                        : "bg-white/10 text-white hover:bg-white/20",
                     )}
                   >
                     {btn.label}

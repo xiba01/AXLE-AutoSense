@@ -876,8 +876,6 @@ const BADGE_REGISTRY = {
     category: "Luxury",
     retrieval_method: "LOGIC",
     visuals: {
-      // Logic Engine will replace [brand] dynamically if detected (e.g. tech_audio_bose.png)
-      // Otherwise falls back to generic premium icon
       image_path: "tech_audio_generic.png",
       alt_text: "Premium Branded Audio System",
     },

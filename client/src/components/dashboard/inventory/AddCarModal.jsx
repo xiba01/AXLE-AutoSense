@@ -6,15 +6,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
-  Input,
   Select,
   SelectItem,
-  Textarea,
-  Divider,
-  Image,
-  Chip,
-  Tooltip,
 } from "@heroui/react";
 import {
   UploadCloud,
@@ -25,13 +18,13 @@ import {
   Info,
   Layers,
   Sparkles,
+  Check,
 } from "lucide-react";
 
-// Imports from previous steps
 import { fetchTrimSpecs } from "../../../services/carSpecsService";
 import { addCar, updateCar } from "../../../store/slices/inventorySlice";
 import { v4 as uuidv4 } from "uuid";
-import SpecsDrawer from "./SpecsDrawer"; // The component we built in Part 3
+import SpecsDrawer from "./SpecsDrawer";
 
 export default function AddCarModal({ isOpen, onClose, initialData }) {
   const dispatch = useDispatch();
@@ -232,36 +225,40 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                {initialData ? "Edit Vehicle" : "Add New Vehicle"}
-                <span className="text-tiny text-default-400 font-normal">
+              <ModalHeader className="flex flex-col gap-1 pb-0">
+                <span className="text-xl font-semibold text-foreground">
+                  {initialData ? "Edit Vehicle" : "Add New Vehicle"}
+                </span>
+                <span className="text-sm text-foreground/50 font-normal">
                   {initialData
-                    ? `Updating ID: ${initialData.vin}`
-                    : "Import data from RapidAPI or enter manually."}
+                    ? `Updating: ${initialData.vin}`
+                    : "Import from API or enter manually"}
                 </span>
               </ModalHeader>
 
-              <ModalBody className="gap-8 pb-8">
-                {/* --- SECTION A: PHOTOS --- */}
-                <div className="space-y-3">
+              <ModalBody className="gap-8 py-6">
+                {/* Photos Section */}
+                <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-default-500 flex items-center gap-2">
-                      <Layers size={16} /> Visuals
-                    </h3>
-                    <span className="text-tiny text-default-400">
-                      {photoPreviews.length} photos selected
+                    <div className="flex items-center gap-2">
+                      <Layers className="size-4 text-foreground/40" />
+                      <h3 className="text-sm font-medium text-foreground">
+                        Photos
+                      </h3>
+                    </div>
+                    <span className="text-xs text-foreground/40">
+                      {photoPreviews.length} selected
                     </span>
                   </div>
 
-                  {/* Upload Area */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {/* Add Button */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {/* Upload Button */}
                     <div
                       onClick={() => fileInputRef.current.click()}
-                      className="aspect-[4/3] rounded-xl border-2 border-dashed border-default-300 hover:border-primary hover:bg-primary/5 cursor-pointer flex flex-col items-center justify-center transition-all group"
+                      className="aspect-[4/3] rounded-xl border border-dashed border-foreground/15 hover:border-foreground/30 hover:bg-foreground/[0.02] cursor-pointer flex flex-col items-center justify-center transition-all group"
                     >
-                      <UploadCloud className="text-default-400 group-hover:text-primary mb-2" />
-                      <span className="text-xs text-default-500 font-medium group-hover:text-primary">
+                      <UploadCloud className="size-5 text-foreground/30 group-hover:text-foreground/50 mb-1.5" />
+                      <span className="text-xs text-foreground/40 group-hover:text-foreground/60">
                         Add Photos
                       </span>
                       <input
@@ -278,195 +275,267 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
                     {photoPreviews.map((src, idx) => (
                       <div
                         key={idx}
-                        className="relative aspect-[4/3] group rounded-xl overflow-hidden shadow-sm border border-default-200"
+                        className="relative aspect-[4/3] group rounded-xl overflow-hidden border border-foreground/10"
                       >
-                        <Image
+                        <img
                           src={src}
                           alt="preview"
-                          classNames={{
-                            wrapper: "w-full h-full",
-                            img: "w-full h-full object-cover",
-                          }}
+                          className="w-full h-full object-cover"
                         />
                         <button
                           onClick={() => removePhoto(idx)}
-                          className="absolute top-1 right-1 bg-black/50 hover:bg-danger text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          className="absolute top-1.5 right-1.5 size-6 bg-black/60 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
                         >
-                          <X size={12} />
+                          <X className="size-3" />
                         </button>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Divider />
+                <div className="h-px bg-foreground/[0.06]" />
 
-                {/* --- SECTION B: IDENTIFICATION (API FETCH) --- */}
+                {/* Form Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column: The "Hook" */}
+                  {/* Left Column: API Import */}
                   <div className="lg:col-span-1 space-y-4">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-default-500 flex items-center gap-2">
-                      <Sparkles size={16} /> Data Import
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="size-4 text-foreground/40" />
+                      <h3 className="text-sm font-medium text-foreground">
+                        Data Import
+                      </h3>
+                    </div>
 
-                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl space-y-4 border border-primary-100 dark:border-primary-800">
-                      <Input
-                        label="RapidAPI Trim ID"
-                        placeholder="e.g. 128478"
-                        value={trimId}
-                        onChange={(e) => setTrimId(e.target.value)}
-                        variant="bordered"
-                        description="Find this ID in the Car Specs API database."
-                        endContent={
-                          <Button
-                            size="sm"
-                            color="primary"
-                            isLoading={isFetching}
-                            isIconOnly={!trimId} // Icon only on mobile/small space
-                            onPress={handleFetch}
+                    <div className="p-4 rounded-xl bg-foreground/[0.02] border border-foreground/[0.06] space-y-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          RapidAPI Trim ID
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="e.g. 128478"
+                            value={trimId}
+                            onChange={(e) => setTrimId(e.target.value)}
+                            className="flex-1 px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                          />
+                          <button
+                            onClick={handleFetch}
+                            disabled={!trimId || isFetching}
+                            className="px-3 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
                           >
-                            {isFetching ? "" : <Search size={16} />}
-                          </Button>
-                        }
-                      />
+                            {isFetching ? (
+                              <div className="size-4 border-2 border-background/20 border-t-background rounded-full animate-spin" />
+                            ) : (
+                              <Search className="size-4" />
+                            )}
+                          </button>
+                        </div>
+                        <p className="text-xs text-foreground/40">
+                          Find ID in Car Specs API
+                        </p>
+                      </div>
 
                       {techSpecs.length > 0 && (
-                        <div className="flex items-center gap-2 text-success-600 bg-white dark:bg-black/20 p-2 rounded-lg text-xs font-medium border border-success-200">
-                          <CheckCircleIcon />
-                          <span>
-                            Successfully loaded {techSpecs.length} specs
+                        <div className="flex items-center gap-2 p-2.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
+                          <Check className="size-4" />
+                          <span className="text-xs font-medium">
+                            Loaded {techSpecs.length} specs
                           </span>
                         </div>
                       )}
 
-                      <Button
-                        fullWidth
-                        variant="flat"
-                        color={techSpecs.length > 0 ? "secondary" : "default"}
-                        isDisabled={techSpecs.length === 0}
-                        onPress={() => setIsDrawerOpen(true)}
-                        startContent={<Cpu size={18} />}
+                      <button
+                        disabled={techSpecs.length === 0}
+                        onClick={() => setIsDrawerOpen(true)}
+                        className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-foreground/5 hover:bg-foreground/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                       >
+                        <Cpu className="size-4" />
                         {techSpecs.length > 0
-                          ? "Review & Edit Specs"
-                          : "Waiting for Data..."}
-                      </Button>
+                          ? "Review Specs"
+                          : "Waiting for data..."}
+                      </button>
                     </div>
                   </div>
 
-                  {/* Right Column: The Form */}
+                  {/* Right Column: Form Fields */}
                   <div className="lg:col-span-2 space-y-4">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-default-500 flex items-center gap-2">
-                      <Info size={16} /> Commercial Details
-                    </h3>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        label="VIN"
-                        placeholder="17 chars"
-                        value={mainInfo.vin}
-                        onChange={(e) =>
-                          handleInputChange("vin", e.target.value)
-                        }
-                        isRequired
-                      />
-                      <Input
-                        label="Make"
-                        value={mainInfo.make}
-                        onChange={(e) =>
-                          handleInputChange("make", e.target.value)
-                        }
-                        isRequired
-                      />
-                      <Input
-                        label="Model"
-                        value={mainInfo.model}
-                        onChange={(e) =>
-                          handleInputChange("model", e.target.value)
-                        }
-                        isRequired
-                      />
-                      <Input
-                        label="Year"
-                        type="number"
-                        value={mainInfo.year}
-                        onChange={(e) =>
-                          handleInputChange("year", e.target.value)
-                        }
-                        isRequired
-                      />
+                    <div className="flex items-center gap-2">
+                      <Info className="size-4 text-foreground/40" />
+                      <h3 className="text-sm font-medium text-foreground">
+                        Vehicle Details
+                      </h3>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        label="Trim / Series"
-                        value={mainInfo.trim}
-                        onChange={(e) =>
-                          handleInputChange("trim", e.target.value)
-                        }
-                        description="e.g. M Sport, AMG Line"
-                      />
-                      <Input
-                        label="Color"
-                        placeholder="e.g. Alpine White"
-                        value={mainInfo.color}
-                        onChange={(e) =>
-                          handleInputChange("color", e.target.value)
-                        }
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          VIN *
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="17 characters"
+                          value={mainInfo.vin}
+                          onChange={(e) =>
+                            handleInputChange("vin", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Make *
+                        </label>
+                        <input
+                          type="text"
+                          value={mainInfo.make}
+                          onChange={(e) =>
+                            handleInputChange("make", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Model *
+                        </label>
+                        <input
+                          type="text"
+                          value={mainInfo.model}
+                          onChange={(e) =>
+                            handleInputChange("model", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Year *
+                        </label>
+                        <input
+                          type="number"
+                          value={mainInfo.year}
+                          onChange={(e) =>
+                            handleInputChange("year", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                      <Input
-                        label="Price"
-                        type="number"
-                        startContent={
-                          <span className="text-default-400">$</span>
-                        }
-                        value={mainInfo.price}
-                        onChange={(e) =>
-                          handleInputChange("price", e.target.value)
-                        }
-                      />
-                      <Input
-                        label="Mileage"
-                        type="number"
-                        endContent={
-                          <span className="text-default-400 text-tiny">mi</span>
-                        }
-                        value={mainInfo.mileage}
-                        onChange={(e) =>
-                          handleInputChange("mileage", e.target.value)
-                        }
-                      />
-                      <Select
-                        label="Condition"
-                        defaultSelectedKeys={[mainInfo.condition]}
-                        onChange={(e) =>
-                          handleInputChange("condition", e.target.value)
-                        }
-                      >
-                        <SelectItem key="New">New</SelectItem>
-                        <SelectItem key="Used">Used</SelectItem>
-                        <SelectItem key="CPO">CPO</SelectItem>
-                      </Select>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Trim / Series
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. M Sport"
+                          value={mainInfo.trim}
+                          onChange={(e) =>
+                            handleInputChange("trim", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Color
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Alpine White"
+                          value={mainInfo.color}
+                          onChange={(e) =>
+                            handleInputChange("color", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Price
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground/40">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            value={mainInfo.price}
+                            onChange={(e) =>
+                              handleInputChange("price", e.target.value)
+                            }
+                            className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Mileage
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={mainInfo.mileage}
+                            onChange={(e) =>
+                              handleInputChange("mileage", e.target.value)
+                            }
+                            className="w-full px-3 py-2 text-sm bg-background border border-foreground/10 rounded-lg focus:outline-none focus:border-foreground/20 transition-colors"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground/40">
+                            mi
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-foreground/50">
+                          Condition
+                        </label>
+                        <Select
+                          aria-label="Condition"
+                          selectedKeys={[mainInfo.condition]}
+                          onChange={(e) =>
+                            handleInputChange("condition", e.target.value)
+                          }
+                          classNames={{
+                            trigger:
+                              "h-[38px] min-h-[38px] bg-background border border-foreground/10 rounded-lg",
+                            value: "text-sm",
+                          }}
+                        >
+                          <SelectItem key="New">New</SelectItem>
+                          <SelectItem key="Used">Used</SelectItem>
+                          <SelectItem key="CPO">CPO</SelectItem>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                 </div>
               </ModalBody>
 
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={handleSave}
-                  isLoading={isSaving}
-                  startContent={!isSaving && <Save size={18} />}
+              <ModalFooter className="border-t border-foreground/[0.06] pt-4">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm text-foreground/60 hover:text-foreground transition-colors"
                 >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background text-sm font-medium rounded-xl hover:bg-foreground/90 disabled:opacity-60 transition-all"
+                >
+                  {isSaving ? (
+                    <div className="size-4 border-2 border-background/20 border-t-background rounded-full animate-spin" />
+                  ) : (
+                    <Save className="size-4" />
+                  )}
                   Save to Inventory
-                </Button>
+                </button>
               </ModalFooter>
             </>
           )}
@@ -483,15 +552,3 @@ export default function AddCarModal({ isOpen, onClose, initialData }) {
     </>
   );
 }
-
-// Simple Icon helper
-const CheckCircleIcon = () => (
-  <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-    ></path>
-  </svg>
-);

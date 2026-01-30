@@ -111,10 +111,10 @@ export const ChatbotWidget = () => {
             }}
             exit={{ opacity: 0, y: 12 }}
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="w-[360px] mb-3 rounded-3xl bg-white/[0.08] backdrop-blur-2xl shadow-2xl shadow-black/40 overflow-hidden"
+            className="w-[360px] mb-3 rounded-3xl bg-[#1a1a1a] shadow-2xl shadow-black/40 overflow-hidden border border-white/10"
           >
             {/* HEADER */}
-            <div className="flex justify-between items-center px-5 py-4 border-b border-white/[0.08]">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                   <img
@@ -163,7 +163,7 @@ export const ChatbotWidget = () => {
 
                   {isTyping && (
                     <div className="flex justify-start">
-                      <div className="bg-white/10 px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1">
+                      <div className="bg-zinc-800 px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1">
                         <span className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                         <span className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                         <span className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce"></span>
@@ -174,7 +174,7 @@ export const ChatbotWidget = () => {
                 </div>
 
                 {/* FOOTER (Input) */}
-                <div className="px-5 pt-4 border-t border-white/[0.08]">
+                <div className="px-5 pt-4 border-t border-white/10">
                   <ChatInput
                     onSendMessage={handleSendMessage}
                     suggestions={suggestions}
@@ -196,7 +196,7 @@ export const ChatbotWidget = () => {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
             onClick={toggleChatbot}
-            className="relative w-14 h-14 rounded-full bg-black/90 backdrop-blur-xl flex items-center justify-center shadow-lg shadow-black/40 hover:shadow-xl transition-shadow border border-white/10"
+            className="relative w-14 h-14 rounded-full bg-white/10 backdrop-blur-2xl flex items-center justify-center shadow-lg shadow-black/40 hover:shadow-xl hover:bg-white/[0.15] transition-all border border-white/20"
           >
             <img
               src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AutoSense-icon.png"

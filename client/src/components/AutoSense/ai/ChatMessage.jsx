@@ -20,7 +20,7 @@ export const ChatMessage = ({ message }) => {
             px-4 py-2.5 text-[13px] leading-relaxed tracking-tight
             ${
               isBot
-                ? "bg-white/10 text-white/90 rounded-2xl rounded-tl-sm"
+                ? "bg-zinc-800 text-white/90 rounded-2xl rounded-tl-sm"
                 : "bg-white text-black rounded-2xl rounded-tr-sm"
             }
           `}
