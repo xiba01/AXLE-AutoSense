@@ -51,10 +51,7 @@ export const BreathingHotspot = ({
             ? "bg-primary shadow-[0_0_15px_rgba(var(--heroui-primary),0.8)] text-white"
             : "bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.8)] text-black",
         )}
-      >
-        {/* Optional Icon inside the dot */}
-        <Plus size={10} strokeWidth={4} />
-      </motion.div>
+      ></motion.div>
 
       {/* Touch Target Expansion */}
       <div className="absolute inset-0 -m-4 bg-transparent rounded-full" />

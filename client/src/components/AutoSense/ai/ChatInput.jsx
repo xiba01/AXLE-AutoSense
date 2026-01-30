@@ -26,6 +26,16 @@ export const ChatInput = ({
     setTimeout(() => onSendMessage(text), 100); // Auto send
   };
 
+  const handleKeyDown = (e) => {
+    // Stop event propagation to prevent conflicts with player controls
+    e.stopPropagation();
+  };
+
+  const handleKeyUp = (e) => {
+    // Stop event propagation to prevent conflicts with player controls
+    e.stopPropagation();
+  };
+
   return (
     <div className="relative w-full">
       {/* Suggestions Popup */}
@@ -69,6 +79,8 @@ export const ChatInput = ({
                 e.target.value === "" && suggestions.length > 0,
               );
             }}
+            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
             onFocus={() => {
               if (inputValue === "") setShowSuggestions(true);
             }}

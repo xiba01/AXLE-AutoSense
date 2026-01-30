@@ -27,7 +27,8 @@ export const HotspotLayer = () => {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full z-[60] pointer-events-none"
+      className="absolute inset-0 w-full h-full z-10 pointer-events-none"
+      style={{ position: "absolute" }}
     >
       {hotspots.map((hotspot) => {
         const IconComponent = Icons[toPascalCase(hotspot.icon)] || Icons.Circle;

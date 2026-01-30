@@ -5,7 +5,6 @@ import { X } from "lucide-react";
 import { SceneLayer } from "./SceneLayer";
 import { CanvasWrapper } from "../3d/CanvasWrapper";
 import { SlideContentLayer } from "./SlideContentLayer";
-import { HotspotLayer } from "../interactive/HotspotLayer";
 import { Subtitles } from "../playback/Subtitles";
 import { AudioPlayer } from "../playback/AudioPlayer";
 
@@ -32,7 +31,6 @@ export const StoryContainer = ({ enableAudio = true }) => {
         <SlideContentLayer />
       </div>
 
-      <HotspotLayer />
       <Subtitles />
 
       {/* Free roam exit control */}

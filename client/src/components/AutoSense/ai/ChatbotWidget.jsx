@@ -98,7 +98,12 @@ export const ChatbotWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-26 right-8 z-[60] flex flex-col items-end">
+    <div
+      className="fixed bottom-26 right-8 z-[60] flex flex-col items-end"
+      onKeyDown={(e) => e.stopPropagation()}
+      onKeyUp={(e) => e.stopPropagation()}
+      onKeyPress={(e) => e.stopPropagation()}
+    >
       {/* CHAT WINDOW */}
       <AnimatePresence>
         {isOpen && (

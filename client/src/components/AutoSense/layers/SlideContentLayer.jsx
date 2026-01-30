@@ -12,6 +12,7 @@ import {
   Trophy,
   Rotate3d,
   Check,
+  CheckCircle2,
   X as XIcon,
 } from "lucide-react";
 import { useStoryStore } from "../../../store/useStoryStore";
@@ -275,7 +276,12 @@ export const SlideContentLayer = () => {
                                         <h4 className="text-white font-bold text-sm mb-1.5">
                                           {badge.label}
                                         </h4>
-                                        <p className="text-xs text-white/60 leading-relaxed">
+                                        <p className="text-xs text-white/60 leading-relaxed flex items-center gap-1.5">
+                                          {(!badge.evidence ||
+                                            badge.evidence ===
+                                              "Verified Feature") && (
+                                            <CheckCircle2 className="size-3.5 text-white/60 shrink-0" />
+                                          )}
                                           {badge.evidence || "Verified Feature"}
                                         </p>
                                       </div>
@@ -293,7 +299,12 @@ export const SlideContentLayer = () => {
                                         <h4 className="text-white font-bold text-sm mb-1">
                                           {badge.label}
                                         </h4>
-                                        <p className="text-xs text-white/60 leading-snug">
+                                        <p className="text-xs text-white/60 leading-snug flex items-center gap-1.5">
+                                          {(!badge.evidence ||
+                                            badge.evidence ===
+                                              "Verified Feature") && (
+                                            <CheckCircle2 className="size-3.5 text-white/60 shrink-0" />
+                                          )}
                                           {badge.evidence || "Verified Feature"}
                                         </p>
                                       </div>

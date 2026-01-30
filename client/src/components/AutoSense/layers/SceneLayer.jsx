@@ -1,10 +1,14 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStoryStore } from "../../../store/useStoryStore";
+import { HotspotLayer } from "../interactive/HotspotLayer";
 
 export const SceneLayer = () => {
-  const { getCurrentScene } = useStoryStore();
+  const { getCurrentScene, activeHotspotId } = useStoryStore();
   const scene = getCurrentScene();
+  
+  // Pause Ken Burns when hovering a hotspot
+  const isHotspotHovered = !!activeHotspotId;
 
   // 1. SAFETY CHECK
   if (!scene) return null;
@@ -34,20 +38,30 @@ export const SceneLayer = () => {
       <AnimatePresence mode="popLayout">
         <motion.div
           key={scene.id}
-          className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            // Subtle "Ken Burns" Pan Effect
-            x: [0, -20, 0],
-            transition: {
-              opacity: { duration: 1 },
-              scale: { duration: 8, ease: "linear" },
-              x: { duration: 15, repeat: Infinity, repeatType: "reverse" },
-            },
-          }}
-          exit={{ opacity: 0 }}
+          className="absolute inset-0 origin-center"
+          style={{ willChange: "transform" }}
+          initial={{ opacity: 0, scale: 1.15 }}
+          animate={
+            isHotspotHovered
+              ? { opacity: 1 } // Freeze animation when hovering hotspot
+              : {
+                  opacity: 1,
+                  scale: [1.15, 1.08, 1.15],
+                  x: [0, -40, 0],
+                  y: [0, -20, 0],
+                }
+          }
+          transition={
+            isHotspotHovered
+              ? { opacity: { duration: 0.3 } }
+              : {
+                  opacity: { duration: 1.5, ease: "easeOut" },
+                  scale: { duration: 20, repeat: Infinity, ease: "linear" },
+                  x: { duration: 25, repeat: Infinity, ease: "linear" },
+                  y: { duration: 30, repeat: Infinity, ease: "linear" },
+                }
+          }
+          exit={{ opacity: 0, transition: { duration: 0.5 } }}
         >
           {/* Background Image */}
           <img
@@ -59,6 +73,9 @@ export const SceneLayer = () => {
           {/* Gradient Overlay for Text Readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent" />
+
+          {/* Hotspots - Now inherit the Ken Burns animation */}
+          <HotspotLayer />
         </motion.div>
       </AnimatePresence>
     </div>
