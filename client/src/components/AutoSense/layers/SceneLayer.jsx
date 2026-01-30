@@ -6,7 +6,7 @@ import { HotspotLayer } from "../interactive/HotspotLayer";
 export const SceneLayer = () => {
   const { getCurrentScene, activeHotspotId } = useStoryStore();
   const scene = getCurrentScene();
-  
+
   // Pause Ken Burns when hovering a hotspot
   const isHotspotHovered = !!activeHotspotId;
 

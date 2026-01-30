@@ -17,6 +17,9 @@ import Login from "./pages/Auth/Login";
 import Inventory from "./pages/Dashboard/Inventory";
 import StudioPage from "./pages/Dashboard/Studio/StudioPage";
 import ViewerPage from "./pages/Player/ViewerPage";
+import PublicLayout from "./layouts/PublicLayout";
+import Showroom from "./pages/Microsite/Showroom";
+import VehicleDetail from "./pages/Microsite/VehicleDetail";
 
 // Onboarding Pages
 import AccountStep from "./pages/Onboarding/AccountStep";
@@ -96,6 +99,10 @@ function App() {
         </Route>
       </Route>
       <Route path="/experience/:storyId" element={<ViewerPage />} />
+      <Route path="/sites/:dealerId" element={<PublicLayout />}>
+        <Route index element={<Showroom />} />
+        <Route path="inventory/:carId" element={<VehicleDetail />} />
+      </Route>
     </Routes>
   );
 }

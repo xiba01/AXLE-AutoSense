@@ -145,6 +145,56 @@ export const useStoryStore = create((set, get) => ({
   activeHotspotId: null,
   setActiveHotspot: (id) => set({ activeHotspotId: id }),
 
+  // --- EDITOR: UPDATE STORY DATA ---
+  updateStoryData: (newStoryData) => {
+    set({
+      story: newStoryData,
+      storyData: newStoryData,
+      scenes: newStoryData?.scenes || [],
+    });
+  },
+
+  // --- EDITOR: UPDATE CURRENT SCENE ---
+  updateCurrentScene: (updates) => {
+    const { scenes, currentSceneIndex, storyData } = get();
+    if (!scenes[currentSceneIndex]) return;
+
+    const currentScene = scenes[currentSceneIndex];
+    let updatedScene = { ...currentScene };
+
+    // Handle nested content updates (intro_content, slide_content, outro_content)
+    Object.keys(updates).forEach((key) => {
+      if (
+        ["intro_content", "slide_content", "outro_content"].includes(key) &&
+        typeof updates[key] === "object"
+      ) {
+        // Merge nested content
+        updatedScene[key] = {
+          ...updatedScene[key],
+          ...updates[key],
+        };
+      } else {
+        // Direct field update
+        updatedScene[key] = updates[key];
+      }
+    });
+
+    // Create new scenes array with updated scene
+    const newScenes = [...scenes];
+    newScenes[currentSceneIndex] = updatedScene;
+
+    // Update the store
+    set({
+      scenes: newScenes,
+      storyData: storyData
+        ? { ...storyData, scenes: newScenes }
+        : { scenes: newScenes },
+      story: storyData
+        ? { ...storyData, scenes: newScenes }
+        : { scenes: newScenes },
+    });
+  },
+
   // --- HELPER: Start experience (combines nextScene + play) ---
   startExperience: () => {
     const { scenes, currentSceneIndex } = get();

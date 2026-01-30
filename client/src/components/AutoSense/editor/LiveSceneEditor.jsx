@@ -28,9 +28,13 @@ import {
 } from "lucide-react";
 
 export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
-  const { updateCurrentScene, playback, setScene, storyData, getCurrentScene } =
-    useStoryStore();
-  const currentSceneIndex = playback.currentSceneIndex;
+  const {
+    updateCurrentScene,
+    currentSceneIndex,
+    goToScene,
+    storyData,
+    getCurrentScene,
+  } = useStoryStore();
 
   // 1. Sync Scene Selection
   useEffect(() => {
@@ -41,10 +45,10 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
       );
 
       if (index !== -1 && index !== currentSceneIndex) {
-        setScene(index);
+        goToScene(index);
       }
     }
-  }, [slide, setScene, currentSceneIndex, storyData]);
+  }, [slide, goToScene, currentSceneIndex, storyData]);
 
   const [previewEnabled, setPreviewEnabled] = useState(true);
 
@@ -58,7 +62,11 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
     // provided we pass the right structure.
 
     // Check if it's content-related
-    if (["headline", "paragraph", "title", "subtitle"].includes(key)) {
+    if (
+      ["headline", "paragraph", "title", "subtitle", "voiceover_text"].includes(
+        key,
+      )
+    ) {
       // Construct the nested object update
       // We let the store helper figure out if it's intro_content or slide_content
       // But to be safe, we can pass a flat object and let the store merge it
@@ -101,37 +109,61 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col bg-black/95 z-50">
+    <div className="absolute inset-0 flex flex-col bg-black z-50">
       {/* 1. TOP BAR */}
-      <div className="h-16 border-b border-white/10 flex items-center justify-between px-6 bg-zinc-900">
+      <div className="h-[60px] border-b border-white/5 flex items-center justify-between px-6 bg-gradient-to-b from-zinc-900 to-zinc-900/80 backdrop-blur-2xl">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <h3 className="font-bold text-white">Live Edit</h3>
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse" />
+            <h3 className="text-sm font-semibold text-white">Live Edit</h3>
           </div>
-          <div className="h-6 w-px bg-white/10" />
-          <span className="text-sm text-zinc-400 font-mono uppercase tracking-wider">
-            {slide?.title || "Unknown Scene"}
-          </span>
+          <div className="h-5 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+              Scene
+            </span>
+            <span className="text-xs font-medium text-zinc-300 bg-white/5 px-2 py-1 rounded-md">
+              {slide?.title || "Unknown"}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button isIconOnly size="sm" variant="flat" onPress={onPrev}>
-            <ChevronLeft size={18} />
+        <div className="flex items-center gap-1.5">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            radius="full"
+            onPress={onPrev}
+            className="bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white w-8 h-8"
+          >
+            <ChevronLeft size={16} />
           </Button>
-          <Button isIconOnly size="sm" variant="flat" onPress={onNext}>
-            <ChevronRight size={18} />
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            radius="full"
+            onPress={onNext}
+            className="bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white w-8 h-8"
+          >
+            <ChevronRight size={16} />
           </Button>
 
-          <div className="h-6 w-px bg-white/10 mx-2" />
+          <div className="h-5 w-px bg-white/10 mx-2" />
 
           <Button
             size="sm"
-            variant={previewEnabled ? "solid" : "bordered"}
-            color={previewEnabled ? "primary" : "default"}
+            variant="flat"
+            radius="full"
             onPress={() => setPreviewEnabled(!previewEnabled)}
+            className={
+              previewEnabled
+                ? "bg-primary/15 text-primary font-medium text-xs px-4"
+                : "bg-white/5 text-zinc-400 font-medium text-xs px-4"
+            }
             startContent={
-              previewEnabled ? <Eye size={16} /> : <EyeOff size={16} />
+              previewEnabled ? <Eye size={14} /> : <EyeOff size={14} />
             }
           >
             {previewEnabled ? "Preview On" : "Preview Off"}
@@ -161,102 +193,180 @@ export const LiveSceneEditor = ({ slide, onNext, onPrev }) => {
         </div>
 
         {/* RIGHT: SETTINGS PANEL */}
-        <div className="w-[400px] border-l border-white/10 bg-zinc-900 flex flex-col">
-          <div className="p-4 border-b border-white/10">
-            <Tabs
-              aria-label="Editor Tabs"
-              color="primary"
-              variant="underlined"
-              fullWidth
-            >
-              <Tab
-                key="content"
-                title={
-                  <div className="flex items-center gap-2">
-                    <Type size={16} /> Content
-                  </div>
-                }
-              >
-                <div className="pt-4 space-y-6">
-                  <Input
-                    label="Headline"
-                    variant="bordered"
-                    value={getValue("headline") || getValue("title")}
-                    onChange={(e) => handleUpdate("headline", e.target.value)}
-                  />
-                  <Textarea
-                    label="Narration Script"
-                    variant="bordered"
-                    minRows={4}
-                    value={getValue("paragraph") || getValue("voiceover_text")}
-                    onChange={(e) => handleUpdate("paragraph", e.target.value)}
-                  />
-                  {/* Stats Editors could go here */}
-                </div>
-              </Tab>
-              <Tab
-                key="visual"
-                title={
-                  <div className="flex items-center gap-2">
-                    <Palette size={16} /> Visual
-                  </div>
-                }
-              >
-                <div className="pt-4 space-y-6 text-white">
-                  <div>
-                    <label className="text-xs text-zinc-500 mb-2 block uppercase font-bold">
-                      Brightness
-                    </label>
-                    <Slider
-                      size="sm"
-                      step={0.1}
-                      minValue={0.5}
-                      maxValue={1.5}
-                      defaultValue={1.0}
-                      aria-label="Brightness"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Motion Blur</span>
-                    <Switch size="sm" defaultSelected />
-                  </div>
-                </div>
-              </Tab>
-              <Tab
-                key="timing"
-                title={
-                  <div className="flex items-center gap-2">
-                    <Clock size={16} /> Timing
-                  </div>
-                }
-              >
-                <div className="pt-4 space-y-6 text-white">
-                  <Input
-                    type="number"
-                    label="Duration (seconds)"
-                    variant="bordered"
-                    value={
-                      getValue("duration_ms")
-                        ? getValue("duration_ms") / 1000
-                        : 5
-                    }
-                    onChange={(e) =>
-                      handleUpdate(
-                        "duration_ms",
-                        parseFloat(e.target.value) * 1000,
-                      )
-                    }
-                  />
-                </div>
-              </Tab>
-            </Tabs>
+        <div className="w-[380px] border-l border-white/5 bg-zinc-900/50 backdrop-blur-xl flex flex-col">
+          {/* Panel Header */}
+          <div className="px-5 py-4 border-b border-white/5">
+            <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              Scene Settings
+            </h3>
           </div>
 
-          {/* Debug Info Footer */}
-          <div className="mt-auto p-4 border-t border-white/10 bg-black/20">
-            <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
-              <Layers size={12} />
-              <span>Scene ID: {slide?.id || "N/A"}</span>
+          {/* Tabs Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-5">
+              <Tabs
+                aria-label="Editor Tabs"
+                color="primary"
+                variant="underlined"
+                fullWidth
+                classNames={{
+                  tabList: "gap-4 border-b border-white/5 pb-0",
+                  tab: "px-0 h-10 text-xs font-medium",
+                  tabContent:
+                    "text-zinc-500 group-data-[selected=true]:text-white",
+                  cursor: "bg-primary",
+                  panel: "pt-5",
+                }}
+              >
+                <Tab
+                  key="content"
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Type size={14} /> Content
+                    </div>
+                  }
+                >
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+                        {currentSceneData?.type === "intro_view"
+                          ? "Title"
+                          : "Headline"}
+                      </label>
+                      <Input
+                        variant="bordered"
+                        radius="lg"
+                        size="sm"
+                        value={
+                          currentSceneData?.type === "intro_view"
+                            ? getValue("title")
+                            : getValue("headline")
+                        }
+                        onChange={(e) =>
+                          handleUpdate(
+                            currentSceneData?.type === "intro_view"
+                              ? "title"
+                              : "headline",
+                            e.target.value,
+                          )
+                        }
+                        classNames={{
+                          inputWrapper:
+                            "bg-white/5 border-white/10 hover:border-white/20 group-data-[focus=true]:border-primary",
+                          input: "text-sm text-white placeholder:text-zinc-600",
+                        }}
+                      />
+                    </div>
+                    {currentSceneData?.type !== "intro_view" && (
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+                          Narration Script
+                        </label>
+                        <Textarea
+                          variant="bordered"
+                          radius="lg"
+                          minRows={4}
+                          value={
+                            getValue("voiceover_text") || getValue("paragraph")
+                          }
+                          onChange={(e) =>
+                            handleUpdate("voiceover_text", e.target.value)
+                          }
+                          classNames={{
+                            inputWrapper:
+                              "bg-white/5 border-white/10 hover:border-white/20 group-data-[focus=true]:border-primary",
+                            input:
+                              "text-sm text-white placeholder:text-zinc-600",
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </Tab>
+                <Tab
+                  key="visual"
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Palette size={14} /> Visual
+                    </div>
+                  }
+                >
+                  <div className="space-y-5 text-white">
+                    <div className="space-y-3">
+                      <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+                        Brightness
+                      </label>
+                      <Slider
+                        size="sm"
+                        step={0.1}
+                        minValue={0.5}
+                        maxValue={1.5}
+                        defaultValue={1.0}
+                        aria-label="Brightness"
+                        classNames={{
+                          track: "bg-white/10",
+                          filler: "bg-primary",
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center py-2 px-3 bg-white/5 rounded-xl">
+                      <span className="text-sm text-zinc-300">Motion Blur</span>
+                      <Switch size="sm" defaultSelected color="primary" />
+                    </div>
+                  </div>
+                </Tab>
+                <Tab
+                  key="timing"
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} /> Timing
+                    </div>
+                  }
+                >
+                  <div className="space-y-5 text-white">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+                        Duration (seconds)
+                      </label>
+                      <Input
+                        type="number"
+                        variant="bordered"
+                        radius="lg"
+                        size="sm"
+                        value={
+                          getValue("duration_ms")
+                            ? getValue("duration_ms") / 1000
+                            : 5
+                        }
+                        onChange={(e) =>
+                          handleUpdate(
+                            "duration_ms",
+                            parseFloat(e.target.value) * 1000,
+                          )
+                        }
+                        classNames={{
+                          inputWrapper:
+                            "bg-white/5 border-white/10 hover:border-white/20 group-data-[focus=true]:border-primary",
+                          input: "text-sm text-white",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Tab>
+              </Tabs>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-white/5 bg-black/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[10px] text-zinc-600 font-mono">
+                <Layers size={10} />
+                <span>{slide?.id || "N/A"}</span>
+              </div>
+              <span className="text-[10px] text-zinc-600 font-medium uppercase">
+                {currentSceneData?.type?.replace("_", " ") || "Unknown"}
+              </span>
             </div>
           </div>
         </div>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, Reorder } from "framer-motion";
 import { useStoryStore } from "../../../store/useStoryStore";
+import { supabase } from "../../../config/supabaseClient";
 import { EditorSlide } from "./EditorSlide";
 import { LiveSceneEditor } from "./LiveSceneEditor";
-import { Button, Chip } from "@heroui/react";
+import { Button } from "@heroui/react";
 import {
   Play,
   Settings,
@@ -45,10 +46,18 @@ export const EditorView = ({ onExit }) => {
   const [selectedSlideId, setSelectedSlideId] = useState(null);
   const [showLiveEditor, setShowLiveEditor] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const isReorderingRef = useRef(false);
+  const isDraggingRef = useRef(false);
 
   // 1. Sync Store to Local State (Adapt Member 4's logic)
   useEffect(() => {
     if (!storyData?.scenes) return;
+
+    // Skip resync if we just reordered (we already have correct local state)
+    if (isReorderingRef.current) {
+      isReorderingRef.current = false;
+      return;
+    }
 
     const slides = storyData.scenes.map((scene, index) => {
       // Determine type for icon mapping
@@ -84,13 +93,30 @@ export const EditorView = ({ onExit }) => {
   };
 
   const handleReorder = (newOrder) => {
-    setEditorSlides(newOrder);
+    // Update local slides with new order indices
+    const updatedSlides = newOrder.map((slide, index) => ({
+      ...slide,
+      order: index,
+    }));
+    setEditorSlides(updatedSlides);
 
-    // Update the actual Store Data
-    // We need to map the new order back to the scenes array
-    const newScenes = newOrder.map((slide) => slide.originalData);
+    // Build new scenes array from the reordered slides
+    // We need to get fresh scene data from storyData.scenes by matching IDs
+    const newScenes = updatedSlides.map((slide) => {
+      const sceneId = slide.id;
+      // Find the actual scene in the current storyData
+      const actualScene = storyData.scenes.find(
+        (s) =>
+          s.scene_id === sceneId ||
+          `scene_${storyData.scenes.indexOf(s)}` === sceneId,
+      );
+      return actualScene || slide.originalData;
+    });
 
-    // This updates the Zustand store instantly
+    // Flag to prevent useEffect from re-syncing
+    isReorderingRef.current = true;
+
+    // Update store without triggering full resync
     updateStoryData({
       ...storyData,
       scenes: newScenes,
@@ -99,9 +125,23 @@ export const EditorView = ({ onExit }) => {
 
   const handleSaveToDB = async () => {
     setIsSaving(true);
-    console.log("Saving to Supabase:", storyData);
-    // TODO: Dispatch Redux Thunk to update 'stories' table
-    setTimeout(() => setIsSaving(false), 1000);
+    try {
+      // Get the latest storyData directly from the store to avoid stale closures
+      const latestStoryData = useStoryStore.getState().storyData;
+
+      const { error } = await supabase
+        .from("stories")
+        .update({ content: latestStoryData })
+        .eq("id", storyId);
+
+      if (error) throw error;
+      console.log("Story saved successfully!");
+    } catch (err) {
+      console.error("Failed to save story:", err);
+      alert("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!storyData)
@@ -110,40 +150,38 @@ export const EditorView = ({ onExit }) => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* HEADER */}
-      <div className="border-b border-white/10 bg-zinc-900/50 backdrop-blur-xl h-16 flex items-center px-6 justify-between shrink-0">
-        <div className="flex items-center gap-4">
+      <div className="border-b border-white/5 bg-gradient-to-b from-zinc-900/90 to-zinc-900/70 backdrop-blur-2xl h-[72px] flex items-center px-8 justify-between shrink-0">
+        <div className="flex items-center gap-5">
           <Button
             isIconOnly
             variant="light"
+            radius="full"
             onPress={onExit}
-            className="text-zinc-400 hover:text-white"
+            className="text-zinc-500 hover:text-white hover:bg-white/10 transition-all"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} />
           </Button>
-          <div className="flex flex-col">
-            <h1 className="text-sm font-bold text-white flex items-center gap-2">
-              {storyData.car_data?.model || "Untitled Project"}
-              <Chip
-                size="sm"
-                color="warning"
-                variant="flat"
-                className="text-[10px] h-5"
-              >
-                DRAFT
-              </Chip>
+          <div className="h-8 w-px bg-white/10" />
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-[15px] font-semibold text-white flex items-center gap-3">
+              {storyData.car?.model || storyData.title || "Untitled Project"}
+              <span className="text-[10px] font-medium bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                Draft
+              </span>
             </h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+            <p className="text-[11px] text-zinc-500 font-medium">
               AutoSense Editor
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {showLiveEditor && (
             <Button
               size="sm"
               variant="flat"
-              className="bg-white/5 text-white"
+              radius="full"
+              className="bg-white/5 text-zinc-300 hover:bg-white/10 font-medium text-xs px-4"
               onPress={() => setShowLiveEditor(false)}
             >
               Back to List
@@ -153,9 +191,13 @@ export const EditorView = ({ onExit }) => {
           <Button
             size="sm"
             variant="flat"
-            color={showLiveEditor ? "primary" : "default"}
-            className={showLiveEditor ? "" : "bg-white/5 text-zinc-400"}
-            startContent={<Eye size={16} />}
+            radius="full"
+            className={
+              showLiveEditor
+                ? "bg-primary/20 text-primary font-medium text-xs px-4"
+                : "bg-white/5 text-zinc-400 hover:bg-white/10 font-medium text-xs px-4"
+            }
+            startContent={<Eye size={14} />}
             onPress={() => {
               if (
                 !showLiveEditor &&
@@ -170,23 +212,27 @@ export const EditorView = ({ onExit }) => {
             {showLiveEditor ? "Exit Live Mode" : "Live Editor"}
           </Button>
 
+          <div className="h-6 w-px bg-white/10 mx-1" />
+
           <Button
             size="sm"
-            color="primary"
-            variant="shadow"
+            variant="flat"
+            radius="full"
             isLoading={isSaving}
             onPress={handleSaveToDB}
-            startContent={!isSaving && <Save size={16} />}
+            className="bg-white text-black font-semibold text-xs px-5 hover:bg-zinc-200"
+            startContent={!isSaving && <Save size={14} />}
           >
-            Save Changes
+            Save
           </Button>
 
           <Button
             size="sm"
-            color="success"
             variant="flat"
-            startContent={<Play size={16} />}
+            radius="full"
+            startContent={<Play size={14} />}
             onPress={handleLaunch}
+            className="bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 font-medium text-xs px-4"
           >
             Preview
           </Button>
@@ -203,17 +249,15 @@ export const EditorView = ({ onExit }) => {
               </h3>
               <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-2">
                 <p className="text-lg font-bold text-white">
-                  {storyData.car_data?.year} {storyData.car_data?.make}{" "}
-                  {storyData.car_data?.model}
+                  {storyData.car?.year} {storyData.car?.make}{" "}
+                  {storyData.car?.model}
                 </p>
-                <p className="text-xs text-zinc-400">
-                  {storyData.car_data?.trim}
-                </p>
+                <p className="text-xs text-zinc-400">{storyData.car?.trim}</p>
                 <div className="h-px bg-white/10 my-2" />
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">VIN</span>
-                  <span className="font-mono text-zinc-300">
-                    {storyData.car_data?.vin || "---"}
+                  <span className="text-zinc-500">Color</span>
+                  <span className="text-zinc-300">
+                    {storyData.car?.color || "---"}
                   </span>
                 </div>
               </div>
@@ -222,18 +266,18 @@ export const EditorView = ({ onExit }) => {
             <div className="space-y-3">
               <div className="p-3 bg-black/20 rounded-lg border border-white/5">
                 <p className="text-[10px] text-zinc-500 uppercase font-bold">
-                  Engine
+                  Body Type
                 </p>
                 <p className="text-sm text-zinc-300">
-                  {storyData.car_data?.specs?.engineHp || "220"} HP Hybrid
+                  {storyData.car?.body_type || "---"}
                 </p>
               </div>
               <div className="p-3 bg-black/20 rounded-lg border border-white/5">
                 <p className="text-[10px] text-zinc-500 uppercase font-bold">
-                  Performance
+                  Scenes
                 </p>
                 <p className="text-sm text-zinc-300">
-                  0-60: {storyData.car_data?.specs?.zero_to_sixty || "6.6"}s
+                  {storyData.scenes?.length || 0} Total
                 </p>
               </div>
             </div>
@@ -255,7 +299,22 @@ export const EditorView = ({ onExit }) => {
             <div className="absolute inset-0 z-10">
               <LiveSceneEditor
                 slide={selectedSlide}
-                // Add handlers for next/prev here
+                onNext={() => {
+                  const currentIndex = editorSlides.findIndex(
+                    (s) => s.id === selectedSlideId,
+                  );
+                  if (currentIndex < editorSlides.length - 1) {
+                    setSelectedSlideId(editorSlides[currentIndex + 1].id);
+                  }
+                }}
+                onPrev={() => {
+                  const currentIndex = editorSlides.findIndex(
+                    (s) => s.id === selectedSlideId,
+                  );
+                  if (currentIndex > 0) {
+                    setSelectedSlideId(editorSlides[currentIndex - 1].id);
+                  }
+                }}
               />
             </div>
           ) : (
@@ -278,7 +337,19 @@ export const EditorView = ({ onExit }) => {
                 {editorSlides.map((slide) => {
                   const Icon = slideIcons[slide.type] || Zap;
                   return (
-                    <Reorder.Item key={slide.id} value={slide}>
+                    <Reorder.Item
+                      key={slide.id}
+                      value={slide}
+                      onDragStart={() => {
+                        isDraggingRef.current = true;
+                      }}
+                      onDragEnd={() => {
+                        // Wait a bit before resetting to ensure click doesn't fire
+                        setTimeout(() => {
+                          isDraggingRef.current = false;
+                        }, 50);
+                      }}
+                    >
                       <div
                         className={cn(
                           "bg-zinc-900/80 border border-white/10 rounded-xl overflow-hidden cursor-pointer transition-all",
@@ -287,6 +358,9 @@ export const EditorView = ({ onExit }) => {
                             "ring-1 ring-primary border-primary bg-primary/5",
                         )}
                         onClick={() => {
+                          // Don't open editor if user just finished dragging
+                          if (isDraggingRef.current) return;
+
                           setSelectedSlideId(slide.id);
                           setShowLiveEditor(true);
                         }}
