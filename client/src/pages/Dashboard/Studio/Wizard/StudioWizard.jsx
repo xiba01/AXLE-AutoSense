@@ -61,16 +61,7 @@ export default function StudioWizard() {
   // Step 3 -> Finish (Redirect to Editor)
   const handleGenerationComplete = (apiResult) => {
     console.log("🎉 Pipeline Finished. Result:", apiResult);
-
-    // Check if we got a valid ID from the backend controller
-    if (apiResult && apiResult.storyId) {
-      // Redirect to the Full Screen Editor
-      navigate(`/editor/${apiResult.storyId}`);
-    } else {
-      // Fallback if something weird happened
-      console.error("Missing Story ID in response");
-      navigate("/dashboard/studio");
-    }
+    // Generation complete - no automatic redirect
   };
 
   return (
@@ -94,15 +85,15 @@ export default function StudioWizard() {
             </Button>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img
               src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AutoSenseLogo.png"
               alt="AutoSense"
-              className="h-6 sm:h-7 lg:h-8 w-auto"
+              className="h-6 sm:h-7 lg:h-8 w-auto brightness-0 invert"
             />
             <div className="flex items-center gap-2">
-              <div className="w-px h-5 sm:h-6 bg-white/20"></div>
-              <span className="text-base sm:text-lg font-semibold text-white tracking-tight">
+              {/* <div className="w-px h-5 sm:h-6 bg-white/20"></div> */}
+              <span className="text-lg sm:text-xl lg:text-2xl font-semibold text-white tracking-tight">
                 Creator
               </span>
             </div>

@@ -1,15 +1,7 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { Card, CardBody, Image, Chip } from "@heroui/react";
-import {
-  Fuel,
-  Gauge,
-  Calendar,
-  ArrowRight,
-  Box,
-  MapPin,
-  CheckCircle2,
-} from "lucide-react";
+import { Card, CardBody, Image } from "@heroui/react";
+import { Fuel, Gauge, Box, ArrowRight } from "lucide-react";
 
 export default function PublicCarCard({ car }) {
   const { dealerId } = useParams();
@@ -33,11 +25,11 @@ export default function PublicCarCard({ car }) {
   return (
     <Link to={`/sites/${dealerId}/inventory/${car.id}`} className="block">
       <Card
-        className="w-full group hover:-translate-y-1 transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-xl hover:border-gray-200 bg-white overflow-hidden rounded-2xl"
+        className="w-full group hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-xl bg-white overflow-hidden rounded-xl border border-transparent hover:border-gray-200"
         isPressable
       >
         {/* IMAGE HEADER */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           <Image
             removeWrapper
             src={image}
@@ -45,72 +37,54 @@ export default function PublicCarCard({ car }) {
             alt={title}
           />
 
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Top Badges Row */}
-          <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-            {/* Condition Badge */}
-            <div
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider shadow-lg backdrop-blur-sm ${
-                isNew
-                  ? "bg-emerald-500 text-white"
-                  : "bg-white/95 text-gray-800"
-              }`}
-            >
-              {car.specs_raw?.condition || "Pre-Owned"}
-            </div>
-
-            {/* AutoSense Badge */}
-            {has3D && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white backdrop-blur-sm text-[10px] font-semibold tracking-wide shadow-lg">
-                <Box size={11} />
+          {/* Top Badge */}
+          {has3D && (
+            <div className="absolute top-3 right-3 z-10">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-sm text-white text-xs font-medium shadow-lg">
+                <Box size={12} />
                 <span>AutoSense</span>
               </div>
-            )}
-          </div>
-
-          {/* Price Tag - Bottom Left */}
-          <div className="absolute bottom-3 left-3 z-10">
-            <div className="bg-white/98 backdrop-blur-md rounded-xl px-3.5 py-2 shadow-lg border border-white/20">
-              <p className="text-lg font-bold text-gray-900">{price}</p>
             </div>
-          </div>
+          )}
 
-          {/* Quick View Arrow */}
-          <div className="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-3 group-hover:translate-x-0">
-            <div className="size-10 bg-white/98 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/20">
-              <ArrowRight size={18} className="text-gray-900" />
-            </div>
-          </div>
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
         </div>
 
         {/* CONTENT BODY */}
-        <CardBody className="p-5 space-y-3.5">
-          {/* Title & Trim */}
-          <div>
-            <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
-              {title}
-            </h3>
-            <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">
-              {subtitle}
-            </p>
+        <CardBody className="p-4 space-y-3">
+          {/* Title & Price */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                {title}
+              </h3>
+              <p className="text-sm text-gray-500 truncate">{subtitle}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <p className="text-lg font-bold text-gray-900">{price}</p>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <ArrowRight size={18} className="text-gray-400" />
+              </div>
+            </div>
           </div>
 
-          {/* Key Specs - Inline Pills */}
-          <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-100">
-              <Gauge size={13} className="text-gray-400" />
+          {/* Key Specs */}
+          <div className="flex items-center gap-4 text-xs text-gray-600">
+            <span className="flex items-center gap-1.5">
+              <Gauge size={14} className="text-gray-400" />
               {car.mileage?.toLocaleString() || "0"} mi
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-100">
-              <Fuel size={13} className="text-gray-400" />
-              {car.specs_raw?.fuelType || "Gasoline"}
+            <span className="text-gray-300">•</span>
+            <span className="flex items-center gap-1.5">
+              <Fuel size={14} className="text-gray-400" />
+              {car.specs_raw?.fuelType || "Gas"}
             </span>
-            {car.specs_raw?.transmission && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-100">
-                {car.specs_raw.transmission}
-              </span>
+            {isNew && (
+              <>
+                <span className="text-gray-300">•</span>
+                <span className="text-emerald-600 font-medium">New</span>
+              </>
             )}
           </div>
         </CardBody>

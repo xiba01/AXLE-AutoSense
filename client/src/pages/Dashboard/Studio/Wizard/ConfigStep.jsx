@@ -85,24 +85,6 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
             </div>
           ))}
         </div>
-
-        {/* AI Insight Card */}
-        {/* <div className="bg-white/[0.04] rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
-              <Sparkles className="w-4 h-4 text-white/90" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-white/90 mb-1.5">
-                AI Suggestion
-              </p>
-              <p className="text-sm text-white/60 leading-relaxed">
-                We'll emphasize the {specs.driveWheels || "handling"} and
-                interior details based on the {car.year} model profile.
-              </p>
-            </div>
-          </div>
-        </div> */}
       </div>
 
       {/* ---------------------------------------------------------- */}

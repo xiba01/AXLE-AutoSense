@@ -275,25 +275,13 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
     };
   }, [activeStoryId]);
 
-  // 4. REDIRECT COUNTDOWN after completion
+  // 4. COMPLETION HANDLER (no automatic redirect)
   useEffect(() => {
     if (phase !== "complete") return;
 
-    const countdownInterval = setInterval(() => {
-      setRedirectCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval);
-          // Navigate to editor
-          navigate(`/editor/${activeStoryId}`);
-          onComplete?.();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(countdownInterval);
-  }, [phase, activeStoryId, navigate, onComplete]);
+    // Just call the completion callback
+    onComplete?.();
+  }, [phase, onComplete]);
 
   // --- RENDERING VARS ---
   const currentStep = GENERATION_STEPS[currentStepIndex];
@@ -301,13 +289,12 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
   const progressPercent =
     ((currentStepIndex + 1) / GENERATION_STEPS.length) * 100;
 
-  // Immediate redirect handler
+  // Manual redirect handler
   const handleImmediateRedirect = useCallback(() => {
     if (activeStoryId) {
-      navigate(`/editor/${activeStoryId}`);
-      onComplete?.();
+      navigate(`/dashboard/editor/${activeStoryId}`);
     }
-  }, [activeStoryId, navigate, onComplete]);
+  }, [activeStoryId, navigate]);
 
   // ERROR STATE
   if (error) {
@@ -733,12 +720,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                     className="group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-white text-black text-sm sm:text-base font-medium hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/20"
                   >
                     <span>Open Editor</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-black/50 text-sm">
-                        {redirectCountdown}s
-                      </span>
-                      <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
+                    <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 </motion.div>
               )}

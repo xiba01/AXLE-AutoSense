@@ -29,55 +29,6 @@ const AIWhisper = ({ text }) => (
 
 // --- MAIN ORCHESTRATOR ---
 export const AIIntentOrchestrator = () => {
-  const { currentIntent, uxMode, clearIntent } = useAIUXStore();
-  const { getCurrentScene } = useStoryStore();
-  const scene = getCurrentScene();
-
-  const [activeWhisper, setActiveWhisper] = useState(null);
-
-  // 1. Generate Automatic Intents based on Scene
-  useEffect(() => {
-    if (uxMode !== "guided" || !scene) return;
-
-    // Reset previous
-    setActiveWhisper(null);
-
-    // Logic: Determine whisper based on scene theme
-    let topic = null;
-    const theme = scene.slide_content?.theme_tag;
-
-    if (theme === "SAFETY") topic = "This model has a 5-Star NHTSA rating.";
-    else if (theme === "PERFORMANCE") topic = "The 0-60 time is best in class.";
-    else if (theme === "EFFICIENCY")
-      topic = "Great for city driving fuel economy.";
-
-    if (topic) {
-      // Delay the whisper so it doesn't pop up instantly
-      const timer = setTimeout(() => {
-        setActiveWhisper(topic);
-      }, 3000); // 3 seconds after scene starts
-      return () => clearTimeout(timer);
-    }
-  }, [scene, uxMode]);
-
-  // 2. Handle Manual Intents (from Store)
-  useEffect(() => {
-    if (!currentIntent) return;
-
-    if (currentIntent.type === "reassure") {
-      setActiveWhisper(currentIntent.message);
-      // Auto-hide after 5 seconds
-      const timer = setTimeout(() => {
-        setActiveWhisper(null);
-        clearIntent();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIntent, clearIntent]);
-
-  return (
-    <AnimatePresence>
-      {activeWhisper && <AIWhisper key="whisper" text={activeWhisper} />}
-    </AnimatePresence>
-  );
+  // Insight cards disabled
+  return null;
 };

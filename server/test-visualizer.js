@@ -2,7 +2,7 @@ const { visualizeStory } = require("./src/services/media/visualizerAgent.js");
 
 const mockContext = {
   identity: { make: "Dacia", model: "Duster", year: 2022, body_type: "SUV" },
-  visuals: { image_prompt_color: "Phytonic Blue Metallic" },
+  visual_directives: { image_prompt_color: "Phytonic Blue Metallic" },
 };
 
 const mockStoryboard = {

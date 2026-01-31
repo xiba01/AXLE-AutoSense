@@ -35,33 +35,34 @@ export const SceneLayer = () => {
 
   return (
     <div className="absolute inset-0 z-0 bg-black">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="wait">
         <motion.div
           key={scene.id}
           className="absolute inset-0 origin-center"
           style={{ willChange: "transform" }}
-          initial={{ opacity: 0, scale: 1.15 }}
+          initial={{ opacity: 0, scale: 1 }}
           animate={
             isHotspotHovered
-              ? { opacity: 1 } // Freeze animation when hovering hotspot
+              ? { opacity: 1, scale: 1 } // Freeze animation when hovering hotspot
               : {
                   opacity: 1,
-                  scale: [1.15, 1.08, 1.15],
-                  x: [0, -40, 0],
-                  y: [0, -20, 0],
+                  scale: [1, 1.08, 1],
                 }
           }
           transition={
             isHotspotHovered
-              ? { opacity: { duration: 0.3 } }
+              ? { opacity: { duration: 0.3 }, scale: { duration: 0.3 } }
               : {
-                  opacity: { duration: 1.5, ease: "easeOut" },
-                  scale: { duration: 20, repeat: Infinity, ease: "linear" },
-                  x: { duration: 25, repeat: Infinity, ease: "linear" },
-                  y: { duration: 30, repeat: Infinity, ease: "linear" },
+                  opacity: { duration: 0.8, ease: "easeOut" },
+                  scale: { 
+                    duration: 20, 
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  },
                 }
           }
-          exit={{ opacity: 0, transition: { duration: 0.5 } }}
+          exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
         >
           {/* Background Image */}
           <img

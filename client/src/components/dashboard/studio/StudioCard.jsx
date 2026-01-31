@@ -67,12 +67,12 @@ export default function StudioCard({
         {/* Top Bar */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
           <span
-            className={`px-2 py-1 text-[10px] font-medium rounded-md ${
+            className={`px-2 py-1 text-[10px] font-medium rounded-md backdrop-blur-sm ${
               isTrash
-                ? "bg-red-500/20 text-red-300"
+                ? "bg-red-500/80 text-white"
                 : car.storyStatus === "published"
-                  ? "bg-green-500/20 text-green-300"
-                  : "bg-yellow-500/20 text-yellow-300"
+                  ? "bg-green-500/80 text-white"
+                  : "bg-yellow-500/80 text-white"
             }`}
           >
             {isTrash ? "Deleted" : car.storyStatus || "Draft"}
