@@ -65,7 +65,7 @@ export default function StudioWizard() {
     // Check if we got a valid ID from the backend controller
     if (apiResult && apiResult.storyId) {
       // Redirect to the Full Screen Editor
-      navigate(`/dashboard/editor/${apiResult.storyId}`);
+      navigate(`/editor/${apiResult.storyId}`);
     } else {
       // Fallback if something weird happened
       console.error("Missing Story ID in response");
@@ -80,8 +80,8 @@ export default function StudioWizard() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
 
       {/* HEADER */}
-      <header className="relative z-50 flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-4">
+      <header className="relative z-50 flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 border-b border-white/5">
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
           {/* Only show back button on Steps 1 & 2 */}
           {step < 3 && (
             <Button
@@ -94,37 +94,52 @@ export default function StudioWizard() {
             </Button>
           )}
 
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <span className="text-primary">AutoSense</span> Creator
-            </h1>
-            <p className="text-xs text-neutral-400 uppercase tracking-widest font-semibold">
-              Step {step} / 3:{" "}
-              {step === 1
-                ? "Select Vehicle"
-                : step === 2
-                  ? "Configuration"
-                  : "Processing"}
-            </p>
+          <div className="flex items-center gap-3">
+            <img
+              src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AutoSenseLogo.png"
+              alt="AutoSense"
+              className="h-6 sm:h-7 lg:h-8 w-auto"
+            />
+            <div className="flex items-center gap-2">
+              <div className="w-px h-5 sm:h-6 bg-white/20"></div>
+              <span className="text-base sm:text-lg font-semibold text-white tracking-tight">
+                Creator
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Close Button (Hidden during generation to prevent accidental exit) */}
-        {step < 3 && (
-          <Button
-            isIconOnly
-            variant="light"
-            color="danger"
-            className="text-white/50 hover:text-white hover:bg-white/10"
-            onPress={handleClose}
-          >
-            <X size={24} />
-          </Button>
-        )}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="hidden sm:flex flex-col items-end">
+            <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">
+              {step === 1
+                ? "Select Vehicle"
+                : step === 2
+                  ? "Configure Story"
+                  : "Processing"}
+            </p>
+            <p className="text-xs text-white/60 font-medium">
+              Step {step} of 3
+            </p>
+          </div>
+
+          {/* Close Button (Hidden during generation to prevent accidental exit) */}
+          {step < 3 && (
+            <Button
+              isIconOnly
+              variant="light"
+              color="danger"
+              className="text-white/50 hover:text-white hover:bg-white/10"
+              onPress={handleClose}
+            >
+              <X size={24} />
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* CONTENT AREA */}
-      <div className="relative z-10 flex-1 w-full max-w-7xl mx-auto p-6 md:p-8 flex flex-col">
+      <div className="relative z-10 flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
         <AnimatePresence mode="wait">
           {/* STEP 1: CAR SELECTOR */}
           {step === 1 && (

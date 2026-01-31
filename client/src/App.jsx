@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Landing/Home";
 import Login from "./pages/Auth/Login";
 import Inventory from "./pages/Dashboard/Inventory";
+import DashboardHome from "./pages/Dashboard/DashboardHome";
 import StudioPage from "./pages/Dashboard/Studio/StudioPage";
 import ViewerPage from "./pages/Player/ViewerPage";
 import PublicLayout from "./layouts/PublicLayout";
@@ -85,7 +86,7 @@ function App() {
         {/* The Layout wraps all inner pages */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           {/* Inner Pages */}
-          <Route index element={<div>Dashboard Home (Coming Soon)</div>} />
+          <Route index element={<DashboardHome />} />
           <Route path="inventory" element={<Inventory />} />
           {/* Index: All Stories */}
           <Route path="studio" element={<StudioPage />} />

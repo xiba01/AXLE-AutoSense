@@ -67,15 +67,27 @@ async function processSingleScene(scene, carContext) {
     if (updatedHotspots.length > 0 && imageUrl) {
       const coordsMap = await scanHotspots(imageUrl, updatedHotspots);
 
-      // Merge the discovered coordinates
-      updatedHotspots = updatedHotspots.map((spot) => {
-        const discovered = coordsMap[spot.id];
-        return {
-          ...spot,
-          x: discovered?.x || spot.x || 50,
-          y: discovered?.y || spot.y || 50,
-        };
-      });
+      // Filter out hotspots that couldn't be located (no valid coords from vision scan)
+      // This removes hotspots where the AI failed to identify their position
+      updatedHotspots = updatedHotspots
+        .filter((spot) => {
+          const discovered = coordsMap[spot.id];
+          if (!discovered) {
+            console.log(
+              `   🗑️  Removing hotspot "${spot.label}" (not found in image)`,
+            );
+            return false;
+          }
+          return true;
+        })
+        .map((spot) => {
+          const discovered = coordsMap[spot.id];
+          return {
+            ...spot,
+            x: discovered.x,
+            y: discovered.y,
+          };
+        });
     }
 
     // 3. Return Updated Scene

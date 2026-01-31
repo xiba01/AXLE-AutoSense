@@ -27,21 +27,34 @@ export const fetchStudioData = createAsyncThunk(
 
       if (error) throw error;
 
-      // --- LOGIC FIX: Handle Empty Arrays Correctly ---
+      // --- LOGIC FIX: INTELLIGENT STORY SELECTION ---
       const studioItems = data.map((car) => {
+        let storiesList = [];
+
+        // 1. Normalize to Array
+        if (Array.isArray(car.stories)) {
+          storiesList = car.stories;
+        } else if (car.stories && typeof car.stories === "object") {
+          storiesList = [car.stories];
+        }
+
         let activeStory = null;
 
-        // 1. Handle One-to-Many (Array)
-        if (Array.isArray(car.stories)) {
-          if (car.stories.length > 0) {
-            activeStory = car.stories[0];
-          } else {
-            activeStory = null; // Explicitly null if empty array
-          }
-        }
-        // 2. Handle One-to-One (Single Object, not Array, not null)
-        else if (car.stories && typeof car.stories === "object") {
-          activeStory = car.stories;
+        if (storiesList.length > 0) {
+          // 2. SORTING: Prioritize Active (null deleted_at) + Newest First
+          storiesList.sort((a, b) => {
+            // Rule A: Active stories come before Deleted stories
+            const aIsActive = a.deleted_at === null;
+            const bIsActive = b.deleted_at === null;
+            if (aIsActive && !bIsActive) return -1;
+            if (!aIsActive && bIsActive) return 1;
+
+            // Rule B: Tie-breaker - Newest created comes first
+            return new Date(b.created_at) - new Date(a.created_at);
+          });
+
+          // 3. Pick the winner
+          activeStory = storiesList[0];
         }
 
         return {
@@ -51,7 +64,7 @@ export const fetchStudioData = createAsyncThunk(
           // A. Does this car have ANY story record?
           hasStoryHistory: !!activeStory,
 
-          // B. Is the story currently in the Trash?
+          // B. Is the *selected* story currently in the Trash?
           isDeleted: activeStory ? !!activeStory.deleted_at : false,
 
           // C. Is the story live and NOT deleted?
@@ -61,7 +74,7 @@ export const fetchStudioData = createAsyncThunk(
         };
       });
 
-      console.log("🔥 Studio Data Fetched:", studioItems);
+      // console.log("🔥 Studio Data Fetched:", studioItems);
       return studioItems;
     } catch (error) {
       console.error("Studio Fetch Error:", error);

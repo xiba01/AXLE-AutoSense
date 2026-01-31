@@ -1,6 +1,6 @@
 const { z } = require("zod");
 
-// 1. Stats for the Slide (The 3 numbers below the text)
+// 1. Stats for the Slide
 const KeyStatSchema = z.object({
   label: z.string().describe("Short label, e.g., 'Boot Space'"),
   value: z.string().describe("The number, e.g., '1444'"),
@@ -16,7 +16,10 @@ const HotspotContentSchema = z.object({
   detail_body: z.string().describe("1 sentence description for the popup card"),
 });
 
-// 2. Slide Content (For standard scenes)
+// Helper: Count words
+const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
+
+// 2. Slide Content
 const SlideScriptSchema = z.object({
   headline: z
     .string()
@@ -24,26 +27,30 @@ const SlideScriptSchema = z.object({
   paragraph: z
     .string()
     .describe(
-      "Professional description, approx 40 words. Factual but engaging."
+      "Professional description, approx 40 words. Factual but engaging.",
     ),
+
+  // --- THE FIX IS HERE ---
   voiceover_text: z
     .string()
+    .refine(
+      (text) => {
+        const wordCount = countWords(text);
+        // Relaxed range: 5 to 60 words prevents crashes
+        return wordCount >= 5 && wordCount <= 60;
+      },
+      { message: "Voiceover must be between 5 and 60 words" },
+    )
     .describe(
-      "Spoken script. Conversational, emotional, approx 15-20 words. No Markdown."
+      "Spoken script. Conversational, emotional, approx 2 sentences. No Markdown.",
     ),
-  key_stats: z
-    .array(KeyStatSchema)
-    .max(3)
-    .describe("Pick up to 3 relevant specs from the context for this scene."),
-  suggested_hotspots: z
-    .array(HotspotContentSchema)
-    .max(2)
-    .describe(
-      "Identify 1 or 2 distinct visual elements visible in this scene to be clickable hotspots."
-    ),
+  // -----------------------
+
+  key_stats: z.array(KeyStatSchema).max(3),
+  suggested_hotspots: z.array(HotspotContentSchema).max(2).optional(),
 });
 
-// 3. Intro Content (For Scene 00)
+// 3. Intro Content
 const IntroScriptSchema = z.object({
   title: z.string().describe("The main title of the experience"),
   subtitle: z.string().describe("The sub-headline, usually Year Make Model"),
@@ -52,20 +59,14 @@ const IntroScriptSchema = z.object({
     .describe("Inviting CTA, e.g., 'Start Adventure'"),
 });
 
-// 4. Outro Content (For Scene 99)
+// 4. Outro Content
 const OutroScriptSchema = z.object({
   headline: z.string().describe("Final closing statement"),
   subheadline: z.string().describe("Call to action text"),
-  cta_button_primary: z
-    .string()
-    .describe("Primary button text, e.g., 'Book Test Drive'"),
-  cta_button_secondary: z
-    .string()
-    .describe("Secondary button text, e.g., 'Replay Story'"),
+  cta_button_primary: z.string().describe("Primary button text"),
+  cta_button_secondary: z.string().describe("Secondary button text"),
 });
 
-// 5. The Container for the AI Output
-// The AI will return ONE of these depending on the scene type requested
 const ScriptOutputSchema = z.object({
   slide_content: SlideScriptSchema.optional(),
   intro_content: IntroScriptSchema.optional(),

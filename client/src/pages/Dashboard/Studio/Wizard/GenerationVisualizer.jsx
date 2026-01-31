@@ -284,7 +284,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
         if (prev <= 1) {
           clearInterval(countdownInterval);
           // Navigate to editor
-          navigate(`/dashboard/editor/${activeStoryId}`);
+          navigate(`/editor/${activeStoryId}`);
           onComplete?.();
           return 0;
         }
@@ -304,7 +304,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
   // Immediate redirect handler
   const handleImmediateRedirect = useCallback(() => {
     if (activeStoryId) {
-      navigate(`/dashboard/editor/${activeStoryId}`);
+      navigate(`/editor/${activeStoryId}`);
       onComplete?.();
     }
   }, [activeStoryId, navigate, onComplete]);
@@ -312,7 +312,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
   // ERROR STATE
   if (error) {
     return (
-      <div className="w-full h-[700px] flex flex-col items-center justify-center bg-gradient-to-b from-neutral-950 via-neutral-900 to-black rounded-[2rem] border border-red-500/20 p-10 text-center relative overflow-hidden">
+      <div className="w-full h-125 sm:h-150 lg:h-175 max-h-[85vh] flex flex-col items-center justify-center bg-linear-to-b from-neutral-950 via-neutral-900 to-black rounded-2xl sm:rounded-3xl lg:rounded-4xl border border-red-500/20 p-6 sm:p-8 lg:p-10 text-center relative overflow-hidden">
         {/* Error ambient glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(239,68,68,0.15)_0%,_transparent_70%)]" />
 
@@ -321,13 +321,13 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
           animate={{ scale: 1, opacity: 1 }}
           className="relative z-10"
         >
-          <div className="p-6 bg-gradient-to-b from-red-500/20 to-red-500/5 rounded-full mb-6 backdrop-blur-xl border border-red-500/20">
-            <AlertTriangle className="size-12 text-red-400" />
+          <div className="p-4 sm:p-6 bg-linear-to-b from-red-500/20 to-red-500/5 rounded-full mb-4 sm:mb-6 backdrop-blur-xl border border-red-500/20">
+            <AlertTriangle className="size-8 sm:size-10 lg:size-12 text-red-400" />
           </div>
-          <h2 className="text-3xl font-semibold text-white mb-3 tracking-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 sm:mb-3 tracking-tight">
             Generation Failed
           </h2>
-          <p className="text-neutral-400 mb-8 max-w-md text-lg leading-relaxed">
+          <p className="text-neutral-400 mb-6 sm:mb-8 max-w-md text-sm sm:text-base lg:text-lg leading-relaxed">
             {error}
           </p>
           <button
@@ -343,7 +343,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
 
   // --- RENDER UI ---
   return (
-    <div className="w-full h-[700px] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-neutral-950 via-[#0a0a0f] to-black rounded-[2rem] border border-white/[0.08] shadow-2xl">
+    <div className="w-full h-125 sm:h-150 lg:h-175 max-h-[85vh] flex flex-col items-center justify-center relative overflow-hidden bg-linear-to-b from-neutral-950 via-[#0a0a0f] to-black rounded-2xl sm:rounded-3xl lg:rounded-4xl border border-white/8 shadow-2xl">
       {/* === AMBIENT BACKGROUND LAYERS === */}
       <div className="absolute inset-0 z-0">
         {/* Dynamic color glow based on current step */}
@@ -356,7 +356,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
         />
 
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] opacity-50" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[60px_60px] opacity-50" />
 
         {/* Radial fade overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]" />
@@ -422,7 +422,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             </div>
 
             {/* Scan grid overlay */}
-            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px]" />
+            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-size-[30px_30px]" />
 
             {/* Scanning beam */}
             <motion.div
@@ -438,15 +438,15 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             />
 
             {/* Corner brackets */}
-            <div className="absolute inset-8 z-30">
+            <div className="absolute inset-4 sm:inset-6 lg:inset-8 z-30">
               {/* Top-left */}
-              <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-cyan-400/50 rounded-tl-lg" />
+              <div className="absolute top-0 left-0 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 border-t-2 border-l-2 border-cyan-400/50 rounded-tl-lg" />
               {/* Top-right */}
-              <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-cyan-400/50 rounded-tr-lg" />
+              <div className="absolute top-0 right-0 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 border-t-2 border-r-2 border-cyan-400/50 rounded-tr-lg" />
               {/* Bottom-left */}
-              <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-cyan-400/50 rounded-bl-lg" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 border-b-2 border-l-2 border-cyan-400/50 rounded-bl-lg" />
               {/* Bottom-right */}
-              <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-cyan-400/50 rounded-br-lg" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 border-b-2 border-r-2 border-cyan-400/50 rounded-br-lg" />
             </div>
 
             {/* Center reticle */}
@@ -455,7 +455,10 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
               >
-                <Aperture className="size-32 text-white/10" strokeWidth={0.5} />
+                <Aperture
+                  className="size-20 sm:size-24 lg:size-32 text-white/10"
+                  strokeWidth={0.5}
+                />
               </motion.div>
               <motion.div
                 className="absolute inset-0 flex items-center justify-center"
@@ -471,20 +474,20 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             </div>
 
             {/* Status HUD */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30">
+            <div className="absolute bottom-6 sm:bottom-8 lg:bottom-12 left-1/2 -translate-x-1/2 z-30">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex flex-col items-center gap-3"
+                className="flex flex-col items-center gap-2 sm:gap-3"
               >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-xl border border-cyan-500/30">
+                <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/60 backdrop-blur-xl border border-cyan-500/30">
                   <div className="size-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-cyan-400">
+                  <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.15em] sm:tracking-[0.2em] text-cyan-400">
                     Analyzing Vehicle
                   </span>
                 </div>
-                <p className="text-white/60 text-sm">
+                <p className="text-white/60 text-xs sm:text-sm">
                   {car?.year} {car?.make} {car?.model}
                 </p>
               </motion.div>
@@ -502,7 +505,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             className="relative z-10 flex flex-col items-center justify-center w-full h-full"
           >
             {/* === MAIN PROGRESS ORB === */}
-            <div className="relative mb-12">
+            <div className="relative mb-6 sm:mb-8 lg:mb-12">
               {/* Outer glow ring */}
               <motion.div
                 animate={{
@@ -513,22 +516,38 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
               />
 
               {/* Orbital rings */}
-              <div className="relative size-56">
+              <div className="relative size-40 sm:size-48 lg:size-56">
                 {orbits.map((orbit) => (
                   <motion.div
                     key={orbit.id}
-                    className="absolute top-1/2 left-1/2 rounded-full border border-white/[0.06]"
+                    className="absolute top-1/2 left-1/2 rounded-full border border-white/6"
                     style={{
                       width: orbit.radius * 2,
                       height: orbit.radius * 2,
                       marginLeft: -orbit.radius,
                       marginTop: -orbit.radius,
                     }}
-                    animate={{ rotate: 360 }}
+                    animate={{
+                      rotate: 360,
+                      scale: [1, 1.05, 1],
+                      opacity: [0.3, 0.6, 0.3],
+                    }}
                     transition={{
-                      duration: orbit.duration,
-                      repeat: Infinity,
-                      ease: "linear",
+                      rotate: {
+                        duration: orbit.duration,
+                        repeat: Infinity,
+                        ease: "linear",
+                      },
+                      scale: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                      opacity: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
                     }}
                   >
                     {Array.from({ length: orbit.dotCount }).map((_, i) => (
@@ -601,7 +620,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                           ? `0 0 60px 20px ${currentStep.color}40`
                           : `0 0 40px 10px ${currentStep.color}30`,
                     }}
-                    className="relative bg-gradient-to-b from-neutral-800/80 to-neutral-900/80 backdrop-blur-xl border border-white/10 p-8 rounded-full"
+                    className="relative bg-linear-to-b from-neutral-800/80 to-neutral-900/80 backdrop-blur-xl border border-white/10 p-4 sm:p-6 lg:p-8 rounded-full"
                   >
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -616,7 +635,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                         }}
                       >
                         <Icon
-                          className={`size-14 ${currentStep.colorClass}`}
+                          className={`size-8 sm:size-10 lg:size-14 ${currentStep.colorClass}`}
                           strokeWidth={1.5}
                         />
                       </motion.div>
@@ -627,7 +646,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             </div>
 
             {/* === STATUS TEXT === */}
-            <div className="w-full max-w-xl text-center px-6">
+            <div className="w-full max-w-xl text-center px-4 sm:px-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep.id}
@@ -653,12 +672,12 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                   </div>
 
                   {/* Main message */}
-                  <h2 className="text-4xl font-semibold text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-white tracking-tight">
                     {currentStep.msg}
                   </h2>
 
                   {/* Subtitle */}
-                  <p className="text-lg text-white/40">
+                  <p className="text-sm sm:text-base lg:text-lg text-white/40">
                     {currentStep.subtitle}
                   </p>
                 </motion.div>
@@ -666,7 +685,7 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             </div>
 
             {/* === STEP PROGRESS DOTS === */}
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2">
+            <div className="absolute bottom-16 sm:bottom-20 lg:bottom-24 left-1/2 -translate-x-1/2">
               <div className="flex items-center gap-1.5">
                 {GENERATION_STEPS.map((step, idx) => (
                   <motion.div
@@ -707,11 +726,11 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                  className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 -translate-x-1/2"
                 >
                   <button
                     onClick={handleImmediateRedirect}
-                    className="group flex items-center gap-3 px-6 py-3 rounded-full bg-white text-black font-medium hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/20"
+                    className="group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-white text-black text-sm sm:text-base font-medium hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/20"
                   >
                     <span>Open Editor</span>
                     <div className="flex items-center gap-2">
@@ -736,11 +755,11 @@ export default function GenerationVisualizer({ car, config, onComplete }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+            className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 -translate-x-1/2 z-10"
           >
-            <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-xl">
-              <Loader2 className="size-4 text-white/40 animate-spin" />
-              <span className="text-sm text-white/50">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/3 border border-white/6 backdrop-blur-xl">
+              <Loader2 className="size-3 sm:size-4 text-white/40 animate-spin" />
+              <span className="text-xs sm:text-sm text-white/50">
                 Generating your experience. Please wait...
               </span>
             </div>

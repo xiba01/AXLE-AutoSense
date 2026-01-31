@@ -13,11 +13,36 @@ const visionModel = new ChatGroq({
   },
 });
 
+/**
+ * Robust JSON extraction that handles nested objects and trailing text.
+ * Matches balanced braces to find the complete JSON object.
+ */
+function extractBalancedJson(content) {
+  const startIdx = content.indexOf("{");
+  if (startIdx === -1) return null;
+
+  let braceCount = 0;
+  let endIdx = -1;
+
+  for (let i = startIdx; i < content.length; i++) {
+    if (content[i] === "{") braceCount++;
+    else if (content[i] === "}") braceCount--;
+
+    if (braceCount === 0) {
+      endIdx = i;
+      break;
+    }
+  }
+
+  if (endIdx === -1) return null;
+  return content.substring(startIdx, endIdx + 1);
+}
+
 async function scanHotspots(imageUrl, hotspots) {
   if (!hotspots || hotspots.length === 0) return {};
 
   console.log(
-    `   👁️  Vision Scanner: Looking for ${hotspots.length} items in image...`
+    `   👁️  Vision Scanner: Looking for ${hotspots.length} items in image...`,
   );
 
   try {
@@ -48,25 +73,51 @@ async function scanHotspots(imageUrl, hotspots) {
     const content = response.content;
 
     // --- ROBUST JSON EXTRACTION ---
-    // Even with JSON mode, we keep this extraction logic as a safety net
-    // in case the model adds whitespace or newlines.
-    const firstBrace = content.indexOf("{");
-    const lastBrace = content.lastIndexOf("}");
+    // Use balanced brace matching to extract valid JSON even if model
+    // adds trailing text or commentary after the JSON object.
+    const jsonStr = extractBalancedJson(content);
 
-    if (firstBrace === -1 || lastBrace === -1) {
-      // If JSON mode failed completely (rare), fallback to empty
+    if (!jsonStr) {
       throw new Error("No JSON object found in response");
     }
 
-    const jsonStr = content.substring(firstBrace, lastBrace + 1);
     const coordinatesMap = JSON.parse(jsonStr);
 
-    console.log("   👁️  Vision Scanner: Targets acquired.");
-    return coordinatesMap;
+    // Validate that coordinates are reasonable numbers
+    const validatedMap = {};
+    for (const [id, coords] of Object.entries(coordinatesMap)) {
+      if (
+        coords &&
+        typeof coords.x === "number" &&
+        typeof coords.y === "number" &&
+        coords.x >= 0 &&
+        coords.x <= 100 &&
+        coords.y >= 0 &&
+        coords.y <= 100
+      ) {
+        validatedMap[id] = coords;
+      } else {
+        console.warn(
+          `   ⚠️ Invalid coords for hotspot "${id}", will be removed`,
+        );
+      }
+    }
+
+    const foundCount = Object.keys(validatedMap).length;
+    const requestedCount = hotspots.length;
+    if (foundCount === requestedCount) {
+      console.log("   👁️  Vision Scanner: Targets acquired.");
+    } else {
+      console.log(
+        `   👁️  Vision Scanner: Found ${foundCount}/${requestedCount} targets.`,
+      );
+    }
+
+    return validatedMap;
   } catch (error) {
     console.warn(
       "   ⚠️ Vision Scan Failed (Using default coords):",
-      error.message
+      error.message,
     );
     return {};
   }

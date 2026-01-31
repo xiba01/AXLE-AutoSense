@@ -34,9 +34,73 @@ export const ChatbotWidget = () => {
   const messagesEndRef = useRef(null);
 
   const currentScene = getCurrentScene();
-  // IMPORTANT: We need to extract the car object from the loaded storyData
-  // Assuming storyData has a 'car' or 'carId' field populated by the Loader
-  const currentCar = storyData?.car_data || storyData?.car || {};
+
+  // Build a rich car context by merging all available data from storyData
+  const buildCarContext = () => {
+    if (!storyData) return {};
+
+    // Start with base car object (prefer car_data, fallback to car)
+    const baseCar = storyData.car_data || storyData.car || {};
+
+    // Merge in root-level badges
+    const rootBadges = storyData.badges || [];
+
+    // Parse specs_raw if it's a string (from database)
+    let parsedSpecsRaw = {};
+    if (baseCar.specs_raw) {
+      try {
+        parsedSpecsRaw = typeof baseCar.specs_raw === 'string' 
+          ? JSON.parse(baseCar.specs_raw) 
+          : baseCar.specs_raw;
+      } catch (e) {
+        console.warn('Failed to parse specs_raw:', e);
+      }
+    }
+
+    // Extract specs from all scene key_stats
+    const extractedSpecs = {};
+    const scenes = storyData.scenes || [];
+    scenes.forEach((scene) => {
+      const keyStats = scene.slide_content?.key_stats || [];
+      keyStats.forEach((stat) => {
+        const label = stat.label?.toLowerCase().replace(/\s+/g, "_");
+        if (label && stat.value) {
+          extractedSpecs[label] = stat.value;
+          // Also store with unit for context
+          extractedSpecs[`${label}_unit`] = stat.unit;
+        }
+      });
+    });
+
+    // Parse HP from trim string if available (e.g., "Standard Range 63 kWh (170 Hp) Electric")
+    let parsedHp = null;
+    const trimSource = baseCar.trim || parsedSpecsRaw.trim;
+    if (trimSource) {
+      const hpMatch = trimSource.match(/(\d+)\s*[Hh][Pp]/i);
+      if (hpMatch) {
+        parsedHp = parseInt(hpMatch[1], 10);
+      }
+    }
+
+    // Build merged context
+    return {
+      ...baseCar,
+      badges: rootBadges,
+      specs: {
+        ...(baseCar.specs || {}),
+        ...parsedSpecsRaw,
+        ...extractedSpecs,
+        hp: baseCar.specs?.hp || parsedSpecsRaw.engineHp || parsedHp,
+      },
+      // Ensure top-level fields are populated from specs_raw if missing
+      color: baseCar.color || parsedSpecsRaw.color_name,
+      condition: baseCar.condition || parsedSpecsRaw.condition,
+      // Keep reference to full storyData for deep lookups
+      _storyData: storyData,
+    };
+  };
+
+  const currentCar = buildCarContext();
 
   // 1. Scroll to bottom
   const scrollToBottom = () => {
@@ -81,9 +145,9 @@ export const ChatbotWidget = () => {
         addBotMessage(response, currentScene?.id);
         setTyping(false);
 
-        // Refresh suggestions based on new context
+        // Refresh suggestions based on new context (pass car data for better suggestions)
         const nextSuggestions =
-          ChatbotBackend.getContextualSuggestions(currentScene);
+          ChatbotBackend.getContextualSuggestions(currentScene, currentCar);
         setSuggestions(nextSuggestions);
       }, 1200);
     } catch (error) {

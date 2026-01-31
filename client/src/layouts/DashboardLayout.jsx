@@ -155,11 +155,14 @@ export default function DashboardLayout() {
 
   const currentSecondaryItems = SECONDARY_MENUS[activeSectionKey];
 
+  // Hide secondary sidebar on Overview page
+  const showSecondarySidebar = location.pathname !== "/dashboard";
+
   // ----------------------------------------------------------------------
   // 🎨 COMPONENT: PRIMARY RAIL
   // ----------------------------------------------------------------------
   const PrimaryRail = () => (
-    <div className="flex flex-col h-full bg-background border-r border-default-200 w-[72px] shrink-0 z-30 items-center py-4">
+    <div className="flex flex-col h-full bg-background border-r border-default-200 w-18 shrink-0 z-30 items-center py-4">
       <Link to="/dashboard" className="mb-8">
         <div className="size-10 flex items-center justify-center">
           <img
@@ -232,7 +235,7 @@ export default function DashboardLayout() {
   // 🎨 COMPONENT: SECONDARY SIDEBAR
   // ----------------------------------------------------------------------
   const SecondarySidebar = () => (
-    <div className="flex flex-col h-full w-[240px] bg-background border-r border-default-200 shrink-0 z-20">
+    <div className="flex flex-col h-full w-60 bg-background border-r border-default-200 shrink-0 z-20">
       {/* User Profile */}
       <div className="h-16 flex items-center px-4 border-b border-default-100">
         <Dropdown placement="bottom-start" className="w-full">
@@ -351,7 +354,7 @@ export default function DashboardLayout() {
       {/* DESKTOP */}
       <div className="hidden lg:flex h-full">
         <PrimaryRail />
-        <SecondarySidebar />
+        {showSecondarySidebar && <SecondarySidebar />}
       </div>
 
       {/* MOBILE */}
@@ -366,10 +369,10 @@ export default function DashboardLayout() {
         }}
       >
         <DrawerContent className="flex flex-row p-0 gap-0">
-          {(onClose) => (
+          {() => (
             <DrawerBody className="p-0 flex flex-row gap-0 overflow-hidden">
               <PrimaryRail />
-              <SecondarySidebar />
+              {showSecondarySidebar && <SecondarySidebar />}
             </DrawerBody>
           )}
         </DrawerContent>
@@ -391,7 +394,9 @@ export default function DashboardLayout() {
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-[1600px] mx-auto h-full flex flex-col">
+          <div
+            className={`mx-auto h-full flex flex-col ${showSecondarySidebar ? "max-w-400" : "max-w-450"}`}
+          >
             <Outlet />
           </div>
         </main>

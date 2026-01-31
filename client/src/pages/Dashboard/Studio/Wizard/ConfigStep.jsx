@@ -17,6 +17,7 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
   const [theme, setTheme] = useState("cinematic");
   const [sceneCount, setSceneCount] = useState(4);
   const [language, setLanguage] = useState("en");
+  const [autoScenes, setAutoScenes] = useState(false);
 
   // Extract Key Stats for the Visual Summary
   const specs = car?.specs_raw || {};
@@ -31,7 +32,11 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
   ];
 
   const handleLaunch = () => {
-    onGenerate({ theme, sceneCount, language });
+    onGenerate({
+      theme,
+      sceneCount: autoScenes ? "auto" : sceneCount,
+      language,
+    });
   };
 
   return (
@@ -166,34 +171,45 @@ export default function ConfigStep({ car, onBack, onGenerate }) {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-white/60 tracking-wide flex items-center gap-2">
-                  <Clock size={13} /> Duration
+                  <Clock size={13} /> Scenes
                 </label>
-                <span className="text-xs text-white/90 font-medium">
-                  ~{sceneCount * 12}s
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setAutoScenes(!autoScenes)}
+                    className={`text-xs font-medium px-2.5 py-1 rounded-md transition-colors ${
+                      autoScenes
+                        ? "bg-white/20 text-white"
+                        : "bg-white/5 text-white/50 hover:bg-white/10"
+                    }`}
+                  >
+                    Auto
+                  </button>
+                  {!autoScenes && (
+                    <span className="text-xs text-white/90 font-medium">
+                      {sceneCount} scenes
+                    </span>
+                  )}
+                </div>
               </div>
-              <Slider
-                size="sm"
-                step={1}
-                maxValue={6}
-                minValue={3}
-                aria-label="Scene Count"
-                value={sceneCount}
-                onChange={setSceneCount}
-                className="max-w-md"
-                color="primary"
-                showSteps={true}
-                marks={[
-                  { value: 3, label: "Short" },
-                  { value: 6, label: "Long" },
-                ]}
-                classNames={{
-                  mark: "text-white/40 text-[10px]",
-                  thumb: "bg-white w-4 h-4 shadow-lg",
-                  track: "bg-white/[0.08]",
-                  filler: "bg-white",
-                }}
-              />
+              {!autoScenes && (
+                <Slider
+                  size="sm"
+                  step={1}
+                  maxValue={14}
+                  minValue={3}
+                  aria-label="Scene Count"
+                  value={sceneCount}
+                  onChange={setSceneCount}
+                  className="max-w-md"
+                  color="primary"
+                  classNames={{
+                    base: "max-w-full",
+                    track: "bg-white/10 border-none h-1",
+                    filler: "bg-white",
+                    thumb: "bg-white w-4 h-4 shadow-lg",
+                  }}
+                />
+              )}
             </div>
 
             {/* Language */}

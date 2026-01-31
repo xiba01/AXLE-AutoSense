@@ -24,7 +24,7 @@ async function generateImage(prompt, seed = Math.floor(Math.random() * 10000)) {
     // 1. CALL POLLINATIONS (Authenticated)
     // We request 'arraybuffer' because we expect an image file, not text.
     const encodedPrompt = encodeURIComponent(prompt);
-    const genUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=nanobanana&width=1920&height=1080&seed=${seed}&nologo=true`;
+    const genUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=1920&height=1080&seed=${seed}&nologo=true`;
 
     const response = await axios.get(genUrl, {
       headers: {

@@ -6,11 +6,20 @@ import { supabase } from "../../config/supabaseClient";
 // ------------------------------------------------------------------
 export const fetchInventory = createAsyncThunk(
   "inventory/fetch",
-  async (_, { rejectWithValue }) => {
+  // 1. Add getState to arguments so we can access auth
+  async (_, { getState, rejectWithValue }) => {
+    const { user } = getState().auth;
+
+    // 2. Validate User
+    if (!user || !user.id) {
+      return rejectWithValue("User not authenticated");
+    }
+
     try {
       const { data, error } = await supabase
         .from("cars")
         .select("*")
+        .eq("dealer_id", user.id) // 3. CRITICAL FILTER: Only fetch THIS dealer's cars
         .order("created_at", { ascending: false });
 
       if (error) throw error;
