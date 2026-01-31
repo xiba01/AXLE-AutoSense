@@ -116,12 +116,18 @@ export default function DashboardLayout() {
       {
         section: "Fleet",
         items: [
-          { label: "All Vehicles", path: "/dashboard/inventory", icon: Car },
+          {
+            label: "All Vehicles",
+            path: "/dashboard/inventory",
+            icon: Car,
+            exact: true,
+          },
           {
             label: "Add Vehicle",
-            path: "/dashboard/inventory",
+            path: "#",
             icon: PlusCircle,
             action: "openModal",
+            highlight: true,
           },
         ],
       },

@@ -25,7 +25,6 @@ export default function InventoryTable({ cars, loading, onEdit }) {
     { name: "Vehicle", uid: "vehicle" },
     { name: "Trim", uid: "trim" },
     { name: "Price", uid: "price" },
-    { name: "Status", uid: "status" },
     { name: "", uid: "actions" },
   ];
 
@@ -88,14 +87,7 @@ export default function InventoryTable({ cars, loading, onEdit }) {
             </div>
           );
 
-        case "status":
-          return (
-            <span
-              className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg capitalize ${statusStyles[car.status] || statusStyles.draft}`}
-            >
-              {car.status}
-            </span>
-          );
+
 
         case "actions":
           return (

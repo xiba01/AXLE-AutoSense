@@ -48,28 +48,28 @@ const scaleIn = {
 // Sample car data for hero
 const sampleCars = [
   {
-    make: "BMW",
-    model: "M4 Competition",
+    make: "Volkswagen",
+    model: "Jetta",
     year: "2024",
-    price: "$84,900",
+    price: "$21,995",
     image:
-      "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=400&h=300&fit=crop",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Dacia_Duster_TCe_130_Extreme_%28III%29_%E2%80%93_f_13102024.jpg/330px-Dacia_Duster_TCe_130_Extreme_%28III%29_%E2%80%93_f_13102024.jpg",
   },
   {
-    make: "Mercedes-Benz",
-    model: "AMG GT",
+    make: "Hyundai",
+    model: "Elantra",
     year: "2024",
-    price: "$118,600",
+    price: "$22,750",
     image:
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=500&h=350&fit=crop",
   },
   {
-    make: "Porsche",
-    model: "911 Carrera",
+    make: "Toyota",
+    model: "Corolla",
     year: "2024",
-    price: "$106,100",
+    price: "$22,050",
     image:
-      "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=500&h=350&fit=crop",
   },
 ];
 
@@ -88,42 +88,36 @@ const features = [
     title: "VIN-Powered Ingestion",
     description:
       "Drop a VIN, get complete specs. Window stickers, market pricing, and feature lists auto-populated in seconds.",
-    highlight: "Decode any VIN instantly",
   },
   {
     icon: Sparkles,
     title: "AI Video Stories",
     description:
       "Our AI director analyzes each vehicle and generates cinematic walkthroughs with professional voice-over.",
-    highlight: "60-second stories, zero effort",
   },
   {
     icon: Camera,
     title: "3D Digital Showroom",
     description:
       "Let buyers explore every angle online. Interactive 360° views that work on any device, no app needed.",
-    highlight: "24/7 virtual test drives",
   },
   {
     icon: MessageSquare,
     title: "AI Sales Assistant",
     description:
       "Answer buyer questions instantly. Our chatbot knows your inventory inside-out and captures leads while you sleep.",
-    highlight: "Never miss a lead again",
   },
   {
     icon: BarChart3,
     title: "Lot Intelligence",
     description:
       "See which vehicles get attention, track buyer behavior, and know exactly what's moving and what's stale.",
-    highlight: "Data-driven decisions",
   },
   {
     icon: Eye,
     title: "Branded Microsites",
     description:
       "Your dealership, your brand. White-label showrooms that showcase your inventory with your identity.",
-    highlight: "Your brand, amplified",
   },
 ];
 
@@ -232,28 +226,13 @@ export default function LandingPage() {
               variants={stagger}
               className="text-center lg:text-left"
             >
-              <motion.div variants={fadeInUp}>
-                <Chip
-                  size="sm"
-                  classNames={{
-                    base: "bg-white/10 backdrop-blur-sm border border-white/10 mb-6",
-                    content: "text-white/80 text-xs font-medium px-2",
-                  }}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Car size={12} className="text-blue-400" />
-                    The #1 Platform for Modern Dealerships
-                  </span>
-                </Chip>
-              </motion.div>
-
               <motion.h1
                 variants={fadeInUp}
-                className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1] mb-6 text-white"
+                className="text-4xl pr-8 md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1] mb-6 text-white"
               >
-                Turn every vehicle into a
+                Turn every vehicle into
                 <span className="block mt-2 bg-linear-to-r from-blue-400 via-violet-400 to-blue-400 bg-clip-text text-transparent">
-                  showroom experience
+                  a showroom experience
                 </span>
               </motion.h1>
 
@@ -300,28 +279,8 @@ export default function LandingPage() {
                   <img
                     src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AutoSenseLogo.png"
                     alt="AutoSense AI"
-                    className="h-5 w-auto"
+                    className="h-5 w-auto brightness-0 invert"
                   />
-                </div>
-              </motion.div>
-
-              <motion.div
-                variants={fadeInUp}
-                className="mt-4 flex items-center gap-6 justify-center lg:justify-start"
-              >
-                <div className="flex -space-x-2">
-                  {["P", "E", "M", "A"].map((letter, i) => (
-                    <div
-                      key={i}
-                      className="size-8 rounded-full bg-zinc-700 border-2 border-zinc-900 flex items-center justify-center text-xs font-medium text-white"
-                    >
-                      {letter}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm text-zinc-400">
-                  <span className="text-white font-medium">2,400+</span>{" "}
-                  dealerships trust Axle
                 </div>
               </motion.div>
             </motion.div>
@@ -331,10 +290,10 @@ export default function LandingPage() {
               variants={scaleIn}
               initial="hidden"
               animate="visible"
-              className="relative"
+              className="relative flex justify-center lg:justify-end"
             >
               {/* Floating car cards */}
-              <div className="relative h-120">
+              <div className="relative h-120 w-full max-w-lg">
                 {sampleCars.map((car, i) => (
                   <motion.div
                     key={i}
@@ -349,17 +308,16 @@ export default function LandingPage() {
                       rotate: i === 1 ? 0 : i === 0 ? -3 : 3,
                     }}
                     transition={{ delay: 0.3 + i * 0.15, duration: 0.6 }}
-                    className={`absolute ${
+                    className={`absolute w-[380px] ${
                       i === 0
                         ? "top-0 left-0 z-10"
                         : i === 1
                           ? "top-12 left-8 z-20"
                           : "top-24 left-16 z-30"
                     }`}
-                    style={{ width: "340px" }}
                   >
                     <div className="rounded-2xl overflow-hidden bg-white shadow-2xl shadow-black/30 border border-zinc-200">
-                      <div className="relative h-44 overflow-hidden bg-zinc-100">
+                      <div className="relative h-52 overflow-hidden bg-zinc-100">
                         <img
                           src={car.image}
                           alt={`${car.year} ${car.make} ${car.model}`}
@@ -374,105 +332,32 @@ export default function LandingPage() {
                         </div>
                       </div>
                       <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start justify-between">
                           <div>
-                            <p className="text-xs text-zinc-500">{car.year}</p>
-                            <p className="font-semibold text-zinc-900">
+                            <p className="text-base text-zinc-500 mb-1">
+                              {car.year}
+                            </p>
+                            <p className="font-semibold text-zinc-900 text-xl">
                               {car.make} {car.model}
                             </p>
                           </div>
-                          <p className="text-lg font-bold text-zinc-900">
+                          <p className="text-2xl font-bold text-zinc-900">
                             {car.price}
                           </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                            <Sparkles size={10} />
-                            AI Story Ready
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-zinc-500">
-                            <Eye size={10} />
-                            1.2k views
-                          </div>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                 ))}
-
-                {/* Floating stats badge */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="absolute bottom-8 right-0 z-40 p-4 rounded-xl bg-white shadow-xl border border-zinc-100"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <TrendingUp size={18} className="text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-zinc-900">+47%</p>
-                      <p className="text-xs text-zinc-500">More test drives</p>
-                    </div>
-                  </div>
-                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="relative bg-zinc-900 border-y border-zinc-800 py-6 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <stat.icon size={18} className="text-blue-400" />
-                <span className="text-2xl md:text-3xl font-bold text-white">
-                  {stat.value}
-                </span>
-              </div>
-              <p className="text-sm text-zinc-500">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Features Section */}
       <section id="features" className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.p
-              variants={fadeInUp}
-              className="text-sm font-semibold text-blue-600 mb-3 tracking-wide"
-            >
-              BUILT FOR DEALERS
-            </motion.p>
-            <motion.h2
-              variants={fadeInUp}
-              className="text-4xl md:text-5xl font-semibold tracking-tight mb-4"
-            >
-              Your entire lot, online
-              <br />
-              <span className="text-zinc-400">like never before</span>
-            </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg text-zinc-500 max-w-2xl mx-auto"
-            >
-              From the moment a VIN hits your system to the moment a buyer
-              signs, Axle handles the digital heavy lifting.
-            </motion.p>
-          </motion.div>
-
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             initial="hidden"
@@ -486,11 +371,6 @@ export default function LandingPage() {
                 variants={fadeInUp}
                 className="group relative p-6 rounded-2xl border border-zinc-100 bg-white hover:border-zinc-200 hover:shadow-xl hover:shadow-zinc-100 transition-all"
               >
-                <div className="absolute top-4 right-4">
-                  <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                    {feature.highlight}
-                  </span>
-                </div>
                 <div className="size-12 rounded-xl bg-zinc-900 flex items-center justify-center mb-5 group-hover:bg-blue-600 transition-colors">
                   <feature.icon size={22} className="text-white" />
                 </div>
@@ -500,185 +380,6 @@ export default function LandingPage() {
                 <p className="text-sm text-zinc-500 leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Demo Section */}
-      <section id="demo" className="py-16 px-6 bg-zinc-50">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="text-center mb-12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.p
-              variants={fadeInUp}
-              className="text-sm font-semibold text-blue-600 mb-3 tracking-wide"
-            >
-              HOW IT WORKS
-            </motion.p>
-            <motion.h2
-              variants={fadeInUp}
-              className="text-4xl md:text-5xl font-semibold tracking-tight mb-4"
-            >
-              VIN to showroom in 60 seconds
-            </motion.h2>
-          </motion.div>
-
-          {/* Video/Demo placeholder */}
-          <motion.div
-            variants={scaleIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="relative aspect-video max-w-4xl mx-auto rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-2xl"
-          >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <button className="size-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-4 mx-auto hover:bg-white/20 transition-colors group">
-                  <Play
-                    size={32}
-                    className="text-white ml-1 group-hover:scale-110 transition-transform"
-                    fill="white"
-                  />
-                </button>
-                <p className="text-white font-medium">
-                  Watch the 60-second demo
-                </p>
-                <p className="text-zinc-500 text-sm mt-1">
-                  See how dealers are transforming their lots
-                </p>
-              </div>
-            </div>
-            {/* Fake video thumbnail overlay */}
-            <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 to-violet-600/20 pointer-events-none" />
-          </motion.div>
-
-          {/* Steps */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            {[
-              {
-                step: "01",
-                title: "Drop the VIN",
-                description:
-                  "Paste a VIN or connect your DMS. We auto-pull specs, window sticker, and market comps.",
-                icon: Car,
-              },
-              {
-                step: "02",
-                title: "AI does the work",
-                description:
-                  "Our AI analyzes the vehicle and generates a cinematic story with professional voice-over.",
-                icon: Sparkles,
-              },
-              {
-                step: "03",
-                title: "Leads roll in",
-                description:
-                  "Publish to your branded showroom. AI chat captures leads 24/7 while you focus on selling.",
-                icon: DollarSign,
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="relative text-center"
-              >
-                <div className="size-14 rounded-full bg-zinc-900 flex items-center justify-center mx-auto mb-4">
-                  <item.icon size={24} className="text-white" />
-                </div>
-                <div className="text-xs font-bold text-blue-600 mb-2">
-                  STEP {item.step}
-                </div>
-                <h3 className="text-xl font-semibold text-zinc-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-zinc-500 leading-relaxed">
-                  {item.description}
-                </p>
-                {i < 2 && (
-                  <ChevronRight
-                    className="hidden md:block absolute top-6 -right-4 text-zinc-300"
-                    size={24}
-                  />
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="py-16 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.p
-              variants={fadeInUp}
-              className="text-sm font-semibold text-blue-600 mb-3 tracking-wide"
-            >
-              SUCCESS STORIES
-            </motion.p>
-            <motion.h2
-              variants={fadeInUp}
-              className="text-4xl md:text-5xl font-semibold tracking-tight mb-4"
-            >
-              Dealers are selling faster
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-lg text-zinc-500">
-              Real results from real dealerships
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            {testimonials.map((testimonial, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50 hover:bg-white hover:shadow-lg transition-all"
-              >
-                {/* Metric badge */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold mb-4">
-                  <TrendingUp size={12} />
-                  {testimonial.metric}
-                </div>
-
-                <p className="text-zinc-700 leading-relaxed mb-6">
-                  "{testimonial.quote}"
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-zinc-200">
-                  <div className="size-10 rounded-full bg-zinc-900 flex items-center justify-center text-white text-sm font-medium">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-zinc-900">
-                      {testimonial.author}
-                    </p>
-                    <p className="text-sm text-zinc-500">{testimonial.role}</p>
-                  </div>
-                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -884,10 +585,13 @@ export default function LandingPage() {
             {/* Brand */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="size-10 rounded-xl bg-zinc-900 flex items-center justify-center">
-                  <Car size={20} className="text-white" />
-                </div>
-                <span className="text-xl font-bold tracking-tight">Axle</span>
+                <Link to="/" className="flex items-center gap-2">
+                  <img
+                    src="https://lvodepwdbesxputvetnk.supabase.co/storage/v1/object/public/application/AXLE-logo.png"
+                    alt="Axle"
+                    className="h-8 w-auto"
+                  />
+                </Link>
               </div>
               <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">
                 The operating system for modern dealerships. AI-powered video
@@ -961,10 +665,6 @@ export default function LandingPage() {
               © {new Date().getFullYear()} Axle Technologies, Inc. All rights
               reserved.
             </p>
-            <div className="flex items-center gap-2 text-sm text-zinc-500">
-              <Users size={14} />
-              <span>Trusted by 2,400+ dealerships nationwide</span>
-            </div>
           </div>
         </div>
       </footer>

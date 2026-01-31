@@ -57,7 +57,7 @@ export default function Login() {
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-4 pt-0.5">
           <Input
             isRequired
             type="email"
@@ -79,7 +79,7 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <div className="space-y-2">
+          <div className="space-y-2 p-0.5">
             <Input
               isRequired
               label="Password"
@@ -88,7 +88,7 @@ export default function Login() {
               labelPlacement="outside"
               size="lg"
               classNames={{
-                label: "text-sm font-medium text-zinc-700 mb-1.5",
+                label: "text-sm font-medium text-zinc-700 mb-1.5 ",
                 input: "text-sm",
                 inputWrapper:
                   "border-zinc-200 hover:border-zinc-300 focus-within:border-blue-500 data-[hover=true]:border-zinc-300 group-data-[focus=true]:border-blue-500 transition-colors",

@@ -154,8 +154,8 @@ export default function PaymentStep() {
                   Stories
                 </li>
                 <li className="text-small text-default-500 flex items-center gap-2">
-                  <div className="size-1.5 rounded-full bg-primary" /> 4K
-                  Rendering
+                  <div className="size-1.5 rounded-full bg-primary" /> 360 car
+                  interior
                 </li>
                 <li className="text-small text-default-500 flex items-center gap-2">
                   <div className="size-1.5 rounded-full bg-primary" />{" "}

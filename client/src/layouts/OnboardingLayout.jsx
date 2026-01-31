@@ -54,7 +54,7 @@ export default function OnboardingLayout() {
         </div>
 
         {/* Steps List */}
-        <div className="z-10 flex flex-col">
+        <div className="z-10 flex flex-col mb-16">
           <StepItem
             icon={<User size={20} />}
             label="Create Account"
@@ -63,7 +63,7 @@ export default function OnboardingLayout() {
           />
 
           {/* Connector Line */}
-          <div className="w-px h-8 bg-default-800 ml-6 my-2" />
+          <div className="w-px h-8 bg-default-800 ml-6" />
 
           <StepItem
             icon={<CreditCard size={20} />}
@@ -73,7 +73,7 @@ export default function OnboardingLayout() {
           />
 
           {/* Connector Line */}
-          <div className="w-px h-8 bg-default-800 ml-6 my-2" />
+          <div className="w-px h-8 bg-default-800 ml-6" />
 
           <StepItem
             icon={<Palette size={20} />}
@@ -85,7 +85,7 @@ export default function OnboardingLayout() {
 
         {/* Footer */}
         <div className="z-10 text-tiny text-default-400">
-          © 2025 Axle Inc. Secure Encrypted Session.
+          © 2026 Axle Inc. Secure Encrypted Session.
         </div>
       </aside>
 

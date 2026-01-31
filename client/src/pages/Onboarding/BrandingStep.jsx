@@ -293,13 +293,6 @@ export default function BrandingStep() {
 
                 {/* Abstract Grid Floor */}
                 <div className="absolute bottom-0 w-full h-1/2 bg-[linear-gradient(to_bottom,transparent,black),repeating-linear-gradient(90deg,rgba(255,255,255,0.03)_0px,rgba(255,255,255,0.03)_1px,transparent_1px,transparent_40px)] perspective-grid"></div>
-
-                {/* Abstract "Car" Shape */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-64 h-32 bg-gradient-to-t from-white/10 to-transparent rounded-t-3xl border-t border-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <div className="text-white/20 font-mono text-xs">
-                    AUTO SENSE 3D MODEL
-                  </div>
-                </div>
               </div>
 
               {/* 3. INTERACTIVE OVERLAYS */}
@@ -309,7 +302,7 @@ export default function BrandingStep() {
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-md">
                     <span className="size-2 rounded-full bg-green-500 animate-pulse" />
                     <span className="text-[10px] font-medium text-white uppercase tracking-wider">
-                      Live Inventory
+                      Inventory
                     </span>
                   </div>
                   <h1 className="text-3xl font-bold text-white leading-tight">
@@ -334,10 +327,6 @@ export default function BrandingStep() {
                 </div>
               </div>
             </div>
-
-            <p className="text-center text-tiny text-default-400 mt-4">
-              * This is a simulation of the buyer's view on your wesite.
-            </p>
           </div>
         </div>
       </div>

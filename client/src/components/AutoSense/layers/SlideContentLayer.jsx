@@ -179,7 +179,7 @@ export const SlideContentLayer = () => {
           className={cn(
             "max-w-xl pointer-events-auto",
             "p-10 rounded-[2rem]",
-            "bg-black/80 backdrop-blur-2xl",
+            "bg-black/40 backdrop-blur-2xl",
             "border border-white/10",
             "shadow-2xl shadow-black/50",
           )}
