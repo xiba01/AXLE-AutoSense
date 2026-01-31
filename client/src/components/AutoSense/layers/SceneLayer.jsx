@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStoryStore } from "../../../store/useStoryStore";
 import { HotspotLayer } from "../interactive/HotspotLayer";
@@ -6,6 +6,27 @@ import { HotspotLayer } from "../interactive/HotspotLayer";
 export const SceneLayer = () => {
   const { getCurrentScene, activeHotspotId } = useStoryStore();
   const scene = getCurrentScene();
+  const [showOverlay, setShowOverlay] = useState(false);
+  const prevSceneTypeRef = useRef(null);
+
+  // Track transitions between tech_view and other views
+  const isTechView = scene?.type === "tech_view";
+
+  useEffect(() => {
+    if (scene) {
+      const prevWasTechView = prevSceneTypeRef.current === "tech_view";
+      const currentIsTechView = scene.type === "tech_view";
+      
+      // Show transition overlay when switching to/from tech_view
+      if (prevSceneTypeRef.current !== null && prevWasTechView !== currentIsTechView) {
+        setShowOverlay(true);
+        const timer = setTimeout(() => setShowOverlay(false), 800);
+        return () => clearTimeout(timer);
+      }
+      
+      prevSceneTypeRef.current = scene.type;
+    }
+  }, [scene]);
 
   // Pause Ken Burns when hovering a hotspot
   const isHotspotHovered = !!activeHotspotId;
@@ -13,11 +34,20 @@ export const SceneLayer = () => {
   // 1. SAFETY CHECK
   if (!scene) return null;
 
-  // 2. 3D MODE CHECK
-  // If this is a "Tech View", we hide the image layer completely
-  // so the 3D Canvas (which sits behind this layer) becomes visible.
-  // Note: Audio and Text layers sit ON TOP, so they continue working fine.
-  if (scene.type === "tech_view") return null;
+  // 2. 3D MODE - Fade out to reveal 3D canvas
+  if (isTechView) {
+    return (
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <motion.div
+          key="tech-fade-out"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          className="absolute inset-0 bg-black"
+        />
+      </div>
+    );
+  }
 
   // 3. IMAGE RESOLUTION
   // Priority: Direct Image -> Intro/Outro Backgrounds -> Placeholder
@@ -53,16 +83,19 @@ export const SceneLayer = () => {
             isHotspotHovered
               ? { opacity: { duration: 0.3 }, scale: { duration: 0.3 } }
               : {
-                  opacity: { duration: 0.8, ease: "easeOut" },
-                  scale: { 
-                    duration: 20, 
+                  opacity: { duration: 0.8, ease: [0.4, 0, 0.2, 1] },
+                  scale: {
+                    duration: 20,
                     ease: "easeInOut",
                     repeat: Infinity,
-                    repeatType: "loop"
+                    repeatType: "loop",
                   },
                 }
           }
-          exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
+          exit={{
+            opacity: 0,
+            transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1] },
+          }}
         >
           {/* Background Image */}
           <img

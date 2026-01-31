@@ -71,8 +71,8 @@ export default function StudioCard({
               isTrash
                 ? "bg-red-500/80 text-white"
                 : car.storyStatus === "published"
-                  ? "bg-green-500/80 text-white"
-                  : "bg-yellow-500/80 text-white"
+                  ? "bg-green-500/40 text-white"
+                  : "bg-yellow-500/40 text-white"
             }`}
           >
             {isTrash ? "Deleted" : car.storyStatus || "Draft"}
